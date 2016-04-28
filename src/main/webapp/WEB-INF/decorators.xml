@@ -14,8 +14,7 @@
     </excludes>
     
     <decorator name="void" page="void.jsp">
-        <pattern>/login.jsp*</pattern>
-        <pattern>/LoginServlet*</pattern>
+        <pattern>/login*</pattern>
     </decorator>
     
     <decorator name="main" page="main.jsp">

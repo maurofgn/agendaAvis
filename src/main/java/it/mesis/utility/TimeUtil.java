@@ -66,6 +66,34 @@ public class TimeUtil
 		"Novembre",
 		"Dicembre"
 	};
+	
+
+	/**
+	 * 
+	 * @param date
+	 * @return la stessa data con le ore, minuti, secondi e millesecondi minimi
+	 *         (0)
+	 */
+	public static Date getMinHour(Date date) {
+		GregorianCalendar gcFrom = new GregorianCalendar();
+		gcFrom.setTime(date);
+		gcFrom.set(GregorianCalendar.HOUR_OF_DAY, 0);
+		return gcFrom.getTime();
+	}
+
+	/**
+	 * 
+	 * @param date
+	 * @return la stessa data con le ore, minuti, secondi e millesecondi massimi 23:59:59 999
+	 */
+	public static Date getMaxHour(Date date) {
+		GregorianCalendar gcTo = new GregorianCalendar();
+		gcTo.setTime(date);
+		gcTo.set(GregorianCalendar.HOUR_OF_DAY, 0);
+		gcTo.add(GregorianCalendar.DAY_OF_YEAR, 1);
+		gcTo.add(GregorianCalendar.MILLISECOND, -1);
+		return gcTo.getTime();
+	}	 
 
 
 	/**

@@ -1,27 +1,41 @@
 package it.mesis.utility;
 
+import it.mesis.utility.model.TraceHead;
+import it.mesis.utility.model.TraceRow;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Random;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.commons.beanutils.converters.DateConverter;
+import org.apache.commons.beanutils.converters.DateTimeConverter;
+
 public class Utility {
 	
 	public static final SimpleDateFormat dfdmy = new SimpleDateFormat("dd/MM/yyyy");
-
+	
+	public static final String dateFormatSecondsPat = "dd/MM/yyyy HH:mm:ss.SS";
+	public static final SimpleDateFormat dateFormatSeconds = new SimpleDateFormat(dateFormatSecondsPat);
 	
 	private static Random rand = new Random();
 	
@@ -891,7 +905,165 @@ public class Utility {
 	            throw new RuntimeException(e);
 	        }
 	    }
+	}
+	
+	public static Collection<String> getRequestParams(Enumeration<String> enumeration) {
+		return getRequestParams(enumeration, false);
+	}
+	
+	public static Collection<String> getRequestParams(Enumeration<String> enumeration, boolean excludeUnderscoreInitial) {
+		
+		Collection<String> fieldsToSave = new HashSet<String>();
+		while (enumeration.hasMoreElements()) {
+			String field = enumeration.nextElement();
+			if (!excludeUnderscoreInitial || !field.startsWith("_"))
+				fieldsToSave.add(field);
+		}
+		return fieldsToSave;
+	}
+	
+	/**
+	 * copies properties from one object to another
+	 * 
+	 * @param src
+	 *            the source object
+	 * @param dest
+	 *            the destination object
+	 * @param properties
+	 *            a list of property names that are to be copied. Each value has
+	 *            the format "srcProperty destProperty". For example,
+	 *            "name fullName" indicates that you want to copy the src.name
+	 *            value to dest.fullName. If both the srcProperty and
+	 *            destProperty property have the same name, you can omit the
+	 *            destProperty. For example, "name" indicates that you want to
+	 *            copy src.name to dest.name.
+	 * @return 
+	 * 
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 */
+	public static TraceHead copyProperties(Object origin, Object dest, Collection<String> properties)
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		return copyProperties(origin, dest, properties.toArray(new String[properties.size()]));
+	}
+	
+	/**
+	 * copies properties from one object to another
+	 * 
+	 * @param origin
+	 *            the source object
+	 * @param dest
+	 *            the destination object
+	 * @param properties
+	 *            a list of property names that are to be copied. Each value has
+	 *            the format "srcProperty destProperty". For example,
+	 *            "name fullName" indicates that you want to copy the src.name
+	 *            value to dest.fullName. If both the srcProperty and
+	 *            destProperty property have the same name, you can omit the
+	 *            destProperty. For example, "name" indicates that you want to
+	 *            copy src.name to dest.name.
+	 * 
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 */
+	public static TraceHead copyProperties(Object origin, Object dest, String... properties) 
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		
+		PropertyUtilsBean propUtils = new PropertyUtilsBean();
+		TraceHead trace = new TraceHead(dest.getClass().getName());
+		
+        DateTimeConverter dtConverter = new DateConverter();
+        dtConverter.setPattern(dateFormatSecondsPat);
+        ConvertUtils.register(dtConverter, Date.class);
+		
+		for (String property : properties) {
+			String[] arr = property.split(" ");
+			String srcProperty;
+			String destProperty;
+			if (arr.length == 2) {
+				srcProperty = arr[0];
+				destProperty = arr[1];
+			} else {
+				srcProperty = property;
+				destProperty = property;
+			}
+			
+			Field f;
+			try {
+				f = dest.getClass().getDeclaredField(destProperty);
+			} catch (NoSuchFieldException e) {
+//				e.printStackTrace();
+				continue;	//nome del campo di destinazione non presente nella classe di destinazione
+			}
+            Object propertyOrigin = propUtils.getProperty(origin, srcProperty);
+            Object propertyDest = propUtils.getProperty(dest, destProperty);
+            
+            if ((propertyOrigin != null || propertyDest != null) && (propertyOrigin == null || propertyDest == null || !propertyOrigin.equals(propertyDest))) {
+            	trace.addRow(new TraceRow(destProperty, f.getType().getSimpleName(), propertyDest, propertyOrigin));
+            }
 
+//            if (property1 == null && property2 == null || (property1 != null && property2 != null && property1.equals(property2))) {
+//                System.out.println("  " + destProperty + " is equal --> [" + property1 + "=" + property2+"]");
+//            } else {
+//                System.out.println("> " + destProperty + " is different (oldValue=\"" + property1 + "\", newValue=\"" + property2 + "\")");
+//                trace.addRow(new TraceRow(destProperty, f.getGenericType().getTypeName(), property1, property2));
+//            }
+            
+            String oriStringValue = null;
+            if (propertyDest instanceof Date)
+            	oriStringValue = dateFormatSeconds.format(propertyOrigin);
+            else
+            	oriStringValue = propertyOrigin.toString();
+
+			BeanUtils.setProperty(dest, destProperty, oriStringValue);
+		}
+		return trace;
+	}
+	
+	/**
+	 * 
+	 * @param pswLength lunghezza della paswword
+	 * @return psw
+	 */
+	public static String getNewPsw(int pswLength) {
+//		String alfabeto = "ABCDEFGJHKILMNOPQRSTUVWXYZ0123456789";
+        String alfabeto = "dJgWZMDGxnIROh5FkV7ozQqvSjbA1aY29rmH6U4PyKuXwL8cCEptNB03silTef";
+		if (pswLength <= 0) 
+			pswLength = 8;
+		int nrGiri = pswLength+50;
+		StringBuffer myPsw = new StringBuffer();
+		for (int ii=0; ii<nrGiri; ii++) {
+			int pos = getOneNumber(alfabeto.length());
+			myPsw.append(alfabeto.substring(pos, pos+1));
+		}
+		int caso = getOneNumber(nrGiri-pswLength);
+
+		return myPsw.substring(caso, caso+pswLength).toString();
+	}
+
+	/**Numero casuale intero compreso tra 0 e max (escluso)
+	 *@param max valore massimo accettabile
+	 *@return numero casuale intero compreso tra 0 e max (escluso)
+	 */
+	public static int getOneNumber(int max) {
+		return (new Double((Math.random()*(Math.pow(10, getDigits(max)))) % max).intValue());
+	}
+	
+	/**Dato un numero ritorna il numero di cifre che lo compone
+	 *@param number numero per il quale si vuole sapere il numero di cifre che lo compone
+	 *@return numero di cifre che compone il numero
+	 */
+	private static long getDigits(long number) {
+		/*Il logaritmo a base X di un numero K è uguale al
+		 log di K a base E diviso il logaritmo di X a base E
+		 */
+		return (Math.round( Math.log(number) / Math.log(10)  + 0.5));
 	}
 	
 }
