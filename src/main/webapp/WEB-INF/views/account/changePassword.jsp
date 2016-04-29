@@ -18,7 +18,7 @@
 
     <div class="container">
         <div class="row">
-        <div id="errormsg" class="alert alert-danger" style="display:none"></div>
+        <div id="errorMsg" class="alert alert-danger" style="display:none"></div>
             <h1><fmt:message key="message.changePassword" bundle="${lang}" /></h1>
             <div >
                 <br/>
@@ -28,8 +28,24 @@
                     <span class="col-sm-5"></span>
 <br/><br/>         
                     <label class="col-sm-2"><fmt:message key="label.user.newPassword" bundle="${lang}"/></label>
-                    <span class="col-sm-5"><input class="form-control" id="pass" name="password" type="password" value="" /></span>
-                    <span class="col-sm-5"></span>
+                    <span class="col-sm-5"><input class="form-control" id="pass" name="password" type="password" value="" 
+                    	onkeypress='$("#errornNewPassword").hide(); $("#errornFormalNewPassword").hide(); $("#errEqPassword").hide();'/>
+                    </span>
+                    <span id="errornNewPassword" class="alert alert-danger" style="display:none">
+                    	<fmt:message key="message.password.minLength" bundle="${lang}">
+                    		<fmt:param value="${pswMinLen}"/>
+						</fmt:message>
+                    </span>
+                    <span id="errornFormalNewPassword" class="alert alert-danger" style="display:none">
+                    	<fmt:message key="message.password.minLength" bundle="${lang}">
+                    		<fmt:param value="${pswMinLen}"/>
+						</fmt:message>
+                    </span>
+                    
+                    <span id="errEqPassword" class="alert alert-danger" style="display:none">
+                    	<fmt:message key="message.newPsw.equal" bundle="${lang}"/>
+                    </span>
+                    
 <br/><br/>
                     <label class="col-sm-2"><fmt:message key="label.user.confirmPass" bundle="${lang}"/></label>
                     <span class="col-sm-5"><input class="form-control" id="passConfirm" type="password" value="" onkeypress='$("#error").hide()' /></span>
@@ -47,24 +63,51 @@
 <script>
 
 var serverContext = '<c:out value="${pageContext.request.contextPath}"/>';
+var pswMinLen = <c:out value="${pswMinLen}"/>;
+var regExp = new RegExp('${pswRegExp}');
 
 function savePass() {
 	
+	var oldpass = $("#oldpass").val();
 	var pass = $("#pass").val();
     var valid = pass == $("#passConfirm").val();
     
     if(!valid) {
       $("#error").show();
       return;
-    } 
+    }
     
-    $.get(serverContext + "/changePassword2", {password: pass, oldpassword: $("#oldpass").val()}
-    	,function(data){
-             window.location.href = serverContext + "/agenda" + "?message="+data.message;
-     	})
-     .fail(function(data) {
-     	$("#errormsg").show().html(data.responseJSON.message);
-     });
+    if (pass == oldpass) {
+        $("#errEqPassword").show();
+        return;
+    } 
+
+//      if (pass.length < pswMinLen) {
+//      	 $("#errornNewPassword").show();
+//           return;
+//      }
+    
+    if (!pass.match(regExp)) {
+    	 $("#errornFormalNewPassword").show().html('<fmt:message key="message.password.regExp" bundle="${lang}"/>');
+    	return;
+    }
+    
+    alert("OK match");
+    
+	$.get(serverContext + "/changePassword2"
+    	, {password: pass, oldpassword: $("#oldpass").val()}
+    	,function(data) {
+    		if (data.result == 'ok') { 
+    			window.location.href = serverContext + "/agenda" + "?message="+data.msg;
+    		} else {
+    			$("#errorMsg").show().html(data.msg);
+    		}
+    	}
+    	
+    	)
+     	.fail(function(data) {
+     		$("#errorMsg").show().html(data);}
+     	);
 
 }
 </script>  

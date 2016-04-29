@@ -17,8 +17,10 @@ import it.mesis.utility.Utility;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -155,25 +157,130 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = "/changePassword", method = RequestMethod.GET)
-	public String changePassword() {
+	public String changePassword(ModelMap model) {
+		
+		model.addAttribute("pswMinLen", environment.getProperty("psw.min.length"));
+		model.addAttribute("pswRegExp", environment.getProperty("psw.reg.exp").replace("\\", "\\\\"));
+		
 		return PREFIX_PATH + "changePassword";
 	}
 	
-	@RequestMapping(value = "/changePassword2", method = RequestMethod.GET)
-	public String changePasswordUpd(@RequestParam("password") String password, @RequestParam("oldpassword") String oldpassword) {
+	@RequestMapping(value = "/changePassword2", method = RequestMethod.GET, produces="application/json")
+	public 	@ResponseBody Map<String, String> changePasswordUpd(
+			@RequestParam("password") String password,
+			@RequestParam("oldpassword") String oldpassword,
+			final HttpServletRequest request) {
 		
-		String userName = getPrincipal();
-		User user = userService.findBySso(userName);
-		
-		if (passwordEncoder.matches(oldpassword, user.getPassword())) {
-			
-			auditService.audit(userName, "Cambio password");
+		Map<String, String> retValue = new HashMap<String, String>();
 
-			userService.updateOldPsw(userName, passwordEncoder.encode(password));
-			return "redirect:/agenda";
+		if (password.compareTo(oldpassword) == 0) {
+			retValue.put("result", "fail");
+			retValue.put("msg", messageSource.getMessage("message.newPsw.equal", null, request.getLocale()));
+			return retValue;
 		}
-		return "";
+		
+		if (!correctnessFormalPsw(password, request.getLocale(), retValue))
+			return retValue;
+		
+		try {
+			
+			String userName = getPrincipal();
+			User user = userService.findBySso(userName);
+			
+			if (passwordEncoder.matches(oldpassword, user.getPassword())) {
+				
+				auditService.audit(userName, "Cambio password");
+
+				userService.updateOldPsw(userName, passwordEncoder.encode(password));
+				retValue.put("result", "ok");
+				retValue.put("msg", messageSource.getMessage("message.password.changed", null, request.getLocale()));
+			}
+			else {
+				retValue.put("result", "fail");
+				retValue.put("msg", messageSource.getMessage("message.oldPassword.invalid", null, request.getLocale()));
+			}
+		} catch (Exception e) {
+			retValue.put("result", "fail");
+			retValue.put("msg", e.getMessage());
+		}
+
+		return retValue;
 	}
+	
+	/**
+	 * check password correctness formal
+	 * @param password
+	 * @param locale
+	 * @param map
+	 * @return result
+	 */
+	private boolean correctnessFormalPsw(String password, Locale locale, Map<String, String> map) {
+		
+//		Integer pswMinLen = Utility.getInteger(environment.getProperty("psw.min.length"));
+//		if (pswMinLen != null && pswMinLen > 0 && password.length() < pswMinLen) {
+//			map.put("result", "fail");
+//			map.put("msg", messageSource.getMessage("message.password.minLength", new Object[] {pswMinLen}, locale));
+//			return false;
+//		}
+		
+		String regExp = environment.getProperty("psw.reg.exp");
+		if (regExp != null && !regExp.isEmpty() && !password.matches(regExp)) {
+			map.put("result", "fail");
+			map.put("msg", messageSource.getMessage("message.password.regExp", null, locale));
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+//	  @ResponseStatus(value=HttpStatus.CONFLICT, reason="sql exception")
+//	  @ExceptionHandler({SQLException.class, DataException.class})
+//	  public ModelAndView dataException(Exception exception) {
+//		  
+//		ModelAndView mav = new ModelAndView();
+//		mav.addObject("exc", exception);
+//		mav.setViewName("myerror");
+//		return mav;	  
+//	  }
+	  
+//	  @ExceptionHandler(SQLException.class)
+//	  public ModelAndView myError(Exception exception) {
+//	    System.out.println("----Caught SQLException----");
+//	    ModelAndView mav = new ModelAndView();
+//	    mav.addObject("exc", exception);
+//	    mav.setViewName("myerror");
+//	    return mav;
+//	  }	
+	
+//	// Specify the name of a specific view that will be used to display the
+//	// error:
+//	@ExceptionHandler({ SQLException.class, DataAccessException.class })
+//	public String databaseError() {
+//		// Nothing to do. Returns the logical view name of an error page, passed
+//		// to
+//		// the view-resolver(s) in usual way.
+//		// Note that the exception is _not_ available to this view (it is not
+//		// added to
+//		// the model) but see "Extending ExceptionHandlerExceptionResolver"
+//		// below.
+//		return "databaseError";
+//	}
+//
+//	// Total control - setup a model and return the view name yourself. Or
+//	// consider
+//	// subclassing ExceptionHandlerExceptionResolver (see below).
+//	@ExceptionHandler(Exception.class)
+//	public ModelAndView handleError(HttpServletRequest req, Exception exception) {
+//		// logger.error("Request: " + req.getRequestURL() + " raised " +
+//		// exception);
+//
+//		ModelAndView mav = new ModelAndView();
+//		mav.addObject("exception", exception);
+//		mav.addObject("url", req.getRequestURL());
+//		mav.setViewName("error");
+//		return mav;
+//	} 
 
 	@RequestMapping(value = "/user/resetPassword", method = RequestMethod.GET)
 	public String resetPassword() {
@@ -181,7 +288,6 @@ public class AccountController {
 	}
 	
 	
-
     @RequestMapping(value = "/user/resetPassword2", method = RequestMethod.GET)
     @ResponseBody
     public GenericResponse resetPassword(final HttpServletRequest request, @RequestParam("email") String userEmail, @RequestParam("codFisc") String codFisc) {

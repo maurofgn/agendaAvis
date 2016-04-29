@@ -11,6 +11,7 @@ import it.mesis.util.model.ReportPreno;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -276,6 +277,10 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	@Override
 	public void disdetta(AgendaKey id) {
 		Agenda agenda = findById(id);
+		
+		Donatore donatore = agenda.getDonatore();
+		prenoDonatore(false, donatore, null, null);
+		
 		agenda.setDonatore(null);
 //		agenda.setNotapren(null);
 		persist(agenda);
@@ -314,9 +319,29 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		List<?> list = query.list();
 		
 		Agenda agenda = list != null && !list.isEmpty() ? (Agenda)list.get(0) : null;
+		
+		prenoDonatore(true, donatore, datePreno, tipoDonaPuntoPrel);
+		
 		agenda.setDonatore(donatore);
 		persist(agenda);
 		return agenda;
+	}
+	
+	
+	private void prenoDonatore(boolean preno, Donatore donatore, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
+		
+		if (preno) {
+			donatore.setConvocato((short) 1);
+			donatore.setCodconvocazion(0);
+			donatore.setTipodonazione(tipoDonaPuntoPrel.getTipoDonaId());
+			donatore.setDataconvpren(new Timestamp(datePreno.getTime()));
+		} else {
+			donatore.setConvocato((short) 0);
+			donatore.setCodconvocazion(0);
+			donatore.setTipodonazione(0);
+			donatore.setDataconvpren(null);
+		}
+		getSession().persist(donatore);
 	}
 	
 	@Override
