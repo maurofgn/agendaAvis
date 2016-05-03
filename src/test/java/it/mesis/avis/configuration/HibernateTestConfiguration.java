@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "it.mesis.avis.dao" })
+@ComponentScan({ "it.mesis.avis.configuration" })
 public class HibernateTestConfiguration {
 
 	@Autowired
