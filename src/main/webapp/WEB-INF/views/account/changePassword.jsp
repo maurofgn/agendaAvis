@@ -92,8 +92,6 @@ function savePass() {
     	return;
     }
     
-    alert("OK match");
-    
 	$.get(serverContext + "/changePassword2"
     	, {password: pass, oldpassword: $("#oldpass").val()}
     	,function(data) {

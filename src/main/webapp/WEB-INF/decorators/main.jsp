@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <%-- <%@include file="/WEB-INF/template/gesCache.jsp"%> --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
@@ -31,11 +32,12 @@
 		</a>
 	  
 	    <div class="navbar-header">
-	<%--       <a class="navbar-brand" href="#" ><fmt:message key="label.pages.home.title" bundle="${lang}" /></a> --%>
 	    </div>
 	      <ul class="nav navbar-nav navbar-right">
-	        <li><a href="logout"><fmt:message key="logout" bundle="${lang}" /></a> </li>
-	        <li><a href="changePassword"><fmt:message key="message.changePassword" bundle="${lang}" /></a> </li>
+		      <sec:authorize access="isAuthenticated()"> 
+		        <li><a href="logout"><fmt:message key="logout" bundle="${lang}" /> <sec:authentication property="principal.username" /></a> </li>
+		        <li><a href="changePassword"><fmt:message key="message.changePassword" bundle="${lang}" /></a> </li>
+		      </sec:authorize>
 	      </ul>
 	    </div>
 	</nav>	

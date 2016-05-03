@@ -35,11 +35,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 		
 		return new org.springframework.security.core.userdetails.User(
 				user.getSsoId(), 
-				user.getPasswordDefault(),								//psw dell'utente o 
+				user.getPasswordDefault(),								//psw dell'utente assoavis o password di app_user
 				user.isEnabled(),										//enabled
 				user.isNotExpired(),									//AccountNotExpired
-//				user.pswNotExpired(userService.getValidityDayPsw()),	//Credential not expired
-				true,													//Credential not expired, viene controllato dopo l'autenticazione 
+				user.pswNotExpired(userService.getValidityDayPsw()),	//Credential not expired
 				user.isNotLocked(),										//Account not locked
 				getGrantedAuthorities(user)								//authorities (rols)
 				);

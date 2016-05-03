@@ -19,12 +19,29 @@
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 </head>
+
 <body>
 	<div id="layout" style="  height: 100%;">
+	
+	<nav class="navbar navbar-default">
+	
+	  <div class="container-fluid">
+
+		<a href="<c:url value='/'/>">
+		    <img src="<c:url value='/static/images/logo.png'/>" alt="logo"/>
+		</a>
+	  
+	    <div class="navbar-header">
+	    </div>
+	      <ul class="nav navbar-nav navbar-right">
+	      </ul>
+	    </div>
+	</nav>
+	
 		<div id="main" >
 			<decorator:body />
 		</div>
-	
+
 		<footer>
 			<div class="footer">
 			  <p>&copy; <script>document.write(new Date().getFullYear())</script>  - <fmt:message key="footer.info.mail" bundle="${lang}" />: <a href="mailto:mesis@mesis.com">MeSIS</a>.</p>

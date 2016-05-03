@@ -236,9 +236,8 @@ public class User {
 		return !State.DELETED.equals(getState());
 	}
 
-	
 	public boolean pswNotExpired(int days) {
-		return daysPasswordExpiry() <= days;
+		return getDonatore() != null ? daysPasswordExpiry() <= days : true;
 	}
 
 	/**
@@ -298,7 +297,7 @@ public class User {
 	
 	public void addDefaultRole() {
 		
-		if (userProfiles != null && !hasRole(UserProfileType.DONA) && getDonatore() != null) {
+		if (!hasRole(UserProfileType.DONA) && getDonatore() != null) {
 			userProfiles.add(new UserProfile(UserProfileType.DONA));
 		}
 		
@@ -307,7 +306,7 @@ public class User {
 				userProfiles.add(new UserProfile(UserProfileType.OPERA));
 			else
 				userProfiles.add(new UserProfile(UserProfileType.AVIS));
-		} else
+		} else if (getDonatore() == null)
 			userProfiles.add(new UserProfile(UserProfileType.OPERA));
 		
 	}

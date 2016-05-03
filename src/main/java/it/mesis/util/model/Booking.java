@@ -57,7 +57,7 @@ public class Booking {
 	 * @return nr posti disponibili o l'ora se prenotata
 	 */
 	public String getFreeOrMyHour() {
-		return agendaKey != null ? HH_MM.format(agendaKey.getDataorapren()) : String.valueOf(agendaList.size() - busy);
+		return agendaKey != null ? HH_MM.format(agendaKey.getDataorapren()) : (agendaList.size() > 0 ? String.valueOf(agendaList.size() - busy ) : "");
 	}
 	
 	public boolean isUpdateable() {

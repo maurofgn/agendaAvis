@@ -11,10 +11,12 @@ import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;
+import it.mesis.utility.TimeUtil;
 import it.mesis.utility.Utility;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -82,8 +84,8 @@ public class AppController {
 			HttpServletResponse response
 			) throws JRException, IOException {
 		
-		GregorianCalendar gc = new GregorianCalendar();
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+
+		Calendar gc = TimeUtil.getToday();	//oggi con ore, min, sec e millis = 0
 		
 		if (dateFrom == null) {
 			if (dateTo == null)

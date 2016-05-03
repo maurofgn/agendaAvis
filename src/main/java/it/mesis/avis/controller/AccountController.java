@@ -15,6 +15,7 @@ import it.mesis.utility.TimeUtil;
 import it.mesis.utility.Utility;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -117,8 +118,8 @@ public class AccountController {
     		@RequestParam(value="state",    required=false) String state
     		) {
 
-		GregorianCalendar gc = new GregorianCalendar();
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+		
+		Calendar gc = TimeUtil.getToday();	//oggi con ore, min, sec e millis = 0
 		
 		if (dateFrom == null) {
 			if (dateTo == null)
@@ -322,11 +323,12 @@ public class AccountController {
 	    SimpleMailMessage email = constructResetTokenEmail("", request.getLocale(), password, user);
 	    mailSender.send(email);
 	    
-	    GregorianCalendar gc = new GregorianCalendar();
-	    gc.add(GregorianCalendar.YEAR, -1);
+	    Calendar gc = TimeUtil.getToday();
+	    gc.add(GregorianCalendar.DAY_OF_YEAR, -userService.getValidityDayPswDue()-1);
 	    
 	    user.setLastChangePsw(new Timestamp(gc.getTimeInMillis()));
 		user.setPassword(passwordEncoder.encode(password));
+		
 	    userService.updateUser(user);
 	    
     	auditService.audit(codFisc, "Nuova password per " +  user.getDonatore().getRefDonatore() + " iviata a: " + user.getDonatore().getEmail());
@@ -523,7 +525,7 @@ public class AccountController {
 		return "redirect:/login?logout";
 	}
 
-	private String getPrincipal(){
+	private String getPrincipal() {
 		String userName = null;
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

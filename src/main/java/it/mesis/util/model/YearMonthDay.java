@@ -45,7 +45,7 @@ public class YearMonthDay extends YearMonth {
 	public int getDay() {
 		return day;
 	}
-
+	
 	public YearMonth getYearMonth() {
 		return yearMonth;
 	}

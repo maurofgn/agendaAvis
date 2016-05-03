@@ -134,8 +134,10 @@ public class DonaStatus {
 	 * @return true se il donatore ha tutte le caratteristiche per prenotare
 	 */
 	public boolean prenoWeb(int dayBefore) {
-		return idoneo && MembershipState.DONATORE.equals(membershipState)
-				&& isMinPrenoOk(dayBefore) && isLtTwoYears()
+		return idoneo 
+				&& MembershipState.DONATORE.equals(membershipState)
+				&& isMinPrenoOk(dayBefore) 
+				&& isLtTwoYears()
 				&& !getListTipoDona().isEmpty()
 				;
 	}
@@ -184,7 +186,7 @@ public class DonaStatus {
 			sb.append(" Non è un Donatore");
 		
 		if (!isMinPrenoOk(dayBefore))
-			sb.append(" Troppo presto per prenotare (non prima di 30 gg)");
+			sb.append(" Troppo presto per prenotare (non prima di 30 gg) prossima donazione tra " + dayDue() + " giorni");
 		
 		if (!isLtTwoYears())
 			sb.append(" Non dona da più di due anni");

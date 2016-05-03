@@ -75,10 +75,27 @@ public class TimeUtil
 	 *         (0)
 	 */
 	public static Date getMinHour(Date date) {
-		GregorianCalendar gcFrom = new GregorianCalendar();
-		gcFrom.setTime(date);
-		gcFrom.set(GregorianCalendar.HOUR_OF_DAY, 0);
-		return gcFrom.getTime();
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(date);
+		setMinHour(gc);
+//		gc.set(Calendar.HOUR_OF_DAY, 0);
+//		gc.set(Calendar.MINUTE, 0);
+//		gc.set(Calendar.SECOND, 0);
+//		gc.set(Calendar.MILLISECOND, 0);
+		return gc.getTime();
+	}
+	
+	public static void setMinHour(Calendar gc) {
+		gc.set(Calendar.HOUR_OF_DAY, 0);
+		gc.set(Calendar.MINUTE, 0);
+		gc.set(Calendar.SECOND, 0);
+		gc.set(Calendar.MILLISECOND, 0);
+	}
+	
+	public static void setMaxHour(Calendar gc) {
+		setMinHour(gc);
+		gc.add(GregorianCalendar.DAY_OF_YEAR, 1);
+		gc.add(GregorianCalendar.MILLISECOND, -1);
 	}
 
 	/**
@@ -89,9 +106,7 @@ public class TimeUtil
 	public static Date getMaxHour(Date date) {
 		GregorianCalendar gcTo = new GregorianCalendar();
 		gcTo.setTime(date);
-		gcTo.set(GregorianCalendar.HOUR_OF_DAY, 0);
-		gcTo.add(GregorianCalendar.DAY_OF_YEAR, 1);
-		gcTo.add(GregorianCalendar.MILLISECOND, -1);
+		setMaxHour(gcTo);
 		return gcTo.getTime();
 	}	 
 

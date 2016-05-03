@@ -20,6 +20,11 @@
 
 <style> 
 
+/* #week tr { line-height: 14px; } */
+/* #week td { line-height: 14px; } */
+
+/* #week td > div { width: 100%; height: 100%; overflow:hidden; } */
+/* #week td { height: 14px; } */
 
 #hours td {
 	padding-top: 0;
@@ -32,8 +37,9 @@
 .flex-container {
     display: -webkit-flex; 
     display: flex; 
+    justify-content: center;
 /*     display: inline-block; */
-    margin-right:10px;
+/*     margin-right:10px; */
 /*     width: 40%; */ */
 /*     height: 250px; */ */
 /*    background-color: lightgrey; */
@@ -42,7 +48,7 @@
 .flex-itemForm {
 	display: block; 
      background-color: #b1caf6;	 /* cornflowerblue; */ 
-    width: 20%;
+/*     width: 20%; */
 /*     height: 100px; */
     margin: 5px;
 }
@@ -103,31 +109,21 @@
 .Occupato {
             -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
             -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-/*             background-color: #E00000; */
             background-color: #E02A2A;            
             border: 1px solid #B00000;
-/*             display: inline-block; */
-/*             cursor: pointer; */
             color: #ffffff;
-/*             font-family: Arial; */
-/*             font-size: 16px; */
-/*             font-weight: bold; */
             padding: 8px 10px;
             text-decoration: none;
         }
-/* .Occupato:hover { */
-/*             background-color: #D00000; */
-/*         } */
 .Occupato:active {
             position: relative;
         }
+        
 .Indisponibile {
             -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
             -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
             
-             /* background-color: #A8A8A8; */ 		/* grigio */ 
              background-color: #c2c2c2;				/* grigio chiaro */
-/*             background-color: #FFFFFF; */		/* bianco */ 
             
             border: 1px solid #808080;
 /*             display: inline-block; */
@@ -136,7 +132,7 @@
 /*             font-family: Arial; */
 /*             font-size: 16px; */
 /*             font-weight: bold; */
-/*             padding: 8px 10px; */
+             padding: 8px 10px; 
             text-decoration: none;
         }
 /* .Indisponibile:hover { */
@@ -151,7 +147,7 @@
             -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
             background-color: #13e3f2;
             border: 1px solid #808080;
-/*             display: inline-block; */
+/*              display: inline-block; */ 
             cursor: pointer;
             color: #ffffff;
 /*             font-family: Arial; */
@@ -165,10 +161,11 @@
         }
 .Mia_Preno:active {
             position: relative;
-        }        
-        input.clicked {
-            background-color: red;
         }
+        
+/* input.clicked { */
+/*             background-color: red; */
+/*         } */
 
 </style>
 
@@ -246,7 +243,7 @@ function populateTable(data) {
 					
 						<div class="col-md-12">
 						
-							<select name='tipoDonazPuntiPrel'>
+							<select name='tipoDonazPuntiPrel' style="width: 180px;">
 							    <c:forEach items="${listTipoDonazPuntiPrel}" var="tipoDonazPuntiPrel">
 							    	<option value="${tipoDonazPuntiPrel.valToString}"
 							    		<c:if test="${tipoDonazPuntiPrel == tipoDonazPuntiPrelSelected}"> selected</c:if>
@@ -266,7 +263,7 @@ function populateTable(data) {
 <%-- 						<label class="col-md-7 control-lable" for="yearMonth"><fmt:message key="agenda.para.yearMonth" bundle="${lang}" /></label> --%>
 						<div class="col-md-12">
 						
-							<select name='yearMonth'>
+							<select name='yearMonth'  style="width: 180px;">
 							    <c:forEach items="${listYearMonth}" var="yearMonth">
 							        <c:if test="${yearMonth != yearMonthSelected}">
 							            <option value="${yearMonth.valToString}">${yearMonth}</option>
@@ -284,10 +281,14 @@ function populateTable(data) {
 					</div>
 				</div>
 				
-				<div class="row col-md-12">
-					<div class="form-actions floatRight col-md-3"><span></span> </div>
-					<div class="form-actions col-md-6">
-						<input type="submit" value="<fmt:message key="submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm"> 
+				<div class="row">
+					<div class="form-group col-md-12">
+<!-- 						<div class="row col-md-12"> -->
+							<div class="form-actions col-md-3"></div>
+							<div class="form-actions col-md-6">
+								<input type="submit" value="<fmt:message key="submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm"> 
+							</div>
+<!-- 						</div> -->
 					</div>
 				</div>
 
@@ -315,7 +316,7 @@ function populateTable(data) {
     
 	<div class="flex-itemTable" <c:if test="${empty monthlyBookings}">class="hide" </c:if>>
 	    
-		<table class="table table-bordered">
+		<table id="week" class="table table-bordered">
 		    <thead>
 		      <tr>
 		        <th class="text-center">Lun</th>
@@ -331,7 +332,7 @@ function populateTable(data) {
 		    
 		        <c:forEach begin="0" end="5" varStatus="weekNr">
 		        
-			        <tr>
+			        <tr >
 				    	<c:forEach begin="0" end="6" varStatus="dayNr">
 				        	<c:set var="booking" value="${monthlyBookings.getBooking(weekNr.index, dayNr.index)}"/>
 				        	
@@ -344,18 +345,18 @@ function populateTable(data) {
 							    </c:otherwise>
 							</c:choose>					        	
 				        	
-				        	<td class='${state}' style="width: 70px; ">
+				        	<td class='${state}' style="width: 50px; height: 50px; line-height: 14px;">
 				        	
 								<c:if test="${not empty booking && booking.valid}">
 								
 										<table class='borderless' style="width: 100%" >
 											<tr>
-												<td ${booking.functionJS}>
+												<td ${booking.functionJS} style="font-size: 10px;">
 													${booking.day.day}
 												</td>
 											</tr>
 											<tr>
-												<td style="text-align: center; width: 100%; font-weight: bold; " ${booking.functionJS}>
+												<td style="text-align: center; width: 100%; font-size: 14px;  " ${booking.functionJS}>
 													${booking.freeOrMyHour}
 												</td>
 											</tr>
@@ -374,25 +375,45 @@ function populateTable(data) {
 		<div class="row">
 			<div class="form-group col-md-12">
 			
-				<div class="col-md-4" style="text-align:right;" >
-					<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthPrev}">disabled</c:if>>
-						<span class="glyphicon glyphicon-step-backward"></span>
-					</a>
-				</div>
+				<c:if test="${empty monthlyBookings.agendaKey}">
+			
+					<div class="col-md-5" style="text-align:right;" >
+						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthPrev}">disabled</c:if>>
+							<span class="glyphicon glyphicon-step-backward"></span>
+						</a>
+					</div>
+					
+					<div class="col-md-2" style="text-align:center;">
+					</div>			
+					
+					<div class="col-md-5" style="text-align:left;">
+						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthNext}">disabled</c:if>>
+							<span class="glyphicon glyphicon-step-forward"></span>
+						</a>
+					</div>
+				</c:if>	
 				
-				<div class="col-md-4" style="text-align:center;">
-					<c:if test="${not empty monthlyBookings.agendaKey}">
-							<a href="<c:url value='agenda' />" class="btn btn-primary">
-								<fmt:message key="agenda.para.current" bundle="${lang}"/>
-							</a>
-					</c:if>	
-				</div>			
+				<c:if test="${not empty monthlyBookings.agendaKey}">
+			
+					<div class="col-md-3" style="text-align:right;" >
+						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthPrev}">disabled</c:if>>
+							<span class="glyphicon glyphicon-step-backward"></span>
+						</a>
+					</div>
+					
+					<div class="col-md-6" style="text-align:center;">
+						<a href="<c:url value='agenda' />" class="btn btn-primary">
+							<fmt:message key="agenda.para.current" bundle="${lang}"/>
+						</a>
+					</div>			
+					
+					<div class="col-md-3" style="text-align:left;">
+						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthNext}">disabled</c:if>>
+							<span class="glyphicon glyphicon-step-forward"></span>
+						</a>
+					</div>
+				</c:if>					
 				
-				<div class="col-md-4" style="text-align:left;">
-					<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthNext}">disabled</c:if>>
-						<span class="glyphicon glyphicon-step-forward"></span>
-					</a>
-				</div>
 				
 			</div>
 		</div>

@@ -1,6 +1,7 @@
 package it.mesis.avis.security;
 
 import it.mesis.avis.model.User;
+import it.mesis.avis.service.AuditService;
 import it.mesis.avis.service.UserService;
 
 import java.io.IOException;
@@ -25,6 +26,9 @@ public class UrlAuthenticationSuccessHandler implements AuthenticationSuccessHan
 	@Autowired
 	UserService userService;
 	
+	@Autowired
+	AuditService auditService;
+
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Override
@@ -59,8 +63,9 @@ public class UrlAuthenticationSuccessHandler implements AuthenticationSuccessHan
     	
         String targetUrl = null;
         
-    	if (user.getCodinternodonat() != null && !user.pswNotExpired(userService.getValidityDayPsw())) {
-    		return "/changePassword";	//Credential expired, solo per donatori
+    	if (user.getCodinternodonat() != null && !user.pswNotExpired(userService.getValidityDayPswDue())) {
+    		auditService.audit(authentication.getName(), "Scadenza password tra " + (userService.getValidityDayPsw() - user.daysPasswordExpiry() + 1) + " gg");
+    		return "/changePassword";	//solo per donatori. Le credenziali stanno per scadere
     	}
     	
         final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();

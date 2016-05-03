@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Formatter;
@@ -68,6 +69,16 @@ public class Utility {
 		return retValue;
 	}
 	
+	/**
+	 * Returns a pseudo-random number between min and max, inclusive.
+	 * The difference between min and max can be at most
+	 * <code>Integer.MAX_VALUE - 1</code>.
+	 *
+	 * @param min Minimum value
+	 * @param max Maximum value.  Must be greater than min.
+	 * @return Integer between min and max, inclusive.
+	 * @see java.util.Random#nextInt(int)
+	 */
 	public static int randInt(int min, int max) {
 	    return rand.nextInt((max - min) + 1) + min;
 	}
@@ -80,8 +91,21 @@ public class Utility {
 	 * @return elenco di numeri casuali senza ripetizioni ed ordinati
 	 */
 	public static Integer[] randInt(int caseNr, int min, int max) {
+		return randInt(caseNr, min, max, true);
+	}
 		
-		int cn = Math.min(Math.abs(caseNr), Math.abs(max-min));
+		
+	/**
+	 * numeri casuali non duplicati
+	 * @param caseNr nr di casi
+	 * @param min minimo 
+	 * @param max massimo
+	 * @param ordered x true, l'output è ordinato in forma crescente
+	 * @return elenco di numeri casuali senza ripetizioni ed ordinati
+	 */
+	public static Integer[] randInt2(int caseNr, int min, int max, boolean ordered) {
+		
+		int cn = Math.min(Math.abs(caseNr), Math.abs(max-min+1));
 		if (cn <= 0)
 			return null;
 		
@@ -105,8 +129,37 @@ public class Utility {
 		Integer[] retValue = new Integer[cn];
 		
 		used.toArray(retValue);
-		Arrays.sort(retValue);
+		if (ordered)
+			Arrays.sort(retValue);
+		return retValue;
+	}
+	
+	/**
+	 * numeri casuali non duplicati
+	 * @param caseNr nr di casi
+	 * @param min minimo (compreso)
+	 * @param max massimo (compreso)
+	 * @param ordered x true, l'output è ordinato in forma crescente
+	 * @return elenco di numeri casuali senza ripetizioni
+	 */
+	public static Integer[] randInt(int caseNr, int min, int max, boolean ordered) {
 		
+		int cn = Math.min(Math.abs(caseNr), Math.abs(max-min+1));
+		if (cn <= 0)
+			return null;
+		
+	    Integer[] arr = new Integer[max-min+1];
+	    for (int i = min-1; i < max; i++) {
+	        arr[i] = i+1;
+	    }
+	    
+	    if (!ordered || arr.length != cn )
+	    	Collections.shuffle(Arrays.asList(arr));
+	    
+		Integer[] retValue = Arrays.copyOf(arr, cn);
+		
+		if (ordered)
+			Arrays.sort(retValue);
 		return retValue;
 	}
 	
@@ -1028,25 +1081,65 @@ public class Utility {
 	
 	/**
 	 * 
-	 * @param pswLength lunghezza della paswword
-	 * @return psw
+	 * @param pswLength lunghezza della password (min 4)
+	 * @return password
 	 */
 	public static String getNewPsw(int pswLength) {
-//		String alfabeto = "ABCDEFGJHKILMNOPQRSTUVWXYZ0123456789";
-        String alfabeto = "dJgWZMDGxnIROh5FkV7ozQqvSjbA1aY29rmH6U4PyKuXwL8cCEptNB03silTef";
-		if (pswLength <= 0) 
+		if (pswLength <= 3) 
 			pswLength = 8;
-		int nrGiri = pswLength+50;
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(getNewPsw(randInt(1, pswLength/4), shake("@#$%^&+=")));
+		sb.append(getNewPsw(randInt(1, pswLength/4), shake("0123456789")));
+		sb.append(getNewPsw(randInt(1, pswLength/4), shake("abcdefgjhkilmnopqrstuvwxyz")));
+		sb.append(getNewPsw(pswLength-sb.length(),   shake("ABCDEFGJHKILMNOPQRSTUVWXYZ")));
+		
+		return shake(sb.toString());
+	}
+	
+	private static String getNewPsw(int pswLength, String base) {
+		int nrGiri = pswLength * 3;
 		StringBuffer myPsw = new StringBuffer();
 		for (int ii=0; ii<nrGiri; ii++) {
-			int pos = getOneNumber(alfabeto.length());
-			myPsw.append(alfabeto.substring(pos, pos+1));
+			int pos = getOneNumber(base.length());
+			myPsw.append(base.substring(pos, pos+1));
 		}
 		int caso = getOneNumber(nrGiri-pswLength);
 
 		return myPsw.substring(caso, caso+pswLength).toString();
 	}
-
+	
+	private static String shake(String base) {
+		
+		if (base.length() <= 1)
+			return base;
+		
+		Integer[] posi = shakePosi(base.length());
+		
+		StringBuffer sb = new StringBuffer();
+		char[] baseChar = base.toCharArray();
+		
+		for (int i = 0; i < posi.length; i++) {
+			sb.append(String.valueOf(baseChar[posi[i]]));
+		}
+		
+		return sb.toString();
+	}
+	
+	/**
+	 * generating non-repeating random numbers
+	 * @param len
+	 * @return
+	 */
+	public static Integer[] shakePosi(int len) {
+	    Integer[] arr = new Integer[len];
+	    for (int i = 0; i < arr.length; i++) {
+	        arr[i] = i;
+	    }
+	    Collections.shuffle(Arrays.asList(arr));
+	    return arr;
+	}
+	
 	/**Numero casuale intero compreso tra 0 e max (escluso)
 	 *@param max valore massimo accettabile
 	 *@return numero casuale intero compreso tra 0 e max (escluso)
@@ -1064,6 +1157,39 @@ public class Utility {
 		 log di K a base E diviso il logaritmo di X a base E
 		 */
 		return (Math.round( Math.log(number) / Math.log(10)  + 0.5));
+	}
+	
+	
+	public static boolean parsePsw(String psw) {
+		StringBuffer sb = new StringBuffer();
+		
+//		^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$
+		
+		sb.append("^"); 					// start-of-string
+		sb.append("(?=.*[0-9])"); 			// a digit must occur at least once
+		sb.append("(?=.*[a-z])"); 			// a lower case letter must occur at least once
+		sb.append("(?=.*[A-Z])"); 			// an upper case letter must occur at least once
+		sb.append("(?=.*[@#$%^&+=])"); 		// a special character must occur at least once
+		sb.append("(?=\\S+$)"); 			// no whitespace allowed in the entire string
+		sb.append(".{8,20}"); 				// anything, at least eight places though
+		sb.append("$");  					// end-of-string
+		
+		String regExp = sb.toString();
+		
+		return psw.matches(regExp);
+		
+//		System.out.println("test regular expression: " + regExp);
+//		
+//		String[] tests = new String[] {"12345678", "1234", "aA1@ 22dsdsdsds", "aA122dsdsdsds", "aA1@#22dsdsdsds", "aA1@#22dsdsd5sd5sd54s5ds4d4ssdsds"};
+//		
+//		for (String oneTest : tests) {
+//			if (oneTest.matches(regExp))
+//				System.out.println("ok " + oneTest);
+//			else
+//				System.err.println("ko " + oneTest);
+//		}
+		
+
 	}
 	
 }

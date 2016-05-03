@@ -32,7 +32,7 @@ public class Audit {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Size(min=2, max=30)
+	@Size(min=1, max=30)
 	@NotEmpty
 	@Column(name = "SSO_ID", nullable = false)
 	private String ssoId;

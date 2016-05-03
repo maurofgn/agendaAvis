@@ -21,6 +21,7 @@ public class UserServiceImpl implements UserService{
 	private static final String MAX_ACCOUNT_ATTEMPT = "5";
 	private static final String TIMEOUT_DAY_PSW = "180";
 	public static final String GG_RANGE_PRENO = "30";
+	private static final String VALIDITY_DAY_PSW_BEFORE = "5";	//giorni prima della scadenza x cu iva richiesto il cambio password
 	
 	@Autowired
 	private UserDao dao;
@@ -64,12 +65,11 @@ public class UserServiceImpl implements UserService{
 	 */
 	public void updateUser(User user) {
 		User entity = dao.findById(user.getId());
-		if(entity!=null){
+		if(entity != null){
 			entity.setSsoId(user.getSsoId());
 			entity.setPassword(user.getPassword());
-//			entity.setFirstName(user.getFirstName());
-//			entity.setLastName(user.getLastName());
-//			entity.setEmail(user.getEmail());
+			entity.setLastChangePsw(user.getLastChangePsw());
+			entity.setState(user.getState());
 			entity.setUserProfiles(user.getUserProfiles());
 		}
 	}
@@ -98,6 +98,17 @@ public class UserServiceImpl implements UserService{
 		return Utility.parseInteger(environment.getProperty("validity.day.psw", VALIDITY_DAY_PSW));
 	}
 	
+	@Override
+	public int getValidityDayPswBefore() {
+		return Utility.parseInteger(environment.getProperty("validity.day.psw.before", VALIDITY_DAY_PSW_BEFORE));
+	}
+	
+	@Override
+	public int getValidityDayPswDue() {
+		return getValidityDayPsw() - getValidityDayPswBefore();
+	}
+	
+
 	@Override
 	public int getMaxAccountAttempt() {
 		return Utility.parseInteger(environment.getProperty("max.account.attempt", MAX_ACCOUNT_ATTEMPT));
@@ -132,7 +143,8 @@ public class UserServiceImpl implements UserService{
 	public void updateOldPsw(String sso, String newPsw) {
 		dao.updateOldPsw(sso, newPsw);
 	}
-	
+
+
 	
 //	public Collection<? extends GrantedAuthority> getRoles() {
 ////		Principal p = request.getUserPrincipal();

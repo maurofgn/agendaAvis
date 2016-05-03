@@ -31,6 +31,10 @@ public interface UserService {
 	UserAttempts getUserAttempts(String sso);
 
 	int getValidityDayPsw();
+	
+	int getValidityDayPswBefore();
+	
+	int getValidityDayPswDue();
 
 	int getMaxAccountAttempt();
 	
@@ -45,6 +49,5 @@ public interface UserService {
 	User findUserByCodFisc(String codFisc);
 	
 	void updateOldPsw(String sso, String newPsw);
-	
-	
+
 }

@@ -10,6 +10,7 @@ import it.mesis.util.model.MonthlyBookings;
 import it.mesis.util.model.ReportPreno;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;
+import it.mesis.utility.TimeUtil;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey) {
 		
 		GregorianCalendar gc = new GregorianCalendar(yearMonth.getYear(), yearMonth.getMonth(), 1);
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+		TimeUtil.setMinHour(gc);
 		
 		Date fromDate = gc.getTime();				//inizio mese
 		
@@ -228,7 +229,8 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(datePreno);
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+
+		TimeUtil.setMinHour(gc);
 		
 		Date fromDate = gc.getTime();				//inizio giornata
 		

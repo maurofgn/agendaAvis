@@ -1,5 +1,7 @@
 package it.mesis.avis.security;
 
+import it.mesis.avis.exception.StatusException;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -10,6 +12,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -30,25 +34,34 @@ public class UrlAuthenticationFailureHandler implements AuthenticationFailureHan
 			HttpServletResponse response, AuthenticationException exception)
 			throws IOException, ServletException {
 		
+		String url = "/login";
+
 		String msg = exception.getMessage();
-		if (exception instanceof BadCredentialsException)
+		if(exception.getClass().isAssignableFrom(BadCredentialsException.class)) {
 			msg = messageSource.getMessage("message.badCredentials", null, request.getLocale());
-			
-		getRedirectStrategy().sendRedirect(request, response, "/login?error=" + msg);
-        clearAuthenticationAttributes(request);
+		} else if(exception.getClass().isAssignableFrom(LockedException.class)) {
+			msg = messageSource.getMessage("message.locked", null, request.getLocale());
+		} else if(exception.getClass().isAssignableFrom(CredentialsExpiredException.class)) {
+			msg = messageSource.getMessage("message.credentialsExpired", null, request.getLocale());
+//			url = "/changePassword";
+		}
+		
+		setMsgErr(request, msg);
+		
+		getRedirectStrategy().sendRedirect(request, response, url);
 	}
 	
-    protected void clearAuthenticationAttributes(final HttpServletRequest request) {
-        final HttpSession session = request.getSession(false);
+    private void setMsgErr(final HttpServletRequest request, String msg) {
+    	final HttpSession session = request.getSession(false);
         if (session == null) {
             return;
         }
-        session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        session.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, new StatusException(msg));
     }
 
-    public void setRedirectStrategy(final RedirectStrategy redirectStrategy) {
-        this.redirectStrategy = redirectStrategy;
-    }
+//    public void setRedirectStrategy(final RedirectStrategy redirectStrategy) {
+//        this.redirectStrategy = redirectStrategy;
+//    }
 
     protected RedirectStrategy getRedirectStrategy() {
         return redirectStrategy;

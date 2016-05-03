@@ -1,6 +1,8 @@
 package it.mesis.avis.model;
 
 //import java.sql.Timestamp;
+import it.mesis.utility.TimeUtil;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -81,9 +83,7 @@ public class Agenda {
 		
 		int hh = gc.get(GregorianCalendar.HOUR_OF_DAY);
 		if (hh >= 7) {
-			gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
-			gc.add(GregorianCalendar.DAY_OF_YEAR, 1);
-			gc.add(GregorianCalendar.SECOND, -1);	//fine giornata odierna (24hh - 1 secondo)
+			TimeUtil.setMaxHour(gc);	//fine giornata odierna (24hh - 1 MILLISECOND)
 		}
 
 		return preno.compareTo(gc.getTime()) > 0;

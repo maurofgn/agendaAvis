@@ -59,14 +59,26 @@ public class LimitLoginAuthenticationProvider extends DaoAuthenticationProvider 
 			//verifica, attraverso userService le caratteristiche dell'utente, se è un donatore ed il suo stato
 			UserSession userSession = userService.getUserSession(authentication.getName());
 			
+//	    	User user = userService.findBySso(authentication.getName());
+//	        String targetUrl = null;
+//	    	if (user.getCodinternodonat() != null && !user.pswNotExpired(userService.getValidityDayPsw())) {
+//	    		return "/changePassword";	//Credential expired, solo per donatori
+//	    	}
+	    	
+//			//chk scadenza psw
+//	    	if (userSession.getDonaStatus().getCodinternodonat() != null && !user.pswNotExpired(userService.getValidityDayPsw())) {
+//	    		return "/changePassword";	//Credential expired, solo per donatori
+//	    	}
+
+			
 			if (userSession.getDonaStatus() != null && !userSession.getDonaStatus().prenoWeb(userService.getMaxDayBeforePreno())) {
 				
 //				//il donatore non può donare. I motivi sono specificati in causa
 				String causa = userSession.getDonaStatus().getMsg(userService.getMaxDayBeforePreno());
 				auditService.audit(authentication.getName(), "Autenticato con successo, ma donatore non idoneo: " + causa);
 				String msg = messageSource.getMessage("msg.no.preno", new String[]{causa}, Locale.getDefault())
-						+ "<br>" 
-						+ "(" + userSession.getDonaStatus().getMsg(userService.getMaxDayBeforePreno()) + ")";
+//						+ "\n\n(" + userSession.getDonaStatus().getMsg(userService.getMaxDayBeforePreno()) + ")"
+						;
 				throw new StatusException(msg);
 			}
 			
@@ -78,7 +90,7 @@ public class LimitLoginAuthenticationProvider extends DaoAuthenticationProvider 
 			auditService.audit(authentication.getName(), "Credenziali scadute");
 			userService.credentialsExpired(authentication.getName());
 			throw e;
-		} catch (BadCredentialsException e) {	
+		} catch (BadCredentialsException e) {
 			auditService.audit(authentication.getName(), "Credenziali non corrette");
 			//invalid login, update to user_attempts
 			userService.updateFailAttempts(authentication.getName());

@@ -10,6 +10,7 @@ import it.mesis.util.model.DonaStatusType;
 import it.mesis.util.model.State;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;
+import it.mesis.utility.TimeUtil;
 
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -239,7 +240,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		Query query = getSession().createSQLQuery(sb.toString());
 
 		GregorianCalendar gc = new GregorianCalendar();
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+		TimeUtil.setMinHour(gc);
 		query.setParameter("dateFrom", gc.getTime());
 		
 		@SuppressWarnings("unchecked")
@@ -283,9 +284,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		
 		Query query = getSession().createSQLQuery(sb.toString());
 
-		GregorianCalendar gc = new GregorianCalendar();
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
-		query.setParameter("dateFrom", gc.getTime());
+		query.setParameter("dateFrom", TimeUtil.getToday().getTime());
 		
 		@SuppressWarnings("unchecked")
 		List<Object[]> rows = query.list();
@@ -352,11 +351,8 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 
 		Query query = getSession().createQuery("from Agenda where CODINTERNODONAT = :donatoreId and dataoraPren >= :today ");
 
-		GregorianCalendar gc = new GregorianCalendar();
-		gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
-		
 		query.setParameter("donatoreId", donatoreId);
-		query.setParameter("today", gc.getTime());	//data odierna con oraio 0
+		query.setParameter("today", TimeUtil.getToday().getTime());	//data odierna con oraio 0
 
 		List<?> list = query.list();
 
