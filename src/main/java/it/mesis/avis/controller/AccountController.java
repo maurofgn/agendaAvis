@@ -442,11 +442,14 @@ public class AccountController {
         
         final SimpleMailMessage email = new SimpleMailMessage();
         
-        //TODO: cambiare dopo il test 
+//TODO: cambiare dopo il test
+        
         boolean test = true;
+        if (test && user.getDonatore() != null && user.getDonatore().getEmail().toLowerCase().endsWith("@mesis.it"))
+        	test = false;
+        
         if (test) {
         	email.setTo("mauro.fugante@gmail.com");
-//        	email.setTo("giovanni.tenace@gmail.com");
             email.setSubject(subject);
             email.setText(message + " \r\nPassword: " + password + "\n\n" + "Questo messaggio è stato mandato da AgendaWeb con il flag test = true.\nModificare AccountController.SimpleMailMessage ");
             email.setFrom(environment.getProperty("support.email"));
@@ -456,6 +459,8 @@ public class AccountController {
             email.setText(message + " \r\nPassword:" + password);
             email.setFrom(environment.getProperty("support.email"));
         }
+        
+//TODO: cambiare dopo il test        
 
         return email;
     }
