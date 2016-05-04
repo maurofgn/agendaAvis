@@ -10,7 +10,6 @@
 
 <c:url value="/freeHours" var="freeHours"/>
 
-
 <html>
 <head>
 	<title><fmt:message key="agenda.para.title" bundle="${lang}"/></title>
@@ -20,153 +19,102 @@
 
 <style> 
 
-/* #week tr { line-height: 14px; } */
-/* #week td { line-height: 14px; } */
-
-/* #week td > div { width: 100%; height: 100%; overflow:hidden; } */
-/* #week td { height: 14px; } */
-
 #hours td {
 	padding-top: 0;
 	padding-bottom: 0;
-};
+	};
 
 .text-center {
 	text-align:center;
-}
+	}
 .flex-container {
     display: -webkit-flex; 
     display: flex; 
     justify-content: center;
-/*     display: inline-block; */
-/*     margin-right:10px; */
-/*     width: 40%; */ */
-/*     height: 250px; */ */
-/*    background-color: lightgrey; */
-}
+	}
 
 .flex-itemForm {
 	display: block; 
-     background-color: #b1caf6;	 /* cornflowerblue; */ 
-/*     width: 20%; */
-/*     height: 100px; */
+    background-color: #b1caf6;	 /* cornflowerblue; */ 
     margin: 5px;
-}
-
+    }
+    
 .flex-itemTable {
- display: block; 
-     background-color: #b1caf6;	 /* cornflowerblue; */ 
-/*     width: 80%; */
-/*     width: auto; */
-/*     height: 100px; */
+	display: block; 
+    background-color: #b1caf6;	 /* cornflowerblue; */ 
     margin: 5px;
-}
+    }
 
 .Libero {
-            -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            background-color: #44c767;
-            border: 1px solid #18ab29;
-/*             display: inline-block; */
-            cursor: pointer;
-            color: #ffffff;
-/*             font-family: Arial; */
-/*             font-size: 16px; */
-/*             font-weight: bold; */
-            padding: 8px 10px;
-            text-decoration: none;
-        }
+	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	background-color: #44c767;
+	border: 1px solid #18ab29;
+	cursor: pointer;
+	color: #ffffff;
+	padding: 8px 10px;
+	text-decoration: none;
+    }
 .Libero:hover {
-            background-color: #5cbf2a;
-        }
+	background-color: #5cbf2a;
+    }
 .Libero:active {
-            position: relative;
-        }
+    position: relative;
+    }
         
 .LiberoNonPrenotabile {
-            -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-/*             background-color: #44a767; */
-            background-color: #468858;
-            border: 1px solid #18ab29;
-/*             display: inline-block; */
-/*             cursor: pointer; */
-            color: #ffffff;
-/*             font-family: Arial; */
-/*             font-size: 16px; */
-/*             font-weight: bold; */
-            padding: 8px 10px;
-            text-decoration: none;
-        }
-/* .LiberoNonPrenotabile:hover { */
-/*             background-color: #5cbf2a; */
-/*         } */
-/* .LiberoNonPrenotabile:active { */
-/*             position: relative; */
-/*         } */
+	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	background-color: #468858;
+	border: 1px solid #18ab29;
+	color: #ffffff;
+	padding: 8px 10px;
+	text-decoration: none;
+    }
 
-        
 .Occupato {
-            -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            background-color: #E02A2A;            
-            border: 1px solid #B00000;
-            color: #ffffff;
-            padding: 8px 10px;
-            text-decoration: none;
-        }
+	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	background-color: #E02A2A;            
+	border: 1px solid #B00000;
+	color: #ffffff;
+	padding: 8px 10px;
+	text-decoration: none;
+    }
 .Occupato:active {
-            position: relative;
-        }
+	position: relative;
+    }
         
 .Indisponibile {
-            -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            
-             background-color: #c2c2c2;				/* grigio chiaro */
-            
-            border: 1px solid #808080;
-/*             display: inline-block; */
-/*             cursor: pointer; */
-             color: #ffffff;
-/*             font-family: Arial; */
-/*             font-size: 16px; */
-/*             font-weight: bold; */
-             padding: 8px 10px; 
-            text-decoration: none;
-        }
-/* .Indisponibile:hover { */
-/*             background-color: #989898; */
-/*         } */
+	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	background-color: #c2c2c2;				/* grigio chiaro */
+	border: 1px solid #808080;
+	color: #ffffff;
+	padding: 8px 10px; 
+	text-decoration: none;
+    }
 .Indisponibile:active {
-            position: relative;
-        }
+	position: relative;
+    }
         
 .Mia_Preno {
-            -moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            -webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-            background-color: #13e3f2;
-            border: 1px solid #808080;
-/*              display: inline-block; */ 
-            cursor: pointer;
-            color: #ffffff;
-/*             font-family: Arial; */
-/*             font-size: 16px; */
-/*             font-weight: bold; */
-            padding: 8px 10px;
-            text-decoration: none;
-        }
+	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+	background-color: #13e3f2;
+	border: 1px solid #808080;
+	cursor: pointer;
+	color: #ffffff;
+	padding: 8px 10px;
+	text-decoration: none;
+    }
 .Mia_Preno:hover {
-            background-color: #1374f2;
-        }
+	background-color: #1374f2;
+	}
 .Mia_Preno:active {
-            position: relative;
-        }
+    position: relative;
+    }
         
-/* input.clicked { */
-/*             background-color: red; */
-/*         } */
-
 </style>
 
 
@@ -229,7 +177,6 @@ function populateTable(data) {
 <div class="container">
 <!--  <div class="content"> -->
  
- 
  <div class="flex-container">
  
 	<div class="flex-itemForm">
@@ -254,13 +201,13 @@ function populateTable(data) {
 							<div class="has-error">
 								<form:errors path="tipoDona" class="help-inline"/>
 							</div>
+							
 						</div>
 					</div>
 				</div>
 			        
 				<div class="row">
 					<div class="form-group col-md-12">
-<%-- 						<label class="col-md-7 control-lable" for="yearMonth"><fmt:message key="agenda.para.yearMonth" bundle="${lang}" /></label> --%>
 						<div class="col-md-12">
 						
 							<select name='yearMonth'  style="width: 180px;">
@@ -282,35 +229,32 @@ function populateTable(data) {
 				</div>
 				
 				<div class="row">
-					<div class="form-group col-md-12">
-<!-- 						<div class="row col-md-12"> -->
-							<div class="form-actions col-md-3"></div>
-							<div class="form-actions col-md-6">
-								<input type="submit" value="<fmt:message key="submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm"> 
-							</div>
-<!-- 						</div> -->
+					<div style="margin: auto; width: 40%;">
+						<input type="submit" value="<fmt:message key="submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm"> 
 					</div>
 				</div>
 
 			</form:form>
+			
 		</div>
 		
-		<sec:authorize access="hasRole('OPERA') or hasRole('ADMIN') or hasRole('AVIS')">
-			<div style="margin-left: 25%; position: relative; top: 140px;">
-				<a href="#" class="btn btn-primary btn-sm" onclick="{document.getElementById('reportAgenda').style.display = 'block';}">
-	    			<span class="glyphicon glyphicon-print"> <fmt:message key="agenda.report" bundle="${lang}"/></span>
-	  			</a>
-			</div>
-		</sec:authorize>
-		
-		<sec:authorize access="hasRole('ADMIN') or hasRole('AVIS')">
-			<div style="margin-left: 25%; position: relative; top: 150px;">
-				<a href="<%=request.getContextPath()%>/audit" class="btn btn-primary btn-sm" >
-	    			<span class="glyphicon glyphicon-pencil"> <fmt:message key="agenda.audit" bundle="${lang}"/></span>
-	  			</a>
-			</div>
-		</sec:authorize>
-		
+		<div style="margin: auto; width: 80%; position: relative; top: 110px;">
+			<sec:authorize access="hasRole('OPERA') or hasRole('ADMIN') or hasRole('AVIS')">
+				<div style="position: relative; margin: 5px;">
+					<a href="#" class="btn btn-primary btn-sm" style="width: 100%;" onclick="{document.getElementById('reportAgenda').style.display = 'block';}">
+		    			<span class="glyphicon glyphicon-print"></span>  <fmt:message key="agenda.report" bundle="${lang}"/>
+		  			</a>
+				</div>
+			</sec:authorize>
+			
+			<sec:authorize access="hasRole('ADMIN') or hasRole('AVIS')">
+				<div style="position: relative; margin: 5px;">
+					<a href="<%=request.getContextPath()%>/audit" style="width: 100%;" class="btn btn-primary btn-sm" >
+		    			<span class="glyphicon glyphicon-pencil"></span>  <fmt:message key="agenda.audit" bundle="${lang}"/>
+		  			</a>
+				</div>
+			</sec:authorize>
+		</div>
 		
     </div>
     
@@ -508,13 +452,7 @@ function populateTable(data) {
 	
 <%-- div x parametri di stampa --%>	
 
-	<%-- div x elenco ore per prenotazione --%>	
-	
-	
-<%-- <form method="GET" action='reportAgenda' id="reportAgenda" target="_blank" class="form-horizontal"  --%>
-<%-- style="position: relative; margin: auto; top: 100px; width: 250px; padding-top:20px; padding-bottom:20px; background-color: rgba(255, 255, 255, 1);"> --%>
-	
-	
+<%-- div x elenco ore per prenotazione --%>	
 	<div id="scrollPanelHours" style="overflow-y:auto; width: 300px; height: 200px; border: solid 1px; display: none; position: relative; margin: auto; ">
 	   <table class="table table-hover" style="width:100%">
 	    <thead>
@@ -527,10 +465,8 @@ function populateTable(data) {
 	    </tbody>
 	  </table>
 	</div>	
-  <%-- div x elenco ore per prenotazione --%>	
+<%-- div x elenco ore per prenotazione --%>	
   
-	 
  </div>	
-	
 </body>
 </html>
