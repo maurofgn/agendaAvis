@@ -60,4 +60,29 @@ public class TipoDonaPuntoPrel {
 				&& macchina.getPuntoprelievo().getCodicepuntoprel() == getPuntoprelId();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + puntoprelId;
+		result = prime * result + tipoDonaId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TipoDonaPuntoPrel other = (TipoDonaPuntoPrel) obj;
+		if (puntoprelId != other.puntoprelId)
+			return false;
+		if (tipoDonaId != other.tipoDonaId)
+			return false;
+		return true;
+	}
+	
 }
