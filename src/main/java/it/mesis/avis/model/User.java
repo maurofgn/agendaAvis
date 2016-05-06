@@ -91,6 +91,10 @@ public class User {
 	public Donatore getDonatore() {
 		return this.donatore;
 	}
+	
+	public void setDonatore(Donatore donatore) {
+		this.donatore = donatore;
+	}
 
 	@NotAudited
 	@ManyToMany(fetch = FetchType.EAGER)
