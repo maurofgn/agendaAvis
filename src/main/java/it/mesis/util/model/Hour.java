@@ -89,7 +89,7 @@ public class Hour {
 
 	@Override
 	public String toString() {
-		return "Hour [date=" + date + ", available=" + available + ", total=" + total + ", yeaMonthDay=" + yeaMonthDay + "]";
+		return "Hour [date=" + date + ", available=" + available + ", total=" + total + ", yeaMonthDay=" + yeaMonthDay + " hh=" +getHourMinutes() + "]";
 	}
 
 }
