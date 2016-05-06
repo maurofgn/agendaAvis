@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -23,11 +22,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "it.mesis.avis.configuration" })
+@ComponentScan({ "it.mesis.avis.dao" })
 public class HibernateTestConfiguration {
 
-	@Autowired
-	private Environment environment;
+//	@Autowired
+//	private Environment environment;
 
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
@@ -41,16 +40,16 @@ public class HibernateTestConfiguration {
 	@Bean(name = "dataSource")
 	public DataSource dataSource() {
 		
-//		String driverClassName = "org.h2.Driver";
-//		String url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE";
-//		String username = "sa";
-//		String password = "";
+		String driverClassName = "org.h2.Driver";
+		String url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE";
+		String username = "sa";
+		String password = "";
 		
-		//mySql
-		String driverClassName = "com.mysql.jdbc.Driver";
-		String url = "jdbc:mysql://localhost:3306/assoAvis_test";
-		String username = "root";
-		String password = "toor";
+//		//mySql
+//		String driverClassName = "com.mysql.jdbc.Driver";
+//		String url = "jdbc:mysql://localhost:3306/assoAvis_test";
+//		String username = "root";
+//		String password = "toor";
 		
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(driverClassName);

@@ -13,7 +13,6 @@ import org.testng.annotations.BeforeMethod;
 
 import it.mesis.avis.configuration.HibernateTestConfiguration;
 
-
 @ContextConfiguration(classes = { HibernateTestConfiguration.class })
 public abstract class EntityDaoImplTest extends AbstractTransactionalTestNGSpringContextTests {
 
