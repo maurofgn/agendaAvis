@@ -19,6 +19,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 @Repository("agendaDao")
@@ -253,7 +255,14 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		sb.append("group by a.dataorapren "); 
 		sb.append("order by a.dataorapren ");
 		
-        Query query = getSession().createSQLQuery(sb.toString());
+        SQLQuery query = getSession().createSQLQuery(sb.toString());
+        //per rendere compatibile il cambio del db è necessario forzare il tipo restituito.
+        //Senza questa forzatura, il tipo è quello restituito dal DB ed ogni DB ha un suo tipo restituito
+        //per esempio sqlserver resituisce Integer, mentre h2 restutisce un BigInteger e mySQL restituisce BigDecimal
+        query.addScalar("dataorapren", StandardBasicTypes.TIMESTAMP);
+        query.addScalar("free", StandardBasicTypes.INTEGER);
+        query.addScalar("tot", StandardBasicTypes.INTEGER);
+        
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
        	query.setParameter("pp", puntoprelId);
