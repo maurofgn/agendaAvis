@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -23,10 +25,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({ "it.mesis.avis.dao" })
+@PropertySource({"classpath:applicationTest.properties", "classpath:emailTest.properties" })
 public class HibernateTestConfiguration {
 
-//	@Autowired
-//	private Environment environment;
+	@Autowired
+	private Environment environment;
 
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
@@ -40,29 +43,24 @@ public class HibernateTestConfiguration {
 	@Bean(name = "dataSource")
 	public DataSource dataSource() {
 		
-		String driverClassName = "org.h2.Driver";
-		String url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE";
-		String username = "sa";
-		String password = "";
-		
-//		//mySql
-//		String driverClassName = "com.mysql.jdbc.Driver";
-//		String url = "jdbc:mysql://localhost:3306/assoAvis_test";
-//		String username = "root";
-//		String password = "toor";
-		
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(driverClassName);
-		dataSource.setUrl(url);
-		dataSource.setUsername(username);
-		dataSource.setPassword(password);
+		
+        dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driverClassName"));
+        dataSource.setUrl(environment.getRequiredProperty("jdbc.url"));
+        dataSource.setUsername(environment.getRequiredProperty("jdbc.username"));
+        dataSource.setPassword(environment.getRequiredProperty("jdbc.password"));
+		
 		return dataSource;
 	}
 
 	private Properties hibernateProperties() {
 		Properties properties = new Properties();
-		properties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-		properties.put("hibernate.hbm2ddl.auto", "create-drop");
+		
+		properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
+		properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
+        properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
+
 		return properties;
 	}
 

@@ -9,10 +9,12 @@ import it.mesis.avis.model.Tipodonaz;
 import it.mesis.util.model.Booking;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
+import it.mesis.util.model.ReportPreno;
 import it.mesis.util.model.YearMonth;
 import it.mesis.utility.TimeUtil;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	AgendaDao agendaDao;
 	
 	private String codDonatoreInterno;
+	private String[] donatori;
 
 	private Integer macchinaId;
 
@@ -51,19 +54,27 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	/* In case you need multiple datasets (mapping different tables) and you do prefer to keep them in separate XML's */
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-	
+		
 		IDataSet[] datasets = new IDataSet[] {
 			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
 			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
 			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("macchine.xml")),
 			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("donatore.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("agenda.xml"))
+			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("agenda.xml")),
+			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("user_profile.xml")),
+			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("utenti.xml")),
+			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("app_user.xml"))
 		  };
 		
 		CompositeDataSet retValue = new CompositeDataSet(datasets);
 		
 		ITable donatore = retValue.getTable("donatore");
 		codDonatoreInterno = (String)donatore.getValue(0, "CODINTERNODONAT");
+		
+		donatori = new String[donatore.getRowCount()];
+		for (int row = 0; row < donatore.getRowCount(); row++) {
+			donatori[row] = (String)donatore.getValue(row, "CODINTERNODONAT");
+		}
 		
 		ITable agenda = retValue.getTable("agenda");
 		macchinaId = Integer.valueOf((String)agenda.getValue(0, "IDMACCHINA"));
@@ -137,6 +148,47 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		
 		agenda = agendaDao.findById(agenda.getId());
 		Assert.assertNull(agenda.getDonatore());
+	}
+	
+	@Test
+	public void report() {
+		
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(dataOraPreno);
+		TimeUtil.setMinHour(gc);
+		Date fromDate = gc.getTime();
+		
+		TimeUtil.setMaxHour(gc);
+		Date toDate = gc.getTime();
+		
+		List<ReportPreno> reportData = agendaDao.reportPreno(fromDate, toDate, 0, 0);	//prenotazioni preesistenti
+		int totPreno = booking()									//crea delle prenotazioni 
+				+ (reportData != null ? reportData.size() : 0)		//prenotazioi preesistenti
+				;
+		
+		reportData = agendaDao.reportPreno(fromDate, toDate, 0, 0);
+		
+		Assert.assertEquals(totPreno, reportData.size());
+	}
+	
+	/**
+	 * crea tante prenotazioni per quante ore libere ci sono. Una per ogni ora libera, anche se la disponibilità è superiore ad uno
+	 *  
+	 * @return nr di prenotazioni eseguite
+	 */
+	private int booking() {
+		List<Hour> hours = agendaDao.freeHours(dataOraPreno, macchina.getTipoDonaPuntoPrel().getPuntoprelId() , macchina.getTipoDonaPuntoPrel().getTipoDonaId());
+		
+		int totPreno = Math.min(donatori.length, hours.size());
+
+		for (int i = 0; i < totPreno; i++) {
+			Hour hour = hours.get(i);
+			Agenda a = agendaDao.prenota(donatori[i], hour.getDate(), macchina.getTipoDonaPuntoPrel());
+			Assert.assertNotNull(a);
+//			System.out.println(a.getId() + " " + a.getDonatore().getCodinternodonat() + " " + a.getDonatore().getCognomeenome());
+		}
+		
+		return totPreno;
 	}
 	
 	@Test
