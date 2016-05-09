@@ -25,7 +25,7 @@ public class Utenti {
 	@Column(name = "UTENTE", nullable = false)
 	private String utente;
 
-	@Size(min=0, max=60)
+	@Size(max=60)
 	@Column(name = "PASSWORD")
 	private String password;
 
