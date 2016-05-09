@@ -1,13 +1,14 @@
 package it.mesis.util.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class ReportPreno implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Date dataOraPreno;
+	private Timestamp dataOraPreno;
 	private String notaPren;
 	private String macchina;
 	private String nomePuntoPrel;
@@ -21,7 +22,7 @@ public class ReportPreno implements Serializable {
 	private String cellulare;
 	private String telefono;
 	
-	public ReportPreno(Date dataOraPreno, String notaPren, String macchina,
+	public ReportPreno(Timestamp dataOraPreno, String notaPren, String macchina,
 			String nomePuntoPrel, String tipoDona, String sigla, String nome,
 			String luogoNascita, String provNascita, Date dataNascita,
 			String codiceFiscale, String cellulare, String telefono) {
@@ -41,10 +42,10 @@ public class ReportPreno implements Serializable {
 		this.telefono = telefono;
 	}
 	
-	public Date getDataOraPreno() {
+	public Timestamp getDataOraPreno() {
 		return dataOraPreno;
 	}
-	public void setDataOraPreno(Date dataOraPreno) {
+	public void setDataOraPreno(Timestamp dataOraPreno) {
 		this.dataOraPreno = dataOraPreno;
 	}
 	public String getNotaPren() {
