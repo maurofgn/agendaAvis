@@ -305,7 +305,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 */
 	@Override
 	public Agenda prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
-
+		
 		Donatore donatore = getDonatore(codinternodonat);
 		if (donatore == null)
 			return null;
@@ -329,15 +329,18 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         
 		List<?> list = query.list();
 		
-		Agenda agenda = list != null && !list.isEmpty() ? (Agenda)list.get(0) : null;
+		if (list == null || list.isEmpty())
+			return null;
+		
+		Agenda agenda = (Agenda)list.get(0);
 		
 		prenoDonatore(true, donatore, datePreno, tipoDonaPuntoPrel);
 		
 		agenda.setDonatore(donatore);
 		persist(agenda);
+		
 		return agenda;
 	}
-	
 	
 	private void prenoDonatore(boolean preno, Donatore donatore, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
 		
@@ -363,98 +366,67 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	
 	@Override
 	public List<ReportPreno> reportPreno(Date fromDate, Date toDate, Integer puntoPrelievo, Integer tipoDona) {
-
+		
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT "); 
-		sb.append("a.dataorapren, "); 				// 0
-		sb.append("a.NOTAPREN , "); 				// 1
-		sb.append("m.NOME macchina , "); 			// 2
-		sb.append("pp.NOMEPUNTOPREL , "); 			// 3
-		sb.append("td.DESCRIZIONE tipo_dona , "); 	// 4
-		sb.append("td.SIGLA , "); 					// 5
-		sb.append("d.COGNOMEENOME , "); 			// 6
-		sb.append("d.LUOGONASCITA , "); 			// 7
-		sb.append("d.PROVDINASCITA , "); 			// 8
-		sb.append("d.DATADINASCITA , "); 			// 9
-		sb.append("d.CODICEFISCALE , "); 			//10
-		sb.append("d.cellulare , "); 				//11
-		sb.append("d.domtel "); 					//12
-		sb.append("from Agenda as a "); 
-		sb.append("inner join macchine as m on  m.ID = a.idMacchina "); 
-		sb.append("inner join puntoprelievo pp on pp.CODICEPUNTOPREL = m.pp "); 
-		sb.append("inner join tipodonaz td on td.CODICE = m.TIPODONAZ_ID "); 
-		sb.append("inner join donatore d on d.CODINTERNODONAT = a.CODINTERNODONAT "); 
 		
-		sb.append("WHERE a.dataorapren >= :fromDate "); 
-		sb.append("and a.dataorapren <= :toDate "); 
-		sb.append("and a.CODINTERNODONAT is not null "); 
-		if (puntoPrelievo != 0)
-			sb.append("and (m.PP = :pp) "); 
-		if (tipoDona != 0)
-			sb.append("and (m.TIPODONAZ_ID = :td) "); 
-		sb.append("order by "); 
-		sb.append("td.DESCRIZIONE, pp.NOMEPUNTOPREL, a.dataorapren, a.idMacchina ");
-		
-        Query query = getSession().createSQLQuery(sb.toString());
+        sb.append("select a.id.dataorapren, a.notapren, m.nome, p.nomepuntoprel, t.descrizione,");
+        sb.append("a.id.macchina.tipoDonazione.sigla, d.cognomeenome, d.luogonascita, d.provdinascita, ");
+        sb.append("d.datadinascita, d.codicefiscale, d.cellulare, d.domtel ");
         
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-//        query.setParameter("fromDate", sdf.format(fromDate));
-//        query.setParameter("toDate", sdf.format(toDate));
+        sb.append("from Agenda as a ");
+        sb.append("  inner join a.donatore as d ");
+        sb.append("  inner join a.id.macchina as m ");
+        sb.append("  inner join m.puntoprelievo as p ");
+        sb.append("  inner join m.tipoDonazione as t ");
+        sb.append("where ");
+        sb.append("a.donatore is not null ");
+        sb.append("and a.id.dataorapren >= :fromDate ");
+        sb.append("and a.id.dataorapren <= :toDate ");
+        
+        if (puntoPrelievo != 0)
+        	sb.append("and p.codicepuntoprel = :pp ");
+        if (tipoDona != 0)
+        	sb.append("and t.codice = :td ");
+        
+		sb.append("order by "); 
+		sb.append("t.descrizione, p.nomepuntoprel, a.id.dataorapren, a.id.macchina.id ");
 
+        Query query = getSession().createQuery(sb.toString());
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
         
-//        GregorianCalendar gc = new GregorianCalendar();
-//        gc.setTime(toDate);
-//        gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
-//        gc.add(GregorianCalendar.DAY_OF_YEAR, 1);
-//        gc.add(GregorianCalendar.SECOND, -1);
-//        
-//        query.setParameter("toDate", new java.sql.Timestamp(gc.getTimeInMillis()));
-        
         if (puntoPrelievo != 0)
         	query.setParameter("pp", puntoPrelievo);
+        
         if (tipoDona != 0)
         	query.setParameter("td", tipoDona);
         
 		@SuppressWarnings("unchecked")
-		List<Object[]> rows = query.list();
+		List<Object[]> list = query.list();
+		
+		if (list == null || list.isEmpty())
+			return null;
 		
 		ArrayList<ReportPreno> retValue = new ArrayList<ReportPreno>();
 		
-		for (Object[] row: rows) {
-//			sb.append("a.DATAORAPREN, "); 				// 0
-//			sb.append("a.NOTAPREN , "); 				// 1
-//			sb.append("m.NOME macchina , "); 			// 2
-//			sb.append("pp.NOMEPUNTOPREL , "); 			// 3
-//			sb.append("td.DESCRIZIONE tipo_dona , "); 	// 4
-//			sb.append("td.SIGLA , "); 					// 5
-//			sb.append("d.COGNOMEENOME , "); 			// 6
-//			sb.append("d.LUOGONASCITA , "); 			// 7
-//			sb.append("d.PROVDINASCITA , "); 			// 8
-//			sb.append("d.DATADINASCITA , "); 			// 9
-//			sb.append("d.CODICEFISCALE , "); 			//10
-//			sb.append("d.cellulare , "); 				//11
-//			sb.append("d.domtel "); 					//12
-
+		for (Object[] row: list) {
+			
 			retValue.add(new ReportPreno(
-					(Date)row[0],
-					(String)row[1], 
-					(String)row[2],
-					(String)row[3],
-					(String)row[4],
-					(String)row[5],
-					(String)row[6],
-					(String)row[7],
-					(String)row[8],
-					(Date)row[9],
-					(String)row[10],
-					(String)row[11],
-					(String)row[12])
-			);
+				(Timestamp)row[0],
+				(String)row[1], 
+				(String)row[2],
+				(String)row[3],
+				(String)row[4],
+				(String)row[5],
+				(String)row[6],
+				(String)row[7],
+				(String)row[8],
+				(Date)row[9],
+				(String)row[10],
+				(String)row[11],
+				(String)row[12])
+					);
 		}
-		
 		return retValue;
 	}
-
 }
