@@ -9,6 +9,10 @@
 <fmt:setBundle basename="messages" var="lang" />
 
 <c:url value="/freeHours" var="freeHours"/>
+<c:url value="/donors" var="donors"/>
+
+freeHours
+
 
 <html>
 <head>
@@ -131,10 +135,6 @@ function disdetta() {
 	}
 }
 
-function prenota_old(dayNr) {
-	location.href = "listFreeHours?dayNr=" + dayNr;
-}
-
 function prenota(dayNr) {
 	var yy=${monthlyBookings.yearMonth.year};
 	var mm=${monthlyBookings.yearMonth.month};
@@ -142,14 +142,14 @@ function prenota(dayNr) {
 	var td=${monthlyBookings.tipoDonaPuntoPrel.tipoDonaId};
 	
 	$.ajax({
-		type : 'get',
+		type: 'get',
 		url: '${freeHours}',
-		data : {puntoprelId:pp, tipoDonaId:td, year:yy, month:mm, day:dayNr},
+		data: {puntoprelId:pp, tipoDonaId:td, year:yy, month:mm, day:dayNr},
 //         context: document.body,
         success: function(response) {
-         	populateTable(response)
+         	populateTable(response);
         },
-		error : function(data) {
+		error: function(data) {
 			console.log("FAILUR: ", data);
 	    }
 	});
@@ -167,6 +167,54 @@ function populateTable(data) {
     
     $('#hours').html(trHTML);
 }
+
+
+function donors(dayNr) {
+	var yy=${monthlyBookings.yearMonth.year};
+	var mm=${monthlyBookings.yearMonth.month};
+	var pp=${monthlyBookings.tipoDonaPuntoPrel.puntoprelId};
+	var td=${monthlyBookings.tipoDonaPuntoPrel.tipoDonaId};
+	
+	document.getElementById('scrollPanelDonors').style.display = 'none';
+
+	$.ajax({
+		type: 'get',
+		url: '${donors}',
+		data: {puntoprelId:pp, tipoDonaId:td, year:yy, month:mm, day:dayNr},
+         context: document.body,
+        success: function(response) {
+        	populateDonars(response);
+        },
+		error: function(data) {
+			console.log("FAILUR: ", data);
+	    }
+	});
+	
+}
+
+function populateDonars(data) {
+	var thHTML = '';
+	var trHTML = '';
+    $.each(data, function (i, item) {
+    	
+    	if (i == 0) {
+    		thHTML = '<th colspan="4"  style="text-align: center;">' + item.dayLong  + '</th>';
+    	}
+    	
+		trHTML += '<tr><td style="width: 40px;">' + item.hourMinute 
+			+ '</td><td style="width: 260px;">' + item.nome 
+			+ '</td><td style="width: 200px;">' + item.nascita 
+			+ '</td><td style="width: 100px;">' + item.telefoni
+			+ '</td></tr>';
+    });
+    
+    $('#donorsHead').html(thHTML);
+    $('#donors').html(trHTML);
+    if (trHTML.length > 0) {
+    	document.getElementById('scrollPanelDonors').style.display = 'block';
+	}
+}
+
 
 </script>
 
@@ -300,7 +348,7 @@ function populateTable(data) {
 												</td>
 											</tr>
 											<tr>
-												<td style="text-align: center; width: 100%; font-size: 14px;  " ${booking.functionJS}>
+												<td style="text-align: center; width: 100%; font-size: 14px; " ${booking.functionJS}>
 													${booking.freeOrMyHour}
 												</td>
 											</tr>
@@ -466,6 +514,26 @@ function populateTable(data) {
 	  </table>
 	</div>	
 <%-- div x elenco ore per prenotazione --%>	
+
+<%-- div x prenotazioni del giorno --%>	
+	<div id="scrollPanelDonors" style="overflow-y:auto; width: 600px; height: 200px; border: solid 1px; display: none; position: relative; margin: auto; ">
+	   <table style="width:100%">
+	    <thead>
+	    
+	      <tr id="donorsHead"></tr>
+	      
+	      <tr>
+	        <th><fmt:message key="agenda.hours" bundle="${lang}"/></th>
+	        <th><fmt:message key="agenda.donor" bundle="${lang}"/></th>
+	        <th><fmt:message key="agenda.born" bundle="${lang}"/></th>
+	        <th><fmt:message key="agenda.telephone" bundle="${lang}"/></th>
+	      </tr>
+	    </thead>
+	    <tbody id = 'donors' >
+	    </tbody>
+	  </table>
+	</div>	
+<%-- div x elenco ore per prenotazione --%>
   
  </div>	
 </body>
