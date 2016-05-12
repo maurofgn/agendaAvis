@@ -1,5 +1,7 @@
 package it.mesis.avis.configuration;
 
+import it.mesis.utility.PswEncoder;
+
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -14,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /*
@@ -71,4 +74,11 @@ public class HibernateTestConfiguration {
 		txManager.setSessionFactory(s);
 		return txManager;
 	}
+	
+	@Bean(name = "passwordEncoder")
+	public PasswordEncoder passwordEncoder() {
+//	    return new BCryptPasswordEncoder();
+		return new PswEncoder();
+	}
+	
 }

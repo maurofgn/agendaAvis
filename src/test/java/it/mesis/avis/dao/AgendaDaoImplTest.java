@@ -55,6 +55,11 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	@Override
 	protected IDataSet getDataSet() throws Exception {
 		
+//		java.io.InputStream is = this.getClass().getClassLoader().getResourceAsStream("app_user.xml");
+//		IDataSet dataSet = new FlatXmlDataSet(is);
+//		System.out.println(dataSet);
+//		IDataSet retValue = dataSet;
+		
 		IDataSet[] datasets = new IDataSet[] {
 			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
 			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
@@ -105,6 +110,17 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		agendaKey = new AgendaKey();
 		agendaKey.setMacchina(macchina);
 		agendaKey.setDataorapren(dataOraPreno);
+		
+		
+//		ITable users = retValue.getTable("app_user");
+//		for (int row = 0; row < users.getRowCount(); row++) {
+//			try {
+//				System.out.println(users.getValue(row, "CODINTERNODONAT"));
+//			} catch (Exception e) {
+//				continue;
+////				e.printStackTrace();
+//			}
+//		}
 
 		return retValue;
 	}
@@ -218,7 +234,7 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 
 		YearMonth yearMonth = new YearMonth(year, month);
 		
-		MonthlyBookings monthlyBookings = agendaDao.getYearMonth(yearMonth, null, false, null);
+		MonthlyBookings monthlyBookings = agendaDao.getYearMonth(yearMonth, null, false, null, true);
 		
 		Booking[][] bookingMonth = monthlyBookings.getBookingsWeek();
 		AgendaKey firstKeyNotNull = null;
@@ -234,5 +250,4 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		Assert.assertNotNull(firstKeyNotNull);
 	}
 	
-
 }
