@@ -22,33 +22,36 @@
 </head>
 <body>
 	<div id="layout" style="  height: 100%;">
-	
-	<nav class="navbar navbar-default">
-	
-	  <div class="container-fluid">
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>                        
+		      </button>
+		      <img src="<c:url value='/static/images/logo.png'/>" alt="logo"/>
+		    </div>
+		    <div class="collapse navbar-collapse" id="myNavbar">
+		      <ul class="nav navbar-nav">
+		        <li><a href="<c:url value='/'/>">Home</a></li>
+		      </ul>
+		      <ul class="nav navbar-nav navbar-right">
+			    <sec:authorize access="isAuthenticated()"> 
+			        <li><a href="logout"><fmt:message key="logout" bundle="${lang}" /> <sec:authentication property="principal.username" /></a> </li>
+			        <li><a href="changePassword"><fmt:message key="message.changePassword" bundle="${lang}" /></a> </li>
+			    </sec:authorize>      
+		      </ul>
+		    </div>
+		  </div>
+		</nav>
 
-		<a href="<c:url value='/'/>">
-		    <img src="<c:url value='/static/images/logo.png'/>" alt="logo"/>
-		</a>
-	  
-	    <div class="navbar-header">
-	    </div>
-	      <ul class="nav navbar-nav navbar-right">
-		      <sec:authorize access="isAuthenticated()"> 
-		        <li><a href="logout"><fmt:message key="logout" bundle="${lang}" /> <sec:authentication property="principal.username" /></a> </li>
-		        <li><a href="changePassword"><fmt:message key="message.changePassword" bundle="${lang}" /></a> </li>
-		      </sec:authorize>
-	      </ul>
-	    </div>
-	</nav>	
-	
-		
 		<a class="menu-link" id="menuLink" href="#menu"> <span></span></a>
 <%-- 		<%@include file="/WEB-INF/template/menu/menu.jsp"%> --%>
 <%-- 		<%@include file="/account/header_login.jsp"%> --%>
 		
 		<div id="main" >
-			<decorator:body />
+			<decorator:body/>
 		</div>
 	
 		<footer>
