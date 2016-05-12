@@ -9,6 +9,7 @@ import it.mesis.avis.service.DownloadService;
 import it.mesis.avis.service.ExporterService;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
+import it.mesis.util.model.ReportPreno;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;
 import it.mesis.utility.TimeUtil;
@@ -173,6 +174,22 @@ public class AppController {
 		return hours;
 	}
 	
+	@RequestMapping(value = {"/donors" }, method = RequestMethod.GET, produces="application/json")
+	public @ResponseBody List<ReportPreno> donorsJson(
+			@RequestParam(value = "puntoprelId", required = false) int puntoprelId,
+			@RequestParam(value = "tipoDonaId", required = false) int tipoDonaId,
+			@RequestParam(value = "year", required = false) int year,
+			@RequestParam(value = "month", required = false) int month,
+			@RequestParam(value = "day", required = false) int day
+			) {
+		
+		GregorianCalendar gc = new GregorianCalendar(year, month, day);
+		
+		List<ReportPreno> rows = agendaService.reportPreno(TimeUtil.getMinHour(gc.getTime()),  TimeUtil.getMaxHour(gc.getTime()), puntoprelId, tipoDonaId);
+		
+		return rows;
+	}
+	
 	/**
 	 * 
 	 * @param dayNr
@@ -249,16 +266,19 @@ public class AppController {
 		}
 
 		GregorianCalendar gc = new GregorianCalendar();
-		AgendaKey agendaKey = null;						//key dell'attuale prenotazione attiva
-		boolean updateable = false;						//agenda è modificabile solo da donatori
+		AgendaKey agendaKey = null;							//key dell'attuale prenotazione attiva
+		boolean updateable = false;							//agenda è modificabile solo da donatori
+		boolean donor = false;								//donatore
 		
 		if (userSession.getDonaStatus() != null) {
 			//donatore
-				
+			
+			donor = true;
+			updateable = true;								//agenda è modificabile x i donatori
+			
 			if (userSession.getDonaStatus().getAgenda() != null)
 				agendaKey = userSession.getDonaStatus().getAgenda().getId();		//prenotazione attiva
 
-			updateable = true;								//agenda è modificabile x i donatori
 			
 			if (agendaKey != null && yearMonth == null) {
 				gc.setTime(agendaKey.getDataorapren());		//data di default x il donatore con una prenotazione attiva
@@ -279,7 +299,7 @@ public class AppController {
 			tipoDonaPuntoPrel = userSession.getListTipoDonazPuntiPrel().get(0);
 		}
 		
-		MonthlyBookings monthlyBookings = agendaService.getYearMonth(yearMonth, tipoDonaPuntoPrel, updateable, agendaKey);
+		MonthlyBookings monthlyBookings = agendaService.getYearMonth(yearMonth, tipoDonaPuntoPrel, updateable, agendaKey, donor);
 		model.addAttribute("monthlyBookings", monthlyBookings);
 		
 		model.addAttribute("listTipoDonazPuntiPrel", userSession.getListTipoDonazPuntiPrel());
