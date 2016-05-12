@@ -5,11 +5,13 @@ import java.io.ByteArrayOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
-import net.sf.jasperreports.engine.export.JRXlsAbstractExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.export.SimpleXlsReportConfiguration;
 
 import org.springframework.stereotype.Service;
 
@@ -66,15 +68,23 @@ public class ExporterService {
 	public void exportXls(JasperPrint jp, ByteArrayOutputStream baos) {
 		// Create a JRXlsExporter instance
 		JRXlsExporter exporter = new JRXlsExporter();
-		 
-		// Here we assign the parameters jp and baos to the exporter
-		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jp);
-		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-		 
-		// Excel specific parameters
-		exporter.setParameter(JRXlsAbstractExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE);
-		exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-		exporter.setParameter(JRXlsAbstractExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+		
+		exporter.setExporterInput(new SimpleExporterInput(jp));
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
+		SimpleXlsReportConfiguration configuration = new SimpleXlsReportConfiguration();
+		configuration.setOnePagePerSheet(true);
+		configuration.setDetectCellType(true);
+		configuration.setCollapseRowSpan(false);
+		exporter.setConfiguration(configuration);
+		
+		// precedente modo per jasper 5
+//		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jp);
+//		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+//		 
+//		// Excel specific parameters
+//		exporter.setParameter(JRXlsAbstractExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE);
+//		exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+//		exporter.setParameter(JRXlsAbstractExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
 		 
 		try {
 			exporter.exportReport();
@@ -84,20 +94,35 @@ public class ExporterService {
 		}
 	}
 	
+	/**
+	 * export to pdf (con versione 6.0)
+	 * @param jp
+	 * @param baos
+	 */
 	public void exportPdf(JasperPrint jp, ByteArrayOutputStream baos) {
-		// Create a JRXlsExporter instance
+		
 		JRPdfExporter exporter = new JRPdfExporter();
-		 
-		// Here we assign the parameters jp and baos to the exporter
-		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jp);
-		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-		 
+		
+		exporter.setExporterInput(new SimpleExporterInput(jp));
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
+		
+		SimplePdfExporterConfiguration configuration = new SimplePdfExporterConfiguration();
+		exporter.setConfiguration(configuration);
+		
+		// Questo pezzo è quello precedente con l'uso della versione 5 di jasperReport		
+//		// Create a JRXlsExporter instance
+//		JRPdfExporter exporter = new JRPdfExporter();
+//		 
+//		// Here we assign the parameters jp and baos to the exporter
+//		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jp);
+//		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+		
 		try {
 			exporter.exportReport();
-			
 		} catch (JRException e) {
 			throw new RuntimeException(e);
 		}
+
 	}
 	
 }
