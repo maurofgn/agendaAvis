@@ -22,7 +22,7 @@ public interface AgendaDao {
 
 	Puntoprelievo getPuntoprelievo(int key);
 	
-	MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey);
+	MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey, boolean donor);
 
 	void disdetta(AgendaKey id);
 

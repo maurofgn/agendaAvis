@@ -18,15 +18,21 @@ public class Booking {
 	private List<Agenda> agendaList;
 	private int busy;
 	private boolean updateable;
+	private boolean donor;
 	private YearMonthDay day;
 	private AgendaKey agendaKey;
 	
 	private static final SimpleDateFormat HH_MM = new SimpleDateFormat("HH:mm");
 	
-	public Booking(YearMonthDay day, boolean updateable) {
+//	public Booking(YearMonthDay day, boolean updateable) {
+//		this(day, updateable, true);
+//	}
+	
+	public Booking(YearMonthDay day, boolean updateable, boolean donor) {
 		super();
 		this.day = day;
 		this.updateable = updateable;
+		this.donor = donor;
 		this.agendaList = new ArrayList<Agenda>();
 	}
 
@@ -67,6 +73,14 @@ public class Booking {
 	public void setUpdateable(boolean updateable) {
 		this.updateable = updateable;
 	}
+	
+	public boolean isDonor() {
+		return donor;
+	}
+
+	public void setDonor(boolean donor) {
+		this.donor = donor;
+	}
 
 	public YearMonthDay getDay() {
 		return day;
@@ -99,19 +113,24 @@ public class Booking {
 
 		if (!isValid() || getTotal() == 0)
 			return "";
-		if (agendaKey != null) {
-			return "onclick=\"disdetta();\"";
+		
+		if (!donor) {
+			return "onclick=\"donors(" + getDay().getDay() + ");\"";
 		}
-		if (updateable && getFree() > 0)
-			return "onclick=\"prenota(" + getDay().getDay() + ");\"";
+		
+		if (updateable) {
+			if (agendaKey != null)
+				return "onclick=\"disdetta();\"";
+			else if (getFree() > 0)
+				return "onclick=\"prenota(" + getDay().getDay() + ");\"";
+		}
 
-		if (!updateable && getFree() > 0)
-			return "";
+//		if (!updateable && getFree() > 0)
+//			return "";
 
 		return "";
 	}
 	
-
 	@Override
 	public String toString() {
 		return "" + getTotal();

@@ -107,7 +107,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 * @param month is 1 based
 	 */
 	@Override
-	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey) {
+	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey, boolean donor) {
 		
 		GregorianCalendar gc = new GregorianCalendar(yearMonth.getYear(), yearMonth.getMonth(), 1);
 		TimeUtil.setMinHour(gc);
@@ -154,7 +154,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 
         @SuppressWarnings("unchecked")
         List<Agenda>resultList = query.list();
-        return new MonthlyBookings(yearMonth, tipoDonazPuntoPrel, resultList, updateable, agendaKey);
+        return new MonthlyBookings(yearMonth, tipoDonazPuntoPrel, resultList, updateable, agendaKey, donor);
 		
 //		Criteria criteria = getSession().createCriteria(Agenda.class, "a") 
 //	        .add(Restrictions.ge("a.DATAORAPREN", fromDate))

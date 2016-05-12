@@ -2,11 +2,16 @@ package it.mesis.util.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ReportPreno implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final SimpleDateFormat HH_FORMAT = new SimpleDateFormat("HH:mm");
+	private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yy");
+	private static final SimpleDateFormat DATA_FORMAT_LONG = new SimpleDateFormat("E dd/MM/yyyy");
 	
 	private Timestamp dataOraPreno;
 	private String notaPren;
@@ -48,6 +53,15 @@ public class ReportPreno implements Serializable {
 	public void setDataOraPreno(Timestamp dataOraPreno) {
 		this.dataOraPreno = dataOraPreno;
 	}
+	
+	public String getDayLong() {
+		return DATA_FORMAT_LONG.format(dataOraPreno);
+	}
+	
+	public String getHourMinute() {
+		return HH_FORMAT.format(dataOraPreno);
+	}
+	
 	public String getNotaPren() {
 		return notaPren;
 	}
@@ -120,5 +134,28 @@ public class ReportPreno implements Serializable {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
+	
+	public String getTelefoni() {
+		return ((cellulare != null && !cellulare.isEmpty() ? cellulare : "") + 
+				(telefono != null && !telefono.isEmpty() ? " " + telefono : "")
+				).trim();
+	}
+	
+	public String getNascita() {
+		return ((luogoNascita != null && !luogoNascita.isEmpty() ? " " + luogoNascita : "")
+				+ (provNascita != null && !provNascita.isEmpty() ? " (" + provNascita + ")" : "")
+				+ (dataNascita != null ? " " + DATA_FORMAT.format(dataNascita) : "")
+				).trim();
+	}
+
+	@Override
+	public String toString() {
+		return "ReportPreno [nome=" + nome + ", luogoNascita=" + luogoNascita
+				+ ", provNascita=" + provNascita + ", dataNascita="
+				+ dataNascita + ", cellulare=" + cellulare + ", telefono="
+				+ telefono + "]";
+	}
+	
+	
 	
 }

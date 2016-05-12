@@ -47,8 +47,8 @@ public class AgendaServiceImpl implements AgendaService {
 	}
 	
 	@Override
-	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey) {
-		return dao.getYearMonth(yearMonth, tipoDonazPuntoPrel, updateable, agendaKey);
+	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey, boolean donor) {
+		return dao.getYearMonth(yearMonth, tipoDonazPuntoPrel, updateable, agendaKey, donor);
 	}
 
 	@Override

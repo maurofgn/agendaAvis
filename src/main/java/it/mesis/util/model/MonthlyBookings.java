@@ -15,16 +15,17 @@ public class MonthlyBookings {
 	private TipoDonaPuntoPrel tipoDonazPuntoPrel;
 	private int lastDay;
 	private boolean updateable;
+	private boolean donor;
 	private AgendaKey agendaKey;
 	private Booking[][] bookingsWeek;
 	
-	public MonthlyBookings(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, List<Agenda> listAgenda, boolean updateable, AgendaKey agendaKey) {
+	public MonthlyBookings(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, List<Agenda> listAgenda, boolean updateable, AgendaKey agendaKey, boolean donor) {
 		super();
 		this.yearMonth = yearMonth;
 		this.tipoDonazPuntoPrel = tipoDonazPuntoPrel;
 		this.updateable = updateable;
 		this.agendaKey = agendaKey;
-		
+		this.donor = donor;
 		loadList(listAgenda);
 	}
 	
@@ -52,6 +53,8 @@ public class MonthlyBookings {
 				
 				/**
 				 * Il giorno è aggiornabile se:
+				 * E' un donatore
+				 * and
 				 * L' agenda è aggiornabile
 				 * and
 				 * (
@@ -65,13 +68,14 @@ public class MonthlyBookings {
 				 */
 				
 				
-				boolean upd = updateable && 
+				boolean upd = donor && 
+						updateable && 
 						sameTipoDonaPuntoPrel &&
 						(dayPreno == null || (dayPreno.equals(day))) &&
 						Agenda.isUpdateable(agenda.getId().getDataorapren())
 						;
 				
-				booking = new Booking(day, upd);
+				booking = new Booking(day, upd, donor);
 				bookingsWeek[day.getWeekNr()][day.getWeekDay()] = booking;
 			}
 			booking.add(agenda);
@@ -93,7 +97,7 @@ public class MonthlyBookings {
 			YearMonthDay day = new YearMonthDay(gc.getTime());
 			
 			if (bookingsWeek[day.getWeekNr()][day.getWeekDay()] == null) {
-				bookingsWeek[day.getWeekNr()][day.getWeekDay()] = new Booking(day, false);
+				bookingsWeek[day.getWeekNr()][day.getWeekDay()] = new Booking(day, false, true);
 			} else if (dayPreno != null) {
 				Booking b = bookingsWeek[day.getWeekNr()][day.getWeekDay()];
 				b.setMyPreno(sameTipoDonaPuntoPrel && dayPreno.equals(day) ? agendaKey : null);
@@ -139,7 +143,7 @@ public class MonthlyBookings {
 		if (retValue != null)
 			return retValue;
 		
-		return new Booking(YearMonthDay.VOID, false);
+		return new Booking(YearMonthDay.VOID, false, true);
 		
 	}
 }
