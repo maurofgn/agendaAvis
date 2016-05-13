@@ -58,6 +58,14 @@ public class Booking {
 		return agendaList.size() - busy;
 	}
 	
+	
+	public String getBusyFreeMyHour() {
+		if (donor)
+			return getFreeOrMyHour();	//nr posti disponibili o l'ora se prenotata
+		else 
+			return getBusyTotal();		//nr posti occupati / totale
+	}
+	
 	/**
 	 * 
 	 * @return nr posti disponibili o l'ora se prenotata
@@ -65,6 +73,15 @@ public class Booking {
 	public String getFreeOrMyHour() {
 		return agendaKey != null ? HH_MM.format(agendaKey.getDataorapren()) : (agendaList.size() > 0 ? String.valueOf(agendaList.size() - busy ) : "");
 	}
+	
+	/**
+	 * 
+	 * @return nr posti occupati / totale
+	 */
+	public String getBusyTotal() {
+		return agendaList.size() > 0 ? String.valueOf(busy) + "/" + String.valueOf(agendaList.size()) : "";
+	}
+
 	
 	public boolean isUpdateable() {
 		return updateable;
@@ -97,16 +114,19 @@ public class Booking {
 		
 		if (!isValid() || getTotal() == 0)
 			return PrenoState.INDISPONIBILE;
-		if (agendaKey != null) {
-			return PrenoState.MIA_PRENO;
+		
+		if (donor) {
+			
+			if (agendaKey != null) 
+				return PrenoState.MIA_PRENO;
+			
+			if (updateable && getFree() > 0)
+				return PrenoState.LIBERO;
+			
+			return !updateable && getFree() > 0 ? PrenoState.LIBERO_NON_PRENO : PrenoState.OCCUPATO;
+		} else {
+			return busy > 0 ? PrenoState.LIBERO : PrenoState.LIBERO_NON_PRENO;
 		}
-		if (updateable && getFree() > 0)
-			return PrenoState.LIBERO;
-		
-		if (!updateable && getFree() > 0)
-			return PrenoState.LIBERO_NON_PRENO;
-		
-		return PrenoState.OCCUPATO;
 	}
 	
 	public String getFunctionJS() {
@@ -124,9 +144,6 @@ public class Booking {
 			else if (getFree() > 0)
 				return "onclick=\"prenota(" + getDay().getDay() + ");\"";
 		}
-
-//		if (!updateable && getFree() > 0)
-//			return "";
 
 		return "";
 	}

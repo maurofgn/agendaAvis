@@ -11,9 +11,6 @@
 <c:url value="/freeHours" var="freeHours"/>
 <c:url value="/donors" var="donors"/>
 
-freeHours
-
-
 <html>
 <head>
 	<title><fmt:message key="agenda.para.title" bundle="${lang}"/></title>
@@ -343,13 +340,13 @@ function populateDonars(data) {
 								
 										<table class='borderless' style="width: 100%" >
 											<tr>
-												<td ${booking.functionJS} style="font-size: 10px;">
+												<td style="font-size: 10px;" ${booking.functionJS}>
 													${booking.day.day}
 												</td>
 											</tr>
 											<tr>
 												<td style="text-align: center; width: 100%; font-size: 14px; " ${booking.functionJS}>
-													${booking.freeOrMyHour}
+													${booking.busyFreeMyHour}
 												</td>
 											</tr>
 										</table>
