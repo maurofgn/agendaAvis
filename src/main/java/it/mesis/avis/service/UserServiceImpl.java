@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService{
 	private static final String VALIDITY_DAY_PSW = "90";
 	private static final String MAX_ACCOUNT_ATTEMPT = "5";
 	private static final String TIMEOUT_DAY_PSW = "180";
-	public static final String GG_RANGE_PRENO = "30";
+	private static final String GG_RANGE_PRENO = "30";
 	private static final String VALIDITY_DAY_PSW_BEFORE = "5";	//giorni prima della scadenza x cu iva richiesto il cambio password
 	
 	@Autowired
@@ -118,10 +118,11 @@ public class UserServiceImpl implements UserService{
 	public int getTimeoutDayPsw() {
 		return Utility.parseInteger(environment.getProperty("timeout.day.psw", TIMEOUT_DAY_PSW));
 	}
-
+	
 	@Override
 	public UserSession getUserSession(String name) {
-		return dao.getUserSession(name);
+		int dayBefore = Utility.parseInteger(environment.getProperty("gg.range.preno", GG_RANGE_PRENO));
+		return dao.getUserSession(name, dayBefore);
 	}
 
 	@Override

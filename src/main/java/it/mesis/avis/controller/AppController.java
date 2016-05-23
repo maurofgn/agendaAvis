@@ -1,5 +1,6 @@
 package it.mesis.avis.controller;
 
+import it.mesis.avis.exception.StatusException;
 import it.mesis.avis.model.Agenda;
 import it.mesis.avis.model.AgendaKey;
 import it.mesis.avis.security.UserSession;
@@ -7,6 +8,7 @@ import it.mesis.avis.service.AgendaService;
 import it.mesis.avis.service.AuditService;
 import it.mesis.avis.service.DownloadService;
 import it.mesis.avis.service.ExporterService;
+import it.mesis.avis.service.UserService;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
 import it.mesis.util.model.ReportPreno;
@@ -21,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +32,7 @@ import javax.servlet.http.HttpSession;
 import net.sf.jasperreports.engine.JRException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.annotation.Secured;
 //import org.springframework.context.MessageSource;
@@ -46,8 +50,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequestMapping("/")
 public class AppController {
 	
-//	@Autowired
-//	MessageSource messageSource;
+	@Autowired
+	MessageSource messageSource;
 	
 	@Autowired
 	AgendaService agendaService;
@@ -58,11 +62,14 @@ public class AppController {
 	@Autowired
 	DownloadService downloadService;
 	
+	@Autowired
+	UserService userService;
 
 	private static final String PREFIX_PATH = "agenda/";
 	
 	private static final SimpleDateFormat DD_MMM_YYYY = new SimpleDateFormat("dd MMM yyyy");
-	
+	private static final SimpleDateFormat DATE_HHMM = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
 	public static HttpSession session() {
 	    ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 	    return attr.getRequest().getSession(true); // true == allow create
@@ -117,6 +124,7 @@ public class AppController {
 		
 		if (userSession.getDonaStatus() != null && userSession.getDonaStatus().getAgenda() != null) {
 			agendaService.disdetta(userSession.getDonaStatus().getAgenda().getId());
+			request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.cancellation.success", null, request.getLocale()));
 			auditService.audit("Disdetta " + userSession.getDonaStatus().getAgenda().getId().toString() + " " + userSession.getDonaStatus().getRefDonatore());
 			userSession.getDonaStatus().setAgenda(null);
 		}
@@ -127,7 +135,7 @@ public class AppController {
 	@RequestMapping(value = {"/listFreeHours" }, method = RequestMethod.GET)
 	public String freeHours(
 			ModelMap model,
-			@RequestParam(value = "dayNr", required = false) int dayNr,
+			@RequestParam(value = "dayNr", required = true) int dayNr,
 			HttpServletRequest request
 			) {
 		
@@ -140,8 +148,7 @@ public class AppController {
 		
 		List<Hour> hours = agendaService.freeHours(gc.getTime(), userSession.getTipoDonaPuntoPrelSelected());
 		
-		String title = DD_MMM_YYYY.format(gc.getTime())
-				+ " - " + userSession.getTipoDonaPuntoPrelSelected();
+		String title = DD_MMM_YYYY.format(gc.getTime()) + " - " + userSession.getTipoDonaPuntoPrelSelected();
 		
 		model.addAttribute("freeHoursTitle", title);
 		model.addAttribute("freeHours", hours);
@@ -213,6 +220,16 @@ public class AppController {
 			return "redirect:/login";	//TODO: questo non dovrebbe accadere, ma sta accadendo, per cui va risolto
 		
 		if (userSession.getDonaStatus() != null) {
+			
+			if (!userSession.getDonaStatus().prenoWeb()) {
+				
+//				//il donatore non può donare. I motivi sono specificati in causa
+				String causa = userSession.getDonaStatus().getMsg();
+				auditService.audit(userSession.getDonaStatus().getCognomeenome() + " prenotazione non eseguita " + causa);
+				String msg = messageSource.getMessage("msg.no.preno", new String[]{causa}, Locale.getDefault());
+				throw new StatusException(msg);
+			}
+
 			GregorianCalendar gc = new GregorianCalendar(userSession.getYearMonth().getYear(), userSession.getYearMonth().getMonth(), dayNr);
 			String[] xx = hhmm.split(":");
 			
@@ -220,9 +237,17 @@ public class AppController {
 			gc.set(GregorianCalendar.MINUTE, Utility.parseInteger(xx[1]));
 			
 			Agenda agenda = agendaService.prenota(userSession.getDonaStatus().getCodinternodonat(), gc.getTime(), userSession.getTipoDonaPuntoPrelSelected());
-			userSession.getDonaStatus().setAgenda(agenda);
 			
-			auditService.audit("Prenotazione " + userSession.getDonaStatus().getAgenda().getId().toString() + " " + userSession.getDonaStatus().getRefDonatore());
+			if (agenda == null) {
+				//non è stato possibile prenotare perchè non c'è più disponibilità
+				auditService.audit("Prenotazione fallita " + userSession.getTipoDonaPuntoPrelSelected().toString() + " " + DATE_HHMM.format(gc.getTime()) + " " + userSession.getDonaStatus().getRefDonatore());
+				request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.preno.missing", null, request.getLocale()));
+			} else {
+				userSession.getDonaStatus().setAgenda(agenda);
+				auditService.audit("Prenotazione " + userSession.getDonaStatus().getAgenda().getId().toString() + " " + userSession.getDonaStatus().getRefDonatore());
+				request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.preno.success", null, request.getLocale()));
+			}
+			
 		}
 		
 		return "redirect:/agenda";
@@ -267,19 +292,12 @@ public class AppController {
 
 		GregorianCalendar gc = new GregorianCalendar();
 		AgendaKey agendaKey = null;							//key dell'attuale prenotazione attiva
-		boolean updateable = false;							//agenda è modificabile solo da donatori
-		boolean donor = false;								//donatore
 		
 		if (userSession.getDonaStatus() != null) {
 			//donatore
-			
-			donor = true;
-			updateable = true;								//agenda è modificabile x i donatori
-			
 			if (userSession.getDonaStatus().getAgenda() != null)
 				agendaKey = userSession.getDonaStatus().getAgenda().getId();		//prenotazione attiva
 
-			
 			if (agendaKey != null && yearMonth == null) {
 				gc.setTime(agendaKey.getDataorapren());		//data di default x il donatore con una prenotazione attiva
 				tipoDonaPuntoPrel = getTipoDonaPuntoPrelFromReq (userSession.getListTipoDonazPuntiPrel(), 
@@ -295,15 +313,17 @@ public class AppController {
 			yearMonth = new YearMonth(gc.get(GregorianCalendar.YEAR), gc.get(GregorianCalendar.MONTH));
 		}
 		
-		if (tipoDonaPuntoPrel == null) {
+		if (tipoDonaPuntoPrel == null && userSession.getDonaStatus() == null) {
 			tipoDonaPuntoPrel = userSession.getListTipoDonazPuntiPrel().get(0);
 		}
 		
-		MonthlyBookings monthlyBookings = agendaService.getYearMonth(yearMonth, tipoDonaPuntoPrel, updateable, agendaKey, donor);
-		model.addAttribute("monthlyBookings", monthlyBookings);
+		if (tipoDonaPuntoPrel != null) {
+			MonthlyBookings monthlyBookings = agendaService.getYearMonth(yearMonth, tipoDonaPuntoPrel, userSession.getDonaStatus());
+			model.addAttribute("tipoDonazPuntiPrelSelected", tipoDonaPuntoPrel);
+			model.addAttribute("monthlyBookings", monthlyBookings);
+		}
 		
 		model.addAttribute("listTipoDonazPuntiPrel", userSession.getListTipoDonazPuntiPrel());
-		model.addAttribute("tipoDonazPuntiPrelSelected", tipoDonaPuntoPrel);
 		
 		model.addAttribute("listYearMonth", userSession.getListYearMonth());
 		model.addAttribute("yearMonthSelected", yearMonth);
@@ -316,7 +336,8 @@ public class AppController {
 
 		if (userSession.getDonaStatus() != null) {
 			userSession.setYearMonth(yearMonth);
-			userSession.setTipoDonaPuntoPrelSelected(tipoDonaPuntoPrel); 
+			if (tipoDonaPuntoPrel != null)
+				userSession.setTipoDonaPuntoPrelSelected(tipoDonaPuntoPrel); 
 		}
 		
 		return PREFIX_PATH + "agenda";

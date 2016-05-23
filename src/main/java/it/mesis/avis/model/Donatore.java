@@ -2065,12 +2065,12 @@ public class Donatore {
 	 * 
 	 * @return status del donatore
 	 */
-	public DonaStatus getDonaStatus() {
+	public DonaStatus getDonaStatus(int dayBefore) {
 		
 		DonaStatus status = new DonaStatus(codinternodonat, isIdoneo(),
 				getMembershipState(), getCognomeenome(), getLuogonascita(),
 				getDatadinascita(), getProvdinascita(), getCodicefiscale(),
-				getSesso());
+				getSesso(), dayBefore);
 		
 		if (sangueintero == 1)
 			status.addStatus(new DonaStatusType(DonaType.SANGUE_INTERO, sangueintero == 1, ultimdonazione, prossdonazione));

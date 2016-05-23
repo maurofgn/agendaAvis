@@ -134,8 +134,6 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 	public void credentialsExpired(String sso) {
 		if (sso == null || sso.isEmpty())
 			return;
-		
-		//TODO: niente da fare. Ma si potrebbe usare questo punto per aggiornare l'audit x password scaduta 
 	}
 	
 	@Override
@@ -165,7 +163,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 //	}
 	
 	@Override
-	public UserSession getUserSession(String sso) {
+	public UserSession getUserSession(String sso, int dayBefore) {
 		
 		User user = findBySSO(sso);
 		if (user == null)
@@ -178,7 +176,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		DonaStatus donaStatus = null;
 		if (donatore != null) {
 			
-			donaStatus = donatore.getDonaStatus();
+			donaStatus = donatore.getDonaStatus(dayBefore);
 			
 //			donaStatus.getStatus().forEach(donaStatusType -> donaStatusType.setSuspended(isSuspend(donaStatusType, donatore.getCodinternodonat())));
 			Set<DonaStatusType> list = donaStatus.getStatus();

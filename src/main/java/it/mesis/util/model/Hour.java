@@ -11,7 +11,8 @@ public class Hour {
 	private YearMonthDay yeaMonthDay;
 	
 	private static final SimpleDateFormat HH_MM = new SimpleDateFormat("HH:mm");
-	
+	private static final SimpleDateFormat DATA_FORMAT_LONG = new SimpleDateFormat("E dd/MM/yyyy");
+
 	public Hour(Date date, int available, int total) {
 		super();
 		this.date = date;
@@ -47,6 +48,10 @@ public class Hour {
 
 	public String getHourMinutes() {
 		return HH_MM.format(date);
+	}
+	
+	public String getDayLong() {
+		return DATA_FORMAT_LONG.format(date);
 	}
 	
 	public String getLinkPreno() {

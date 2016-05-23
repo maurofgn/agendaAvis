@@ -5,6 +5,7 @@ import it.mesis.avis.model.AgendaKey;
 import it.mesis.avis.model.Donatore;
 import it.mesis.avis.model.Puntoprelievo;
 import it.mesis.avis.model.Tipodonaz;
+import it.mesis.util.model.DonaStatus;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
 import it.mesis.util.model.ReportPreno;
@@ -24,7 +25,7 @@ public interface AgendaService {
 
 	Puntoprelievo getPuntoprelievo(int key);
 
-	MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey, boolean donor);
+	MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, DonaStatus donaStatus);
 	
 	void disdetta(AgendaKey id);
 

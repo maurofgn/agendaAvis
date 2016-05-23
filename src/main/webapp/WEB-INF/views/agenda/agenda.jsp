@@ -44,7 +44,17 @@
 	display: block; 
     background-color: #b1caf6;	 /* cornflowerblue; */ 
     margin: 5px;
+    flex-wrap: wrap
     }
+    
+.flex-itemMsg {
+	display: block; 
+    background-color: #b1caf6;	 /* cornflowerblue; */ 
+    width: 548px;
+    margin: 5px;
+    flex-wrap: wrap
+    }
+    
 
 .Libero {
 	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
@@ -142,7 +152,7 @@ function prenota(dayNr) {
 		type: 'get',
 		url: '${freeHours}',
 		data: {puntoprelId:pp, tipoDonaId:td, year:yy, month:mm, day:dayNr},
-//         context: document.body,
+        context: document.body,
         success: function(response) {
          	populateTable(response);
         },
@@ -156,12 +166,19 @@ function prenota(dayNr) {
 
 function populateTable(data) {
 	
+	var thHTML = '';
 	var trHTML = '';
 	
     $.each(data, function (i, item) {
+    	
+	   	if (i == 0) {
+	   		thHTML = '<th colspan="2"  style="text-align: center;">' + item.dayLong + '</th>';
+	   	}
+
 		trHTML += '<tr><td style="width: 80px;">' + item.linkPreno + '</td><td style="width: 150px;">' + item.state + '</td></tr>';
     });
     
+    $('#hoursHead').html(thHTML);
     $('#hours').html(trHTML);
 }
 
@@ -235,7 +252,14 @@ function populateDonars(data) {
 					
 						<div class="col-md-12">
 						
-							<select name='tipoDonazPuntiPrel' style="width: 180px;">
+							<select name='tipoDonazPuntiPrel' style="width: 180px;" onchange="this.form.submit()">
+							
+								<c:if test="${empty tipoDonazPuntiPrelSelected}">
+									<option value="0,0">
+										<fmt:message key="empty.option" bundle="${lang}"/>
+									</option>
+								</c:if>
+							
 							    <c:forEach items="${listTipoDonazPuntiPrel}" var="tipoDonazPuntiPrel">
 							    	<option value="${tipoDonazPuntiPrel.valToString}"
 							    		<c:if test="${tipoDonazPuntiPrel == tipoDonazPuntiPrelSelected}"> selected</c:if>
@@ -255,7 +279,7 @@ function populateDonars(data) {
 					<div class="form-group col-md-12">
 						<div class="col-md-12">
 						
-							<select name='yearMonth'  style="width: 180px;">
+							<select name='yearMonth'  style="width: 180px;" onchange="this.form.submit()">
 							    <c:forEach items="${listYearMonth}" var="yearMonth">
 							        <c:if test="${yearMonth != yearMonthSelected}">
 							            <option value="${yearMonth.valToString}">${yearMonth}</option>
@@ -273,12 +297,12 @@ function populateDonars(data) {
 					</div>
 				</div>
 				
-				<div class="row">
-					<div style="margin: auto; width: 40%;">
-						<input type="submit" value="<fmt:message key="submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm"> 
-					</div>
-				</div>
-
+<!-- 				<div class="row"> -->
+<!-- 					<div style="margin: auto; width: 40%;"> -->
+<%-- 						<input type="submit" value="<fmt:message key="submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm">  --%>
+<!-- 					</div> -->
+<!-- 				</div> -->
+				
 			</form:form>
 			
 		</div>
@@ -303,7 +327,8 @@ function populateDonars(data) {
 		
     </div>
     
-	<div class="flex-itemTable" <c:if test="${empty monthlyBookings}">class="hide" </c:if>>
+    
+	<div class="flex-itemTable"  >
 	    
 		<table id="week" class="table table-bordered">
 		    <thead>
@@ -411,8 +436,14 @@ function populateDonars(data) {
 	
 	</div>	 <!-- flex-container -->
 	
-	<sec:authorize access="!hasRole('DONA')">
-	</sec:authorize>
+	<c:if test="${!empty prenoMsg}">
+		<div class="flex-container">
+			<div class="flex-itemMsg">
+				<span style="margin:5px;"><c:out value="${prenoMsg}"/></span>
+			</div>
+		</div>
+		<c:remove scope="session" var="prenoMsg"/>
+	</c:if>
 	
 	<sec:authorize access="hasRole('OPERA') or hasRole('ADMIN') or hasRole('AVIS')">
 	
@@ -501,6 +532,7 @@ function populateDonars(data) {
 	<div id="scrollPanelHours" style="overflow-y:auto; width: 300px; height: 200px; border: solid 1px; display: none; position: relative; margin: auto; ">
 	   <table class="table table-hover" style="width:100%">
 	    <thead>
+ 	      <tr id="hoursHead"></tr>
 	      <tr>
 	        <th><fmt:message key="agenda.hours" bundle="${lang}"/></th>
 	        <th><fmt:message key="agenda.available" bundle="${lang}" /></th>

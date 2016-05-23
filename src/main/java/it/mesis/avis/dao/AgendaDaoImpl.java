@@ -5,6 +5,7 @@ import it.mesis.avis.model.AgendaKey;
 import it.mesis.avis.model.Donatore;
 import it.mesis.avis.model.Puntoprelievo;
 import it.mesis.avis.model.Tipodonaz;
+import it.mesis.util.model.DonaStatus;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
 import it.mesis.util.model.ReportPreno;
@@ -102,12 +103,11 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		List<?> list = query.list();
 		return list != null && !list.isEmpty() ? (Puntoprelievo)list.get(0) : null;
 	}
-	
+
 	/**
-	 * @param month is 1 based
+	 * 
 	 */
-	@Override
-	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, boolean updateable, AgendaKey agendaKey, boolean donor) {
+	public MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, DonaStatus donaStatus) {
 		
 		GregorianCalendar gc = new GregorianCalendar(yearMonth.getYear(), yearMonth.getMonth(), 1);
 		TimeUtil.setMinHour(gc);
@@ -133,12 +133,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         	sb.append("and t.codice = :td ");
         }
         
-//        if (pp != 0)
-//        	sb.append("and p.codicepuntoprel = :pp ");
-//        if (tipoDona != 0)
-//        	sb.append("and t.codice = :td ");
-       
-        Query query =  getSession().createQuery(sb.toString());
+        Query query = getSession().createQuery(sb.toString());
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
         
@@ -147,14 +142,9 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         	query.setParameter("td", tipoDonazPuntoPrel.getTipoDonaId());
         }
         
-//        if (pp != 0)
-//        	query.setParameter("pp", pp);
-//        if (tipoDona != 0)
-//        	query.setParameter("td", tipoDona);
-
         @SuppressWarnings("unchecked")
         List<Agenda>resultList = query.list();
-        return new MonthlyBookings(yearMonth, tipoDonazPuntoPrel, resultList, updateable, agendaKey, donor);
+        return new MonthlyBookings(yearMonth, tipoDonazPuntoPrel, resultList, donaStatus);
 		
 //		Criteria criteria = getSession().createCriteria(Agenda.class, "a") 
 //	        .add(Restrictions.ge("a.DATAORAPREN", fromDate))
@@ -322,7 +312,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         sb.append("and p.codicepuntoprel = :pp ");
         sb.append("and t.codice = :td ");
         
-        Query query =  getSession().createQuery(sb.toString());
+        Query query = getSession().createQuery(sb.toString());
         query.setParameter("datePreno", datePreno);
         query.setParameter("pp", tipoDonaPuntoPrel.getPuntoprelId());
         query.setParameter("td", tipoDonaPuntoPrel.getTipoDonaId());
@@ -332,12 +322,29 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		if (list == null || list.isEmpty())
 			return null;
 		
-		Agenda agenda = (Agenda)list.get(0);
+        sb = new StringBuffer();
+        sb.append("update Agenda as a "); 
+        sb.append("set a.donatore = :dona "); 
+        sb.append("where a.id = :id "); 
+        sb.append("and a.donatore is null ");
+        Query upd = getSession().createQuery(sb.toString());
+
+		Agenda agenda = null;
+		for (Object object : list) {
+			agenda = (Agenda)object;
+			upd.setParameter("dona", donatore);
+			upd.setParameter("id", agenda.getId());
+			int result = upd.executeUpdate();
+			if (result == 0)
+				agenda = null;
+			else
+				break;
+		}
 		
-		prenoDonatore(true, donatore, datePreno, tipoDonaPuntoPrel);
-		
-		agenda.setDonatore(donatore);
-		persist(agenda);
+		if (agenda != null) {
+			prenoDonatore(true, donatore, datePreno, tipoDonaPuntoPrel);
+			agenda.setDonatore(donatore);
+		}
 		
 		return agenda;
 	}

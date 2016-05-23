@@ -24,10 +24,6 @@ public class Booking {
 	
 	private static final SimpleDateFormat HH_MM = new SimpleDateFormat("HH:mm");
 	
-//	public Booking(YearMonthDay day, boolean updateable) {
-//		this(day, updateable, true);
-//	}
-	
 	public Booking(YearMonthDay day, boolean updateable, boolean donor) {
 		super();
 		this.day = day;
@@ -108,22 +104,19 @@ public class Booking {
 	}
 	
 	
-//	updateable
-	
 	public PrenoState getState() {
 		
 		if (!isValid() || getTotal() == 0)
 			return PrenoState.INDISPONIBILE;
 		
 		if (donor) {
-			
 			if (agendaKey != null) 
 				return PrenoState.MIA_PRENO;
+			else if (getFree() <= 0)
+				return PrenoState.OCCUPATO;
+			else 
+				return updateable ? PrenoState.LIBERO : PrenoState.LIBERO_NON_PRENO;
 			
-			if (updateable && getFree() > 0)
-				return PrenoState.LIBERO;
-			
-			return !updateable && getFree() > 0 ? PrenoState.LIBERO_NON_PRENO : PrenoState.OCCUPATO;
 		} else {
 			return busy > 0 ? PrenoState.LIBERO : PrenoState.LIBERO_NON_PRENO;
 		}

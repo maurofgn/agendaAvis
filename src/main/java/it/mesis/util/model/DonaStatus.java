@@ -2,13 +2,12 @@ package it.mesis.util.model;
 
 import it.mesis.avis.enu.MembershipState;
 import it.mesis.avis.model.Agenda;
-import it.mesis.avis.service.UserServiceImpl;
 import it.mesis.utility.TimeUtil;
-import it.mesis.utility.Utility;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,12 +26,16 @@ public class DonaStatus {
 	private String provdinascita;
 	private String codicefiscale;
 	private String sesso;
+//	private String msg;
+	private int dayBefore;
+	private Date lowLimit;
+	private Date upLimit;
 
 	public DonaStatus(String codinternodonat, boolean idoneo,
 			MembershipState membershipState, String cognomeenome,
 			String luogonascita, java.sql.Timestamp datadinascita,
 			String provdinascita, String codicefiscale,
-			String sesso) {
+			String sesso, int dayBefore) {
 		super();
 		this.codinternodonat = codinternodonat;
 		this.idoneo = idoneo;
@@ -44,6 +47,9 @@ public class DonaStatus {
 		this.codicefiscale = codicefiscale;
 		this.sesso = sesso;
 		status = new HashSet<DonaStatusType>();
+		this.dayBefore = dayBefore;
+		
+		setBookablePeriod();
 	}
 	
 	public String getCodinternodonat() {
@@ -93,10 +99,17 @@ public class DonaStatus {
 		return codicefiscale;
 	}
 	
-	
 	public String getSesso() {
 		return sesso;
 	}
+	
+//	public String getMsg() {
+//		return msg;
+//	}
+
+//	public void setMsg(String msg) {
+//		this.msg = msg;
+//	}
 
 	/**
 	 * 
@@ -120,31 +133,28 @@ public class DonaStatus {
 				+ "]";
 	}
 	
+//	/**
+//	 * 
+//	 * @return true se il donatore ha tutte le caratteristiche per prenotare
+//	 */
+//	public boolean prenoWeb() {
+//		return prenoWeb(Utility.parseInteger(UserServiceImpl.GG_RANGE_PRENO));
+//	}
+	
 	/**
 	 * 
 	 * @return true se il donatore ha tutte le caratteristiche per prenotare
 	 */
 	public boolean prenoWeb() {
-		return prenoWeb(Utility.parseInteger(UserServiceImpl.GG_RANGE_PRENO));
-	}
-	
-	/**
-	 * 
-	 * @param dayBefore giorni precedenti la prossima donazione prima dei quali non è possibile prenotare (troppo precedente)
-	 * @return true se il donatore ha tutte le caratteristiche per prenotare
-	 */
-	public boolean prenoWeb(int dayBefore) {
 		return idoneo 
 				&& MembershipState.DONATORE.equals(membershipState)
-				&& isMinPrenoOk(dayBefore) 
+				&& isMinPrenoOk() 
 				&& isLtTwoYears()
 				&& !getListTipoDona().isEmpty()
 				;
 	}
 	
-	
-	
-	public boolean isMinPrenoOk(int dayBefore) {
+	public boolean isMinPrenoOk() {
 		return dayDue() - dayBefore <= 0;
 	}
 	
@@ -158,24 +168,7 @@ public class DonaStatus {
 		return gg < 365*2;
 	}
 	
-//	/**
-//	 * 
-//	 * @return data minima di prenotazione
-//	 */
-//	public Date getMinPreno(int dayBefore) {
-//		Date minPreno = getMinNext(); 	//data prossima donazione
-//		if (minPreno != null) {
-//			GregorianCalendar gc = new GregorianCalendar();
-//			gc.setTime(minPreno);
-//			gc.add(GregorianCalendar.DAY_OF_YEAR, -dayBefore);
-//			minPreno = gc.getTime();
-//			return minPreno;
-//		}
-//		else
-//			return minPreno;
-//	}
-	
-	public String getMsg(int dayBefore) {
+	public String getMsg() {
 		
 		StringBuffer sb = new StringBuffer();
 		
@@ -185,7 +178,7 @@ public class DonaStatus {
 		if (!MembershipState.DONATORE.equals(membershipState))
 			sb.append(" Non è un Donatore");
 		
-		if (!isMinPrenoOk(dayBefore))
+		if (!isMinPrenoOk())
 			sb.append(" Troppo presto per prenotare (non prima di 30 gg) prossima donazione tra " + dayDue() + " giorni");
 		
 		if (!isLtTwoYears())
@@ -212,7 +205,7 @@ public class DonaStatus {
 	
 	/**
 	 * 
-	 * @return ultima data di nonazione
+	 * @return ultima data di donazione
 	 */
 	public Date getLast() {
 		Date retValue = null;
@@ -232,6 +225,30 @@ public class DonaStatus {
 		return minNext == null || minNext.compareTo(new Date()) <= 0
 			? 0
 			: TimeUtil.getDeltaDay(new Date(), minNext);
+	}
+	
+	/**
+	 * 
+	 * @param bookingDate
+	 * @return true se la data passata è interna al periodo valido di prenotazione
+	 */
+	public boolean isBookable(Date bookingDate) {
+		return bookingDate.compareTo(lowLimit) >= 0 &&  bookingDate.compareTo(upLimit) <= 0;
+	}
+	
+	private void setBookablePeriod() {
+		GregorianCalendar gc = new GregorianCalendar();
+		
+		if (dayDue() <= dayBefore) {
+			lowLimit = gc.getTime();	//limite inferiore per accettazione prenotazione
+			gc.add(GregorianCalendar.DAY_OF_WEEK, dayBefore);
+			upLimit = gc.getTime();		//limite superiore per accettazione prenotazione
+		} else {
+			upLimit = getMinNext();		//limite superiore per accettazione prenotazione
+			gc.setTime(upLimit);
+			gc.add(GregorianCalendar.DAY_OF_YEAR, -dayBefore);
+			lowLimit = gc.getTime();	//limite inferiore per accettazione prenotazione
+		}
 	}
 
 	public void setAgenda(Agenda agenda) {

@@ -434,7 +434,7 @@ public class AppControllerTest {
 		DonaStatus donaStatus = null;
 		if (donatore != null) {
 			
-			donaStatus = donatore.getDonaStatus();
+			donaStatus = donatore.getDonaStatus(30);
 			
 			donaStatus.getStatus().forEach(donaStatusType -> donaStatusType.setSuspended(false));
 			

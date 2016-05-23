@@ -34,7 +34,7 @@ public interface UserDao {
 
 	List<YearMonth> getYearMonths(List<Integer> listTipoDona);
 	
-	UserSession getUserSession(String sso);
+	UserSession getUserSession(String sso, int dayBefore);
 
 	void credentialsExpired(String sso);
 

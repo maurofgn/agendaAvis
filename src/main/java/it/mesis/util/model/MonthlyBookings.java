@@ -6,6 +6,11 @@ import it.mesis.avis.model.AgendaKey;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+/**
+ * 
+ * prenotazioni mensili
+ *
+ */
 public class MonthlyBookings {
 	
 	private static final int MAX_WEEK = 6;	//nr settimane max di un mese (0..5)
@@ -14,22 +19,33 @@ public class MonthlyBookings {
 	private YearMonth yearMonth;
 	private TipoDonaPuntoPrel tipoDonazPuntoPrel;
 	private int lastDay;
-	private boolean updateable;
-	private boolean donor;
-	private AgendaKey agendaKey;
+	
+//	private boolean updateable;
+//	private boolean donor;
+//	private AgendaKey agendaKey;
+	
+	private DonaStatus donaStatus;
+	
 	private Booking[][] bookingsWeek;
 	
-	public MonthlyBookings(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, List<Agenda> listAgenda, boolean updateable, AgendaKey agendaKey, boolean donor) {
+	public MonthlyBookings(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, List<Agenda> listAgenda, DonaStatus donaStatus) {
 		super();
 		this.yearMonth = yearMonth;
 		this.tipoDonazPuntoPrel = tipoDonazPuntoPrel;
-		this.updateable = updateable;
-		this.agendaKey = agendaKey;
-		this.donor = donor;
+		
+//		this.updateable = updateable;
+//		this.agendaKey = agendaKey;
+//		this.donor = donor;
+		
+		this.donaStatus = donaStatus;
+		
 		loadList(listAgenda);
 	}
 	
 	private void loadList(List<Agenda> listAgenda) {
+		
+		
+		AgendaKey agendaKey = getAgendaKey();
 		
 		YearMonthDay dayPreno = agendaKey != null
 			? new YearMonthDay(agendaKey.getDataorapren()) 
@@ -55,8 +71,6 @@ public class MonthlyBookings {
 				 * Il giorno è aggiornabile se:
 				 * E' un donatore
 				 * and
-				 * L' agenda è aggiornabile
-				 * and
 				 * (
 				 * 	non esiste una precedente prenotazione
 				 * 	or
@@ -66,16 +80,15 @@ public class MonthlyBookings {
 				 * il giorno corrente è aggiornabile
 				 * 
 				 */
-				
-				
-				boolean upd = donor && 
-						updateable && 
+				boolean upd = donaStatus != null && 
+//						updateable && 
 						sameTipoDonaPuntoPrel &&
 						(dayPreno == null || (dayPreno.equals(day))) &&
-						Agenda.isUpdateable(agenda.getId().getDataorapren())
+						Agenda.isUpdateable(agenda.getId().getDataorapren()) &&
+						donaStatus.isBookable(agenda.getId().getDataorapren())		//verifica che la data dell'agenda sia compresa all'interno del range accettabile
 						;
 				
-				booking = new Booking(day, upd, donor);
+				booking = new Booking(day, upd, donaStatus != null);
 				bookingsWeek[day.getWeekNr()][day.getWeekDay()] = booking;
 			}
 			booking.add(agenda);
@@ -100,7 +113,7 @@ public class MonthlyBookings {
 				bookingsWeek[day.getWeekNr()][day.getWeekDay()] = new Booking(day, false, true);
 			} else if (dayPreno != null) {
 				Booking b = bookingsWeek[day.getWeekNr()][day.getWeekDay()];
-				b.setMyPreno(sameTipoDonaPuntoPrel && dayPreno.equals(day) ? agendaKey : null);
+				b.setMyPreno(sameTipoDonaPuntoPrel && dayPreno.equals(day) ? getAgendaKey() : null);
 			} else if (dayPreno == null) {
 				Booking b = bookingsWeek[day.getWeekNr()][day.getWeekDay()];
 				if (b.isValid() && b.isUpdateable()) {
@@ -115,7 +128,7 @@ public class MonthlyBookings {
 	}
 	
 	public AgendaKey getAgendaKey() {
-		return agendaKey;
+		return donaStatus != null && donaStatus.getAgenda() != null ? donaStatus.getAgenda().getId() : null;
 	}
 
 	public YearMonth getYearMonth() {
@@ -126,24 +139,34 @@ public class MonthlyBookings {
 		return  tipoDonazPuntoPrel;
 	}
 
+	/**
+	 * 
+	 * @return prenotazioni del mese
+	 */
 	public Booking[][] getBookingsWeek() {
 		return bookingsWeek;
 	}
-	
+
+	/**
+	 * 
+	 * @param week
+	 * @return prenotazioni della settimana
+	 */
   	public Booking[] getWeekDays(int week) {
 		return week >= 0 && week < MAX_WEEK ? bookingsWeek[week] : null;
 	}
 
+  	/**
+  	 * 
+  	 * @param week nr settimana
+  	 * @param weekDay giorno della settimana
+  	 * @return premotazioni del giorno
+  	 */
 	public Booking getBooking(int week, int weekDay) {
 		
 		if (week < 0 || week >= MAX_WEEK || weekDay < 0 || weekDay >= MAX_DAY)
 			return null;	//fuori range
 		
-		Booking retValue = bookingsWeek[week][weekDay];
-		if (retValue != null)
-			return retValue;
-		
-		return new Booking(YearMonthDay.VOID, false, true);
-		
+		return bookingsWeek[week][weekDay] != null ? bookingsWeek[week][weekDay] : new Booking(YearMonthDay.VOID, false, true);
 	}
 }

@@ -73,12 +73,12 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		
 		CompositeDataSet retValue = new CompositeDataSet(datasets);
 		
-		ITable donatore = retValue.getTable("donatore");
-		codDonatoreInterno = (String)donatore.getValue(0, "CODINTERNODONAT");
+		ITable donatores = retValue.getTable("donatore");
+		codDonatoreInterno = (String)donatores.getValue(0, "CODINTERNODONAT");
 		
-		donatori = new String[donatore.getRowCount()];
-		for (int row = 0; row < donatore.getRowCount(); row++) {
-			donatori[row] = (String)donatore.getValue(row, "CODINTERNODONAT");
+		donatori = new String[donatores.getRowCount()];
+		for (int row = 0; row < donatores.getRowCount(); row++) {
+			donatori[row] = (String)donatores.getValue(row, "CODINTERNODONAT");
 		}
 		
 		ITable agenda = retValue.getTable("agenda");
@@ -143,6 +143,16 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		Assert.assertTrue(!hours.isEmpty());
 	}
 
+	@Test
+	public void prenotaConcurrent() {
+		Agenda agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		Assert.assertEquals(agenda.getId().getDataorapren(), dataOraPreno);
+		Assert.assertEquals(agenda.getDonatore().getCodinternodonat(), codDonatoreInterno);
+		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+	}
+	
 	@Test
 	public void prenota() {
 		Agenda agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
@@ -224,7 +234,14 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 //	List<Puntoprelievo> getPuntiPrelievoList();
 //
 //	List<ReportPreno> reportPreno(Date fromDate, Date toDate, Integer puntoPrelievo, Integer tipoDona);
-
+	
+	
+	@Test
+	public void getDonatore() {
+		Donatore donatore = agendaDao.getDonatore(codDonatoreInterno);
+		Assert.assertEquals(donatore.getCodinternodonat(), codDonatoreInterno);
+	}
+	
 	@Test
 	public void monthlyBookings() {
 		
@@ -234,7 +251,10 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 
 		YearMonth yearMonth = new YearMonth(year, month);
 		
-		MonthlyBookings monthlyBookings = agendaDao.getYearMonth(yearMonth, null, false, null, true);
+		Donatore donatore = agendaDao.getDonatore(codDonatoreInterno);
+		Assert.assertEquals(donatore.getCodinternodonat(), codDonatoreInterno);
+
+		MonthlyBookings monthlyBookings = agendaDao.getYearMonth(yearMonth, null, donatore.getDonaStatus(30));
 		
 		Booking[][] bookingMonth = monthlyBookings.getBookingsWeek();
 		AgendaKey firstKeyNotNull = null;

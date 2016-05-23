@@ -12,7 +12,6 @@ public class YearMonthDay extends YearMonth {
 	
 	public static final YearMonthDay VOID = new YearMonthDay(null);
 
-	
 	private YearMonth yearMonth;
 	private int day;
 	private int weekNr;		//nr settimana del mese 0 based

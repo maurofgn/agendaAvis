@@ -71,10 +71,10 @@ public class LimitLoginAuthenticationProvider extends DaoAuthenticationProvider 
 //	    	}
 
 			
-			if (userSession.getDonaStatus() != null && !userSession.getDonaStatus().prenoWeb(userService.getMaxDayBeforePreno())) {
+			if (userSession.getDonaStatus() != null && !userSession.getDonaStatus().prenoWeb()) {
 				
 //				//il donatore non può donare. I motivi sono specificati in causa
-				String causa = userSession.getDonaStatus().getMsg(userService.getMaxDayBeforePreno());
+				String causa = userSession.getDonaStatus().getMsg();
 				auditService.audit(authentication.getName(), "Autenticato con successo, ma donatore non idoneo: " + causa);
 				String msg = messageSource.getMessage("msg.no.preno", new String[]{causa}, Locale.getDefault())
 //						+ "\n\n(" + userSession.getDonaStatus().getMsg(userService.getMaxDayBeforePreno()) + ")"
