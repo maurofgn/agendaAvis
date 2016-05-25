@@ -4,14 +4,18 @@ import it.mesis.avis.interceptor.Trasfusionale;
 
 import java.util.Properties;
 
+//import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -25,10 +29,8 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-
-
 @ComponentScan(basePackages = "it.mesis.avis")
-@PropertySource("classpath:email.properties")
+@PropertySource(value = { "classpath:email.properties" , "classpath:application.properties"})
 
 public class AppConfig extends WebMvcConfigurerAdapter {
 	
@@ -102,6 +104,38 @@ public class AppConfig extends WebMvcConfigurerAdapter {
         mailSenderImpl.setJavaMailProperties(javaMailProps);
         return mailSenderImpl;
     }
+    
+    
+	/**
+	 * Add PropertySourcesPlaceholderConfigurer to make placeholder work. This
+	 * method MUST be static
+	 */
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+
+		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+
+		// get active profile
+		String activeProfile = System.getProperty("spring.profiles.active", "Production");
+//		AnnotationConfigApplicationContext  context = Env.get
+        //Sets the active profiles
+
+		ClassPathResource resource = null;
+		// choose different property files for different active profile
+		if ("development".equalsIgnoreCase(activeProfile)) {
+			resource = new ClassPathResource("development.properties");
+		} else if ("test".equalsIgnoreCase(activeProfile)) {
+			resource = new ClassPathResource("test.properties");
+		} else {
+			resource = new ClassPathResource("production.properties");
+		}
+
+		// load the property file
+		propertySourcesPlaceholderConfigurer.setLocation(resource);
+//		propertySourcesPlaceholderConfigurer.setNullValue("");
+
+		return propertySourcesPlaceholderConfigurer;
+	}
     
 
 }
