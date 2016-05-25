@@ -114,11 +114,10 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
 
 		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+		
+		propertySourcesPlaceholderConfigurer.setNullValue("@null");	//stringa con la quale si riconosce il null
 
-		// get active profile
-		String activeProfile = System.getProperty("spring.profiles.active", "Production");
-//		AnnotationConfigApplicationContext  context = Env.get
-        //Sets the active profiles
+		String activeProfile = System.getProperty("spring.profiles.active", "production");
 
 		ClassPathResource resource = null;
 		// choose different property files for different active profile
@@ -132,10 +131,8 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 
 		// load the property file
 		propertySourcesPlaceholderConfigurer.setLocation(resource);
-//		propertySourcesPlaceholderConfigurer.setNullValue("");
 
 		return propertySourcesPlaceholderConfigurer;
 	}
     
-
 }

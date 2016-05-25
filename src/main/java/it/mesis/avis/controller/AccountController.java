@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -73,6 +74,9 @@ public class AccountController {
 	
 	@Autowired
 	AuditService auditService;
+	
+	@Value("${env.emailTo:@null}")
+	private String testEmailTo;
 
 	private static final String PREFIX_PATH = "/account/";
 
@@ -118,7 +122,6 @@ public class AccountController {
     		@RequestParam(value="state",    required=false) String state
     		) {
 
-		
 		Calendar gc = TimeUtil.getToday();	//oggi con ore, min, sec e millis = 0
 		
 		if (dateFrom == null) {
@@ -217,13 +220,6 @@ public class AccountController {
 	 */
 	private boolean correctnessFormalPsw(String password, Locale locale, Map<String, String> map) {
 		
-//		Integer pswMinLen = Utility.getInteger(environment.getProperty("psw.min.length"));
-//		if (pswMinLen != null && pswMinLen > 0 && password.length() < pswMinLen) {
-//			map.put("result", "fail");
-//			map.put("msg", messageSource.getMessage("message.password.minLength", new Object[] {pswMinLen}, locale));
-//			return false;
-//		}
-		
 		String regExp = environment.getProperty("psw.reg.exp");
 		if (regExp != null && !regExp.isEmpty() && !password.matches(regExp)) {
 			map.put("result", "fail");
@@ -320,7 +316,7 @@ public class AccountController {
 	    
         String password = Utility.getNewPsw(10);
         
-	    SimpleMailMessage email = constructResetTokenEmail("", request.getLocale(), password, user);
+	    SimpleMailMessage email = constructResetTokenEmail(request.getLocale(), password, user);
 	    mailSender.send(email);
 	    
 	    Calendar gc = TimeUtil.getToday();
@@ -337,131 +333,28 @@ public class AccountController {
 
     	return genericResponse;
 //        return new GenericResponse(messageSource.getMessage("message.resetPasswordEmail", null, request.getLocale()));
-        
     }
 	
-//	@RequestMapping(value = "/user/resetPassword2", method = RequestMethod.GET)
-//	public String resetPassword(ModelMap model, final HttpServletRequest request, @RequestParam("email") String userEmail, @RequestParam("codFisc") String codFisc) {
-//		
-//	    User user = userService.findUserByCodFisc(codFisc);
-//	    if (user == null || user.getDonatore() == null) {
-//	    	
-//	    	auditService.audit(codFisc, "Richiesta password di un donatore non presente tra i donatori");
-//	    	
-//	        throw new UsernameNotFoundException("Non trovato: " + codFisc);
-//	    }
-//	    
-//	    if (user.getDonatore().getEmail() == null || user.getDonatore().getEmail().isEmpty()) {
-//	    	auditService.audit(codFisc, "Richiesta password di un donatore, con e-mail in assoAvis non definita. L'utente ha fornito la sua email: " + userEmail);
-//	    	throw new UsernameNotFoundException("Non trovato: " + userEmail);
-//	    }
-//	    
-//	    if (!user.getDonatore().getEmail().equalsIgnoreCase(userEmail)) {
-//	    	auditService.audit(codFisc, "Richiesta password di un donatore, ma l'e-mail specificata non è la stessa di assoavis. " + user.getDonatore().getEmail() + " <> " + userEmail);
-//	    	throw new UsernameNotFoundException("Non trovato: " + userEmail);
-//	    }
-//	    
-////	    String token = UUID.randomUUID().toString();
-////	    userService.createPasswordResetTokenForUser(user, token);
-////	    String appUrl = 
-////	      "http://" + request.getServerName() + 
-////	      ":" + request.getServerPort() + 
-////	      request.getContextPath();
-//	    
-//        String password = Utility.getNewPsw(10);
-//        
-//	    SimpleMailMessage email = constructResetTokenEmail("", request.getLocale(), password, user);
-//	    mailSender.send(email);
-//	    
-//	    GregorianCalendar gc = new GregorianCalendar();
-//	    gc.add(GregorianCalendar.YEAR, -1);
-//	    
-//	    user.setLastChangePsw(new Timestamp(gc.getTimeInMillis()));
-//		user.setPassword(passwordEncoder.encode(password));
-//	    userService.updateUser(user);
-//	    
-//    	auditService.audit(codFisc, "Nuova password per " +  user.getDonatore().getRefDonatore() + " iviata a: " + user.getDonatore().getEmail());
-//
-////		model.addAttribute("msg", "e-mail inviata all'indirizzo specificato");
-//
-////	    return model;
-//		return "e-mail inviata all'indirizzo specificato";
-//	}
-//	
-//	private ModelAndView resetPassword_ori(final HttpServletRequest request, @RequestParam("email") String userEmail, @RequestParam("codFisc") String codFisc) {
-//		
-//	    User user = userService.findUserByCodFisc(codFisc);
-//	    if (user == null || user.getDonatore() == null) {
-//	    	
-//	    	auditService.audit(codFisc, "Richiesta password di un donatore non presente tra i donatori");
-//	    	
-//	        throw new UsernameNotFoundException("Non trovato: " + codFisc);
-//	    }
-//	    
-//	    if (user.getDonatore().getEmail() == null || user.getDonatore().getEmail().isEmpty()) {
-//	    	auditService.audit(codFisc, "Richiesta password di un donatore, con e-mail in assoAvis non definita. L'utente ha fornito la sua email: " + userEmail);
-//	    	throw new UsernameNotFoundException("Non trovato: " + userEmail);
-//	    }
-//	    
-//	    if (!user.getDonatore().getEmail().equalsIgnoreCase(userEmail)) {
-//	    	auditService.audit(codFisc, "Richiesta password di un donatore, ma l'e-mail specificata non è la stessa di assoavis. " + user.getDonatore().getEmail() + " <> " + userEmail);
-//	    	throw new UsernameNotFoundException("Non trovato: " + userEmail);
-//	    }
-//	    
-////	    String token = UUID.randomUUID().toString();
-////	    userService.createPasswordResetTokenForUser(user, token);
-////	    String appUrl = 
-////	      "http://" + request.getServerName() + 
-////	      ":" + request.getServerPort() + 
-////	      request.getContextPath();
-//	    
-//        String password = Utility.getNewPsw(10);
-//        
-//	    SimpleMailMessage email = constructResetTokenEmail("", request.getLocale(), password, user);
-//	    mailSender.send(email);
-//	    
-//	    GregorianCalendar gc = new GregorianCalendar();
-//	    gc.add(GregorianCalendar.YEAR, -1);
-//	    
-//	    user.setLastChangePsw(new Timestamp(gc.getTimeInMillis()));
-//		user.setPassword(passwordEncoder.encode(password));
-//	    userService.updateUser(user);
-//	    
-//    	auditService.audit(codFisc, "Nuova password per " +  user.getDonatore().getRefDonatore() + " iviata a: " + user.getDonatore().getEmail());
-//
-//	    ModelAndView model = new ModelAndView();
-//	    
-//		model.setViewName(PREFIX_PATH + "login");
-//	    return model;
-//	}
-	
-    private final SimpleMailMessage constructResetTokenEmail(final String contextPath, final Locale locale, final String password, final User user) {
-//        final String url = contextPath + "/user/changePassword?id=" + user.getId() + "&token=" + token;
+    private final SimpleMailMessage constructResetTokenEmail(final Locale locale, final String password, final User user) {
         final String subject = messageSource.getMessage("message.Subject.resetPassword", null, locale);
         final String message = messageSource.getMessage("message.Body.resetPassword", null, locale);
         
         final SimpleMailMessage email = new SimpleMailMessage();
         
-//TODO: cambiare dopo il test
-        
-        boolean test = true;
+        boolean test = testEmailTo != null && !testEmailTo.isEmpty();
         if (test && user.getDonatore() != null && user.getDonatore().getEmail().toLowerCase().endsWith("@mesis.it"))
         	test = false;
         
         if (test) {
-        	email.setTo("mauro.fugante@gmail.com");
-            email.setSubject(subject);
+        	email.setTo(testEmailTo);
             email.setText(message + " \r\nPassword: " + password + "\n\n" + "Questo messaggio è stato mandato da AgendaWeb con il flag test = true.\nModificare AccountController.SimpleMailMessage ");
-            email.setFrom(environment.getProperty("support.email"));
         } else {
         	email.setTo(user.getDonatore().getEmail());
-            email.setSubject(subject);
             email.setText(message + " \r\nPassword:" + password);
-            email.setFrom(environment.getProperty("support.email"));
         }
+        email.setSubject(subject);
+        email.setFrom(environment.getProperty("support.email"));
         
-//TODO: cambiare dopo il test        
-
         return email;
     }
 	
