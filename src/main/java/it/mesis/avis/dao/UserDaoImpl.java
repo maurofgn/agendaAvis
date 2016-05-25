@@ -24,8 +24,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
 import org.springframework.stereotype.Repository;
 
 @Repository("userDao")
@@ -327,14 +329,15 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		DecimalFormat df2 = new DecimalFormat( "00" );
 		
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT count(*) "); 
+		sb.append("SELECT count(*) conta "); 
 		sb.append("FROM LOGIDONEITA li "); 
 		sb.append("where "); 
 		sb.append("li.CODINTERNODONAT = :codDon "); 
 		sb.append("and li.idoneita != 1 and li.chiusa = 0 "); 
 		sb.append("and li.emoc_" + df2.format(ds.getType().getIndex()) + " = 1 ");
+		SQLQuery query = getSession().createSQLQuery(sb.toString())
+				.addScalar("conta", new IntegerType());
 		
-		Query query = getSession().createSQLQuery(sb.toString());
 		query.setString("codDon", codDon);
 		Integer result = (Integer) query.uniqueResult();
 		return result.longValue() > 0;
