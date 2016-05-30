@@ -1,16 +1,16 @@
 package it.mesis.avis.controller;
 
 import it.mesis.avis.exception.StatusException;
-import it.mesis.avis.model.Audit;
 import it.mesis.avis.model.User;
 import it.mesis.avis.model.UserProfile;
 import it.mesis.avis.service.AuditService;
 import it.mesis.avis.service.UserProfileService;
 import it.mesis.avis.service.UserService;
 import it.mesis.util.model.AuditDto;
-import it.mesis.util.model.AuditMapper;
 import it.mesis.util.model.GenericResponse;
-import it.mesis.util.model.JqgridResponse;
+import it.mesis.util.model.jq.ColumnsDataTable;
+import it.mesis.util.model.jq.DataTable;
+import it.mesis.utility.DateFromTo;
 import it.mesis.utility.TimeUtil;
 import it.mesis.utility.Utility;
 
@@ -88,72 +88,54 @@ public class AccountController {
 	}
 
 	/**
-	 * non usata, ma lascita per eventuale uso futuro in cui è viene gestita la paginazione dei dati in output
-	 * @param page
-	 * @param rows
-	 * @return
+	 * 
+	 * @param request
+	 * @param dateFrom
+	 * @param dateTo
+	 * @param user
+	 * @param state
+	 * @return dati json per paginazione con jquery.DataTable
 	 */
 	@Secured ({"ROLE_ADMIN", "ROLE_AVIS"})
 	@RequestMapping(value="/auditRecsPages", produces="application/json")
-	public @ResponseBody JqgridResponse<AuditDto> recordsPages(
-    		@RequestParam(value="page", required=false) Integer page,	//pagina richiesta
-    		@RequestParam(value="rows", required=false) Integer rows	//nr righe per ogni singola pagina
+	public @ResponseBody DataTable<AuditDto> recordsPages(
+			HttpServletRequest  request,
+    		@RequestParam(value="dateFrom", required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateFrom,
+    		@RequestParam(value="dateTo",   required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateTo,
+    		@RequestParam(value="user",     required=false) String user,
+    		@RequestParam(value="state",    required=false) String state
     		) {
-
-		List<Audit> audits = auditService.findAllAudits();
-		List<AuditDto> dtos = AuditMapper.map(audits);
 		
-		JqgridResponse<AuditDto> response = new JqgridResponse<AuditDto>();
-		response.setRows(dtos);
-		
-		response.setRecords(Long.valueOf(audits.size()).toString());
-		response.setTotal(Integer.valueOf(1).toString());	//totale pagine
-		response.setPage(Integer.valueOf(1).toString());	//numero pagina (1 based)
-
-		return response;
+		return getPage(request, dateFrom, dateTo, user, state);
 	}
 	
 	@Secured ({"ROLE_ADMIN", "ROLE_AVIS"})
 	@RequestMapping(value="/auditRecs", produces="application/json")
-	public @ResponseBody JqgridResponse<AuditDto> records(
+	public @ResponseBody DataTable<AuditDto> records(
+			HttpServletRequest  request,
     		@RequestParam(value="dateFrom", required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateFrom,
     		@RequestParam(value="dateTo",   required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateTo,
     		@RequestParam(value="user",     required=false) String user,
     		@RequestParam(value="state",    required=false) String state
     		) {
 
-		Calendar gc = TimeUtil.getToday();	//oggi con ore, min, sec e millis = 0
-		
-		if (dateFrom == null) {
-			if (dateTo == null)
-				dateFrom = gc.getTime();
-			else if (dateTo.after(gc.getTime()))
-				dateFrom = gc.getTime();
-			else
-				dateFrom = dateTo;
-		}
-		
-		if (dateTo == null)
-			dateTo = dateFrom;
-		
-		List<Audit> audits = auditService.findAudits(TimeUtil.getMinHour(dateFrom), TimeUtil.getMaxHour(dateTo), user, state);
-		List<AuditDto> dtos = AuditMapper.map(audits);
-		
-		JqgridResponse<AuditDto> response = new JqgridResponse<AuditDto>();
-		response.setRows(dtos);
-		
-//		response.setRecords(Long.valueOf(audits.getTotalElements()).toString());
-//		response.setTotal(Integer.valueOf(audits.getTotalPages()).toString());
-//		response.setPage(Integer.valueOf(audits.getNumber()+1).toString());
-		
-		response.setRecords(Long.valueOf(audits.size()).toString());
-		response.setTotal(Integer.valueOf(1).toString());	//totale pagine
-		response.setPage(Integer.valueOf(1).toString());	//numero pagina (1 based)
-
-		return response;
+		return getPage(request, dateFrom, dateTo, user, state);
+	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param dateFrom
+	 * @param dateTo
+	 * @param user
+	 * @param state
+	 * @return DataTable<AuditDto>
+	 */
+	private DataTable<AuditDto> getPage(HttpServletRequest request, Date dateFrom, Date dateTo, String user, String state) {
+		DateFromTo dateRange = new DateFromTo(dateFrom, dateTo);
+		return auditService.findAuditsPage(new ColumnsDataTable(request), dateRange.getDateFrom(), dateRange.getDateTo(), user, state);
 	}
 
-	
 	@RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
 	public String accessDeniedPage(ModelMap model) {
 		model.addAttribute("user", getPrincipal());

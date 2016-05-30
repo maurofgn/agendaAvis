@@ -935,5 +935,15 @@ public class TimeUtil
 		
 		return retValue;
 	}
+
+	/**
+	 * 
+	 * @param dateFrom
+	 * @param dateTo
+	 * @return il range di date con l'orario minimo per dateFrom e orario max per dateTo
+	 */
+	public static DateFromTo getDateRange(Date dateFrom, Date dateTo) {
+		return new DateFromTo(dateFrom, dateTo);
+	}
 	
 }

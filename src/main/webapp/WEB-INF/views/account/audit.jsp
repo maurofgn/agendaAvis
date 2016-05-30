@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
-<%-- <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>  --%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <c:set var="language" value="${not empty param.language ? param.language : not empty language ? language : pageContext.request.locale}" scope="session" />
@@ -13,9 +13,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> 
 <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script> 
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+<script type="text/javascript" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII"/>
 <title><fmt:message key="audit.title" bundle="${lang}" /></title>
 
@@ -30,50 +33,110 @@
 
 <script type='text/javascript'>
 
-$(function() {
-	$( "#dateFrom" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: 'today-190Y', maxDate: 'today'}).datepicker("setDate", new Date());
-	$( "#dateTo" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: 'today-190Y', maxDate: 'today'}).datepicker("setDate", new Date());
-});
+var tableLogs;
+
+function getParams() {
+	parameters = new Object();
+	parameters.dateFrom = $('#dateFrom').val();
+	parameters.dateTo = $('#dateTo').val();
+	parameters.user = $('#user').val();
+	parameters.state = $('#state').val();
+	return $.param(parameters);
+}
+
+function parseDate(input) {
+	  var parts = input.split('/');
+	  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
+	  return new Date(parts[2], parts[1]-1, parts[0]); // Note: months are 0-based
+}	
+
+//Plug-in to fetch page data 
+jQuery.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
+{
+	return {
+		"iStart":         oSettings._iDisplayStart,
+		"iEnd":           oSettings.fnDisplayEnd(),
+		"iLength":        oSettings._iDisplayLength,
+		"iTotal":         oSettings.fnRecordsTotal(),
+		"iFilteredTotal": oSettings.fnRecordsDisplay(),
+		"iPage":          oSettings._iDisplayLength === -1 ? 0 : Math.ceil( oSettings._iDisplayStart / oSettings._iDisplayLength ),
+		"iTotalPages":    oSettings._iDisplayLength === -1 ? 0 : Math.ceil( oSettings.fnRecordsDisplay() / oSettings._iDisplayLength )
+	};
+};
 
 $(document).ready(function() {
-	getLogs();
-	});
 	
-$(document).ajaxStart(function() {
-    $("title").html("LOADING ...");
-});
+	$( "#dateFrom" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: '-90y', maxDate: 'today'}).datepicker("setDate", new Date());
+	$( "#dateTo" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: '-90y', maxDate: 'today'}).datepicker("setDate", new Date());
 	
-function getLogs() {
-    var dateFrom = $("#dateFrom").val();
-    var dateTo = $("#dateTo").val();
-    var user = $("#user").val();
-    var state = $("#state").val();
-    
-	$.ajax({
-		type : 'get',
-		url: '${auditRecs}',
-		data : {dateFrom: dateFrom, dateTo: dateTo, user:user, state:state},
-//         context: document.body,
-        success: function(response) {
-         	populateTable(response)
+	tableLogs = $("#logs").DataTable( {
+ 		"lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+        "processing": true,
+        "serverSide": true,
+        "bFilter": false,		//senza input x search
+        //bStateSave variable you can use to save state on client cookies: set value "true" 
+        "bStateSave": false,
+        //Default: Page display length
+        "iDisplayLength": 10,
+        //We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+        "iDisplayStart": 0,
+        "fnDrawCallback": function () {
+            //Get page numer on client. Please note: number start from 0 So
+            //for the first page you will see 0 second page 1 third page 2...
+            //Un-comment below alert to see page number
+        	//alert("Current page number: "+this.fnPagingInfo().iPage);
         },
-		error : function(data) {
-			console.log("FAILUR: ", data);
-	    }
+        "language": {
+            "lengthMenu": "Mostra _MENU_ righe per pagina",
+            "zeroRecords": "Nessun valore da visualizzare",
+            "info": "Pagina _PAGE_ di _PAGES_",
+            "infoEmpty": "Non ci sono valori disponibili",
+            "emptyTable": "Non ci sono valori disponibili",
+            "infoFiltered": "(filtrati da _MAX_ records totali)",
+            "search":         "Cerca:",
+            "thousands":      ".",
+            "decimal":        "",
+            "loadingRecords": "Loading...",
+            "processing":     "Processing...",
+            "paginate": {
+                "first":      "Primo",
+                "last":       "Ultimo",
+                "next":       "Successivo",
+                "previous":   "Precedente"
+            }
+        },
+        "ajax": 
+        	{
+            url : "auditRecsPages",
+            type: "GET", // This is the default value, could also be POST
+            data: function(d) {
+                    d.dateFrom = $('#dateFrom').val();
+                	d.dateTo = $('#dateTo').val();
+                	d.user = $('#user').val();
+                	d.state = $('#state').val();
+                }
+        	},
+        "columns": [
+				{ "mData": "created", "render": function (data) {
+			          var date = new Date(data);
+			          var month = date.getMonth() + 1;
+			          month = month.length > 1 ? month : "0" + month;
+			          var day = date.getDate();
+			          day = day > 9 ? day : "0" + day;
+					  return day + "/" + month + "/" + date.getFullYear();
+					}
+		    	 },
+			{ "mData": "ssoId" },
+			{ "mData": "state" }
+        ],
+        "order": [[ 0, 'desc' ], [ 1, 'asc' ]]
+    } );
+	
+	$('#dateFrom, #dateTo, #user, #state').on('change keyup paste', function () {
+ 		tableLogs.ajax.reload();
 	});
-}
-
-function populateTable(data) {
 	
-	var trHTML = '';
-	
-    $.each(data.rows, function (i, item) {
-		trHTML += '<tr><td style="width: 160px;">' + item.createdHourString + '</td><td style="width: 150px;">' + item.ssoId + '</td><td style="width: 780px;">' + item.state + '</td></tr>';
-    });
-    
-    $('#tbodyLogs').html(trHTML);
-}
-
+});
 	
 </script>
 
@@ -85,9 +148,8 @@ function populateTable(data) {
   
  	<sec:authorize access="hasRole('ADMIN') or hasRole('AVIS')">
 
-		<div id="auditPara">
-		
-		    <form  style=" display: flex; margin: auto; position: relative; ">
+		<div>
+		    <form:form action="" method="GET" style="display: flex; margin: auto; position: relative;">
 
 				<div class="row">
 					<div class="form-group col-md-12" style=" display: flex; margin: auto; position: relative; ">
@@ -103,50 +165,37 @@ function populateTable(data) {
 					</div>
 				</div>
 
-
 				<div class="row">
 					<div class="form-group col-md-12" style=" display: flex; margin: auto; position: relative; ">
 						<label class="control-lable" for="user" style="padding: 5px;"><fmt:message key="audit.label.utente" bundle="${lang}"/></label>
 						<input type="text" name="user" id="user" class="form-control input-sm" style="width: 150px;" />
 					</div>
 				</div>
-				
-				
+
 				<div class="row">
 					<div class="form-group col-md-12" style=" display: flex; margin: auto; position: relative; ">
 						<label class="control-lable" for="state" style="padding: 5px;"><fmt:message key="audit.label.state" bundle="${lang}"/></label>
 						<input type="text" name="state" id="state" class="form-control input-sm" style="width: 150px;" />
 					</div>
 				</div>
-				
-				<div class="row">
-					<div class="form-group col-md-12" >
-						<a href="#" class="btn btn-primary btn-default btn-sm" onclick="getLogs()" style=" width: 100%; margin-left:15px">
-							<fmt:message key="search" bundle="${lang}"/>
-			  			</a>
-					</div>
-				</div>
-				
-			</form>
+			</form:form>
+			
+			<table id='logs' class="table table-hover" style="width:100%">
+			    <thead>
+			      <tr>
+			        <th><fmt:message key="audit.label.data" bundle="${lang}" /></th>
+			        <th><fmt:message key="audit.label.utente" bundle="${lang}" /></th>
+			        <th><fmt:message key="audit.label.state" bundle="${lang}" /></th>
+			      </tr>
+			    </thead>
+			    <tbody id = 'tbodyLogs' >
+			    </tbody>
+		  	</table>
+		  	
 		</div>
 		
 	</sec:authorize>
 	
-   <div id="scrollPanel" style="overflow-y:auto; height: 400px; border: solid 1px;">
-	   <table id='logs' class="table table-hover" style="width:100%">
-	    <thead>
-	      <tr>
-	        <th><fmt:message key="audit.label.data" bundle="${lang}" /></th>
-	        <th><fmt:message key="audit.label.utente" bundle="${lang}" /></th>
-	        <th><fmt:message key="audit.label.state" bundle="${lang}" /></th>
-	      </tr>
-	    </thead>
-	    <tbody id = 'tbodyLogs' >
-	    </tbody>
-	  </table>
-  </div>
-	  
 </div>
-
 </body>
 </html>

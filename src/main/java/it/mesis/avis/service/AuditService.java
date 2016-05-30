@@ -1,6 +1,9 @@
 package it.mesis.avis.service;
 
 import it.mesis.avis.model.Audit;
+import it.mesis.util.model.AuditDto;
+import it.mesis.util.model.jq.ColumnsDataTable;
+import it.mesis.util.model.jq.DataTable;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -21,5 +24,9 @@ public interface AuditService {
 	List<Audit> findAllAudits();
 	
 	List<Audit> findAudits(Date dateFrom, Date dateTo, String user, String state);
+	
+	List<Audit> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state);
+
+	DataTable<AuditDto> findAuditsPage(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state);
 	
 }

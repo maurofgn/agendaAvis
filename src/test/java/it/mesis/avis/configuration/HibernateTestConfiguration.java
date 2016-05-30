@@ -8,12 +8,16 @@ import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,12 +32,21 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({ "it.mesis.avis.dao" })
-@PropertySource({"classpath:applicationTest.properties", "classpath:emailTest.properties" })
+@PropertySource(value = { "classpath:email.properties" , "classpath:application.properties"})
 public class HibernateTestConfiguration {
 
 	@Autowired
 	private Environment environment;
-
+	
+	@Value("${jdbc.driverClassName:com.mysql.jdbc.Driver}") private String driverClassName;
+	@Value("${jdbc.url:jdbc:jtds:jdbc:mysql://localhost:3306/assoAvis_test}") private String url;
+	@Value("${jdbc.username:root}") private String username;
+	@Value("${jdbc.password:toor}") private String password;
+	@Value("${hibernate.dialect:org.hibernate.dialect.MySQLDialect}") private String dialect;
+	@Value("${hibernate.show_sql:true}") private String showSql;
+	@Value("${hibernate.format_sql:true}") private String formatSql;
+	@Value("${hibernate.hbm2ddl.auto:update}") private String hbm2ddlAuto;	//validate | update | create | create-drop
+	
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
@@ -44,29 +57,28 @@ public class HibernateTestConfiguration {
 	}
 
 	@Bean(name = "dataSource")
-	public DataSource dataSource() {
-		
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		
-        dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driverClassName"));
-        dataSource.setUrl(environment.getRequiredProperty("jdbc.url"));
-        dataSource.setUsername(environment.getRequiredProperty("jdbc.username"));
-        dataSource.setPassword(environment.getRequiredProperty("jdbc.password"));
-		
-		return dataSource;
-	}
+  public DataSource dataSource() {
+      DriverManagerDataSource dataSource = new DriverManagerDataSource();
+      dataSource.setDriverClassName(driverClassName);
+      dataSource.setUrl(url);
+      dataSource.setUsername(username);
+      dataSource.setPassword(password);
+      return dataSource;
+  }
 
-	private Properties hibernateProperties() {
-		Properties properties = new Properties();
-		
-		properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
-		properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
-        properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
-        properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
-
-		return properties;
-	}
-
+//  @Profile("Production")
+  private Properties hibernateProperties() {
+      Properties properties = new Properties();
+      properties.put("hibernate.dialect", dialect);
+      properties.put("hibernate.show_sql", showSql);
+      properties.put("hibernate.format_sql", formatSql);
+      
+      if (hbm2ddlAuto != null && !hbm2ddlAuto.isEmpty())
+      	properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
+      
+      return properties;        
+  }	
+	
 	@Bean
 	@Autowired
 	public HibernateTransactionManager transactionManager(SessionFactory s) {
@@ -80,5 +92,49 @@ public class HibernateTestConfiguration {
 //	    return new BCryptPasswordEncoder();
 		return new PswEncoder();
 	}
+	
+    @Bean
+    public JavaMailSenderImpl javaMailSenderImpl() {
+        final JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
+        mailSenderImpl.setHost(environment.getProperty("smtp.host"));
+        mailSenderImpl.setPort(environment.getProperty("smtp.port", Integer.class));
+        mailSenderImpl.setProtocol(environment.getProperty("smtp.protocol"));
+        mailSenderImpl.setUsername(environment.getProperty("smtp.username"));
+        mailSenderImpl.setPassword(environment.getProperty("smtp.password"));
+        final Properties javaMailProps = new Properties();
+        javaMailProps.put("mail.smtp.auth", true);
+        javaMailProps.put("mail.smtp.starttls.enable", true);
+        mailSenderImpl.setJavaMailProperties(javaMailProps);
+        return mailSenderImpl;
+    }
+	
+	/**
+	 * Add PropertySourcesPlaceholderConfigurer to make placeholder work. This
+	 * method MUST be static
+	 */
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+
+		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+		
+		propertySourcesPlaceholderConfigurer.setNullValue("@null");	//stringa con la quale si riconosce il null
+
+		String activeProfile = System.getProperty("spring.profiles.active", "test");
+
+		ClassPathResource resource = null;
+		// choose different property files for different active profile
+		if ("development".equalsIgnoreCase(activeProfile)) {
+			resource = new ClassPathResource("development.properties");
+		} else if ("production".equalsIgnoreCase(activeProfile)) {
+			resource = new ClassPathResource("production.properties");
+		} else {
+			resource = new ClassPathResource("test.properties");
+		}
+
+		// load the property file
+		propertySourcesPlaceholderConfigurer.setLocation(resource);
+
+		return propertySourcesPlaceholderConfigurer;
+	}	
 	
 }

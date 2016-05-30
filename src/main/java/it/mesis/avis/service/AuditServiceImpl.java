@@ -2,6 +2,9 @@ package it.mesis.avis.service;
 
 import it.mesis.avis.dao.AuditDao;
 import it.mesis.avis.model.Audit;
+import it.mesis.util.model.AuditDto;
+import it.mesis.util.model.jq.ColumnsDataTable;
+import it.mesis.util.model.jq.DataTable;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -58,5 +61,19 @@ public class AuditServiceImpl implements AuditService {
 	public List<Audit> findAudits(Date dateFrom, Date dateTo, String user, String state) {
 		return dao.findAudits(dateFrom, dateTo, user, state);
 	}
+
+	@Override
+	public 	List<Audit> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state) {
+		return dao.findAudits(firstResult, pageSize, dateFrom, dateTo, user, state);
+	}
+	
+	@Override
+	public DataTable<AuditDto> findAuditsPage(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state) {
+		return dao.findAuditsPages(columnsDataTable, dateFrom, dateTo, user, state);
+	}
+
+	
+
+	
 
 }
