@@ -44,6 +44,19 @@ function getParams() {
 	return $.param(parameters);
 }
 
+function isValidDate(date)
+{
+    var matches = /^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.exec(date);
+    if (matches == null) return false;
+    var d = matches[1];
+    var m = matches[2] - 1;
+    var y = matches[3];
+    var composedDate = new Date(y, m, d);
+    return composedDate.getDate() == d &&
+            composedDate.getMonth() == m &&
+            composedDate.getFullYear() == y;
+}
+
 function parseDate(input) {
 	  var parts = input.split('/');
 	  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
@@ -66,8 +79,16 @@ jQuery.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
 
 $(document).ready(function() {
 	
-	$( "#dateFrom" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: '-90y', maxDate: 'today'}).datepicker("setDate", new Date());
-	$( "#dateTo" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: '-90y', maxDate: 'today'}).datepicker("setDate", new Date());
+	$( "#dateFrom" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: '-90y', maxDate: 'today'})
+ 		.datepicker("setDate", new Date())
+// 		.on('changeDate', function(ev) {
+// 	        $(this).valid();  // triggers the validation test
+// 	        // '$(this)' refers to '$("#dateFrom")'
+// 	    	})
+	    	;
+	$( "#dateTo" ).datepicker({ dateFormat: 'dd/mm/yy', minDate: '-90y', maxDate: 'today'})
+ 		.datepicker("setDate", new Date())
+		;
 	
 	tableLogs = $("#logs").DataTable( {
  		"lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
@@ -80,6 +101,8 @@ $(document).ready(function() {
         "iDisplayLength": 10,
         //We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
         "iDisplayStart": 0,
+        "scrollY":        "240px",
+        "scrollCollapse": true,
         "fnDrawCallback": function () {
             //Get page numer on client. Please note: number start from 0 So
             //for the first page you will see 0 second page 1 third page 2...
@@ -133,7 +156,8 @@ $(document).ready(function() {
     } );
 	
 	$('#dateFrom, #dateTo, #user, #state').on('change keyup paste', function () {
- 		tableLogs.ajax.reload();
+		if (isValidDate($('#dateFrom').val()) && isValidDate($('#dateTo').val()))
+ 			tableLogs.ajax.reload();
 	});
 	
 });

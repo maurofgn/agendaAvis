@@ -9,11 +9,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class DonaStatus {
 	
+	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
 	private String codinternodonat;
 	private boolean idoneo;
 	private Set<DonaStatusType> status;
@@ -169,25 +174,29 @@ public class DonaStatus {
 	}
 	
 	public String getMsg() {
+		return StringUtils.join(getReasons(), ", ");
+	}
+	
+	private List<String> getReasons() {
 		
-		StringBuffer sb = new StringBuffer();
+		List<String> reasons = new LinkedList<String>();
 		
 		if (!idoneo)
-			sb.append("Non idoneo");
+			reasons.add("Non idoneo");
 		
 		if (!MembershipState.DONATORE.equals(membershipState))
-			sb.append(" Non è un Donatore");
+			reasons.add("Non è un Donatore");
 		
 		if (!isMinPrenoOk())
-			sb.append(" Troppo presto per prenotare (non prima di 30 gg) prossima donazione tra " + dayDue() + " giorni");
+			reasons.add("Troppo presto per prenotare (non prima di 30 gg) prossima donazione tra " + dayDue() + " giorni");
 		
 		if (!isLtTwoYears())
-			sb.append(" Non dona da più di due anni");
+			reasons.add("Non dona da più di due anni");
 		
 		if (getListTipoDona().isEmpty())
-			sb.append(" Non ha nessun tipo donazione assegnato");
-		
-		return sb.toString().trim();
+			reasons.add("Non ha nessun tipo donazione assegnato");
+
+		return reasons;
 	}
 	
 	/**
@@ -264,19 +273,28 @@ public class DonaStatus {
 	}
 	
 	public String getRefDonatore() {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		
 		StringBuffer sb = new StringBuffer();
 		if (cognomeenome != null && !cognomeenome.isEmpty())
 			sb.append(cognomeenome);
 		if (luogonascita != null && !luogonascita.isEmpty())
-			sb.append(" nat" + getOA() + " a " + luogonascita);
-		if (provdinascita != null && !provdinascita.isEmpty())
-			sb.append("(" + provdinascita + ") ");
+			sb.append(" nat" + getOA() + " a " + getRefLuogoNascita());
 		if (datadinascita != null)
 			sb.append(" il " + sdf.format(datadinascita) + " ");
 		if (codicefiscale != null && !codicefiscale.isEmpty())
 			sb.append(" c.f. " + codicefiscale);
+		
 		return sb.toString().trim();
+	}
+	
+	public String getRefLuogoNascita() {
+		StringBuffer sb = new StringBuffer();
+		if (luogonascita != null && !luogonascita.isEmpty())
+			sb.append(luogonascita);
+		if (provdinascita != null && !provdinascita.isEmpty())
+			sb.append("(" + provdinascita + ") ");
+		
+		return sb.toString();
 	}
 	
 	private String getOA() {

@@ -28,8 +28,12 @@ public interface AgendaService {
 	MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, DonaStatus donaStatus);
 	
 	void disdetta(AgendaKey id);
+	
+	Boolean hasPrenoActive(Donatore donatore);
 
 	Agenda prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel);
+	
+	Agenda getPrenoActive(Donatore donatore) ;
 	
 	Donatore getDonatore(String codinternodonat);
 	

@@ -40,6 +40,9 @@ public interface AgendaDao {
 	List<Puntoprelievo> getPuntiPrelievoList();
 
 	List<ReportPreno> reportPreno(Date fromDate, Date toDate, Integer puntoPrelievo, Integer tipoDona);
+	
+	Boolean hasPrenoActive(Donatore donatore);
 
+	Agenda getPrenoActive(Donatore donatore);
 
 }

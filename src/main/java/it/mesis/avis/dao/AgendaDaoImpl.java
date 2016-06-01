@@ -15,10 +15,12 @@ import it.mesis.utility.TimeUtil;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.StandardBasicTypes;
@@ -279,13 +281,42 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	public void disdetta(AgendaKey id) {
 		Agenda agenda = findById(id);
 		
-		Donatore donatore = agenda.getDonatore();
-		prenoDonatore(false, donatore, null, null);
-		
-		agenda.setDonatore(null);
-//		agenda.setNotapren(null);
-		persist(agenda);
+		if (agenda != null) {
+			
+			Donatore donatore = agenda.getDonatore();
+			prenoDonatore(false, donatore, null, null);
+			
+			agenda.setDonatore(null);
+	//		agenda.setNotapren(null);
+			persist(agenda);
+		}
 	}
+	
+	@Override
+	public Boolean hasPrenoActive(Donatore donatore) {
+		
+		Query query = getSession().createQuery("select count(*) from Agenda a where a.donatore = :dona and a.id.dataorapren >= :todayMorning");
+		query.setParameter("dona", donatore);
+		query.setParameter("todayMorning", getTodayMorning());
+		return (Long) query.uniqueResult() > 0;
+	}
+	
+	@Override
+	public Agenda getPrenoActive(Donatore donatore) {
+		
+		Query query = getSession().createQuery("select a from Agenda a where a.donatore = :dona and a.id.dataorapren >= :todayMorning");
+		query.setParameter("dona", donatore);
+		query.setParameter("todayMorning", getTodayMorning());
+		
+		return (Agenda)query.uniqueResult();
+//		return (Agenda)query.list().get(0);
+	}
+	
+	private Date getTodayMorning() {
+		return DateUtils.truncate(new Date(), Calendar.DATE);
+
+	}
+
 	
 	/**
 	 * 
@@ -311,12 +342,18 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         sb.append("and a.id.dataorapren = :datePreno ");
         sb.append("and p.codicepuntoprel = :pp ");
         sb.append("and t.codice = :td ");
+        sb.append("and not exists (select 1 from Agenda a2 where a2.donatore = :dona and a2.id.dataorapren >= :todayMorning)");
         
+		Date today = new Date();
+		Date todayMorning = DateUtils.truncate(today, Calendar.DATE);
+
         Query query = getSession().createQuery(sb.toString());
         query.setParameter("datePreno", datePreno);
         query.setParameter("pp", tipoDonaPuntoPrel.getPuntoprelId());
         query.setParameter("td", tipoDonaPuntoPrel.getTipoDonaId());
-        
+        query.setParameter("dona", donatore);
+        query.setParameter("todayMorning", todayMorning);
+
 		List<?> list = query.list();
 		
 		if (list == null || list.isEmpty())
@@ -348,8 +385,18 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		
 		return agenda;
 	}
-	
+
+	/**
+	 * aggiorna i dati sull'anagrafica del donatore
+	 * @param preno
+	 * @param donatore
+	 * @param datePreno
+	 * @param tipoDonaPuntoPrel
+	 */
 	private void prenoDonatore(boolean preno, Donatore donatore, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
+		
+		if (donatore == null)
+			return;
 		
 		if (preno) {
 			donatore.setConvocato((short) 1);
@@ -436,4 +483,5 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		}
 		return retValue;
 	}
+
 }

@@ -72,8 +72,4 @@ public class AuditServiceImpl implements AuditService {
 		return dao.findAuditsPages(columnsDataTable, dateFrom, dateTo, user, state);
 	}
 
-	
-
-	
-
 }

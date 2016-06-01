@@ -10,6 +10,7 @@
 
 <c:url value="/freeHours" var="freeHours"/>
 <c:url value="/donors" var="donors"/>
+<c:url value='audit' var="audit"/>
 
 <html>
 <head>
@@ -23,11 +24,22 @@
 #hours td {
 	padding-top: 0;
 	padding-bottom: 0;
-	};
-
+	}
+	
+.text-italic {
+	font-style: italic;
+	text-align: right;
+	padding-right: 10px;
+	font-variant: small-caps;
+	}
+.text-bold {
+ 	font-weight: bold;
+	}
+	
 .text-center {
 	text-align:center;
 	}
+	
 .flex-container {
     display: -webkit-flex; 
     display: flex; 
@@ -57,8 +69,8 @@
     
 
 .Libero {
-	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+/* 	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
+/* 	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
 	background-color: #44c767;
 	border: 1px solid #18ab29;
 	cursor: pointer;
@@ -74,8 +86,8 @@
     }
         
 .LiberoNonPrenotabile {
-	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+/* 	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
+/* 	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
 	background-color: #468858;
 	border: 1px solid #18ab29;
 	color: #ffffff;
@@ -84,8 +96,8 @@
     }
 
 .Occupato {
-	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+/* 	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
+/* 	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
 	background-color: #E02A2A;            
 	border: 1px solid #B00000;
 	color: #ffffff;
@@ -97,8 +109,8 @@
     }
         
 .Indisponibile {
-	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+/* 	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
+/* 	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
 	background-color: #c2c2c2;				/* grigio chiaro */
 	border: 1px solid #808080;
 	color: #ffffff;
@@ -110,8 +122,8 @@
     }
         
 .Mia_Preno {
-	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b;
-	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b;
+/* 	-moz-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
+/* 	-webkit-box-shadow: inset 0px 1px 0px 0px #3dc21b; */
 	background-color: #13e3f2;
 	border: 1px solid #808080;
 	cursor: pointer;
@@ -137,7 +149,8 @@ $(function() {
 });
 
 function disdetta() {
-	if (confirm('Vuoi disdire la prenotazione ?')) {
+
+	if (confirm('<fmt:message key="msg.cancellation.confirm" bundle="${lang}"/>')) {
 		location.href = "disdetta";
 	}
 }
@@ -229,22 +242,55 @@ function populateDonars(data) {
 	}
 }
 
-
 </script>
 
 </head>
 <body>
 
-
 <div class="container">
 <!--  <div class="content"> -->
+
+ <c:if test="${userSession.isDonatore()}">
+	 <div class="flex-container">
+	 	<div class="flex-itemMsg">
+			<table style="width: 100%;">
+			 <thead style="border-bottom: 1px solid #0075BE; ">
+				<tr>
+					<td align="center" valign="middle" colspan=4 style="font-weight: bold; font-size: 120% ">${userSession.donaStatus.cognomeenome.toUpperCase()}</td>
+				</tr>
+			 </thead>
+			 
+			 <tbody>
+				<tr>
+					<td class='text-italic'><fmt:message key="agenda.born.location" bundle="${lang}"/>:</td>
+					<td class='text-bold'><c:out value='${userSession.donaStatus.refLuogoNascita}'/></td>
+					<td class='text-italic'><fmt:message key="agenda.born.date" bundle="${lang}"/>:</td>
+					<td class='text-bold'><fmt:formatDate value="${userSession.donaStatus.datadinascita}" pattern="dd/MM/yyyy"/></td>
+				</tr>
+				
+				<tr>
+					<td class='text-italic'><fmt:message key="agenda.fiscal.code" bundle="${lang}"/>:</td>
+					<td class='text-bold'><c:out value='${userSession.donaStatus.codicefiscale}'/></td>
+					<td class='text-italic'><fmt:message key="agenda.last.donation" bundle="${lang}"/>:</td>
+					<td class='text-bold'><fmt:formatDate value="${userSession.donaStatus.last}" pattern="dd/MM/yyyy"/></td>
+				</tr>
+				
+			 </tbody>
+			</table>
+			
+			
+			
+		</div>
+	 
+	 </div>
+ </c:if>
  
  <div class="flex-container">
  
 	<div class="flex-itemForm">
 	 	<h2><fmt:message key="agenda.title" bundle="${lang}" /></h2>
 	
-		<div>  	
+		<div>
 		    <form:form method="GET" action='agenda' id="frmAgenda" class="form-horizontal">
 		    
 				<div class="row">
@@ -318,9 +364,13 @@ function populateDonars(data) {
 			
 			<sec:authorize access="hasRole('ADMIN') or hasRole('AVIS')">
 				<div style="position: relative; margin: 5px;">
-					<a href="<%=request.getContextPath()%>/audit" style="width: 100%;" class="btn btn-primary btn-sm" >
-		    			<span class="glyphicon glyphicon-pencil"></span>  <fmt:message key="agenda.audit" bundle="${lang}"/>
+
+					<a href="${audit}" style="width: 100%;" class="btn btn-primary btn-sm">
+		    			<span class="glyphicon glyphicon-pencil"></span> <fmt:message key="agenda.audit" bundle="${lang}"/>
 		  			</a>
+<%-- 					<a href="<%=request.getContextPath()%>/audit" style="width: 100%;" class="btn btn-primary btn-sm"> --%>
+<%-- 		    			<span class="glyphicon glyphicon-pencil"></span> <fmt:message key="agenda.audit" bundle="${lang}"/> --%>
+<!-- 		  			</a> -->
 				</div>
 			</sec:authorize>
 		</div>
@@ -449,9 +499,7 @@ function populateDonars(data) {
 	
 <%-- div x parametri di stampa --%>
 		<div id="reportAgenda" style="position: absolute; top: 0px; left: 0px; z-index: 1000; background: transparent none repeat scroll 0px 0px; height: 100%; width: 100%; display: none; background-color: rgba(192,192,192,0.6);">
-	<!-- 	 display: none; block; -->
-		
-		    <form:form method="GET" action='reportAgenda' id="reportAgenda" target="_blank" class="form-horizontal" style="position: relative; margin: auto; top: 100px; width: 250px; padding-top:20px; padding-bottom:20px; background-color: rgba(255, 255, 255, 1);">
+		    <form:form method="GET" action='reportAgenda' id="frmReportAgenda" target="_blank" class="form-horizontal" style="position: relative; margin: auto; top: 100px; width: 250px; padding-top:20px; padding-bottom:20px; background-color: rgba(255, 255, 255, 1);">
 				<div class="row">
 					<div class="form-group col-md-12">
 						<div class="col-md-12">
@@ -513,9 +561,9 @@ function populateDonars(data) {
 					<div class="form-actions floatRight col-md-3"><span></span> </div>
 					<div class="form-actions col-md-6">
 					
-						<input type="submit" value="<fmt:message key="report.button.submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm" onclick="{document.getElementById('reportAgenda').style.display = 'none';}">
+						<input type="submit" value="<fmt:message key="report.button.submit" bundle="${lang}"/>" style="width: 100%;" class="btn btn-primary btn-sm" onclick="{document.getElementById('reportAgenda').style.display = 'none'; location.reload(true);}">
 	
-						<a href="#" class="btn btn-primary btn-sm" onclick="{document.getElementById('reportAgenda').style.display = 'none';}" style=" width: 100%; margin-top: 15px;  height: 22px;">
+						<a href="#" class="btn btn-primary btn-sm" onclick="{document.getElementById('reportAgenda').style.display = 'none'; location.reload(true);}" style=" width: 100%; margin-top: 15px;  height: 22px;">
 							<fmt:message key="agenda.report.annulla" bundle="${lang}"/>
 			  			</a>
 			  			

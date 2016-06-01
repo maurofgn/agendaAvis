@@ -87,4 +87,14 @@ public class AgendaServiceImpl implements AgendaService {
 		return dao.reportPreno(fromDate, toDate, puntoPrelievo, tipoDona);
 	}
 
+	@Override
+	public Boolean hasPrenoActive(Donatore donatore) {
+		return dao.hasPrenoActive(donatore);
+	}
+
+	@Override
+	public Agenda getPrenoActive(Donatore donatore) {
+		return dao.getPrenoActive(donatore);
+	}
+
 }

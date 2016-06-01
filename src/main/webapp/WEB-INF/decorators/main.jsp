@@ -38,8 +38,8 @@
 		      </ul>
 		      <ul class="nav navbar-nav navbar-right">
 			    <sec:authorize access="isAuthenticated()"> 
-			        <li><a href="logout"><fmt:message key="logout" bundle="${lang}" /> <sec:authentication property="principal.username" /></a> </li>
 			        <li><a href="changePassword"><fmt:message key="message.changePassword" bundle="${lang}" /></a> </li>
+			        <li><a href="logout"><fmt:message key="logout" bundle="${lang}" /> <sec:authentication property="principal.username" /></a> </li>
 			    </sec:authorize>      
 		      </ul>
 		    </div>

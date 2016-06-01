@@ -38,6 +38,8 @@
 		
 		<jasperreports.version>6.1.0</jasperreports.version>
 		
+		<commons-lang3.version>3.0</commons-lang3.version>
+		
 	</properties>
 	
 	<dependencies>
@@ -191,7 +193,14 @@
 			<artifactId>jasperreports</artifactId>
 			<version>${jasperreports.version}</version>
 		</dependency>
-
+		
+		<!-- String Utils -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>${commons-lang3.version}</version>
+		</dependency>
+		
 		<!-- Servlet+JSP+JSTL -->
 		<dependency>
 			<groupId>javax.servlet</groupId>

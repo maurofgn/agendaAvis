@@ -3,6 +3,7 @@ package it.mesis.avis.controller;
 import it.mesis.avis.exception.StatusException;
 import it.mesis.avis.model.Agenda;
 import it.mesis.avis.model.AgendaKey;
+import it.mesis.avis.model.Donatore;
 import it.mesis.avis.security.UserSession;
 import it.mesis.avis.service.AgendaService;
 import it.mesis.avis.service.AuditService;
@@ -229,7 +230,15 @@ public class AppController {
 				String msg = messageSource.getMessage("msg.no.preno", new String[]{causa}, Locale.getDefault());
 				throw new StatusException(msg);
 			}
-
+			
+			Donatore donatore = agendaService.getDonatore(userSession.getDonaStatus().getCodinternodonat());
+			
+			if (agendaService.hasPrenoActive(donatore)) {
+				auditService.audit("Prenotazione già esistente " + userSession.getDonaStatus().getRefDonatore());
+				request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.preno.exist", null, request.getLocale()));
+				return "redirect:/agenda";
+			}
+			
 			GregorianCalendar gc = new GregorianCalendar(userSession.getYearMonth().getYear(), userSession.getYearMonth().getMonth(), dayNr);
 			String[] xx = hhmm.split(":");
 			
@@ -239,7 +248,7 @@ public class AppController {
 			Agenda agenda = agendaService.prenota(userSession.getDonaStatus().getCodinternodonat(), gc.getTime(), userSession.getTipoDonaPuntoPrelSelected());
 			
 			if (agenda == null) {
-				//non è stato possibile prenotare perchè non c'è più disponibilità
+				//non è stato possibile prenotare perchè non c'è più disponibilità oppure è stata fatta una prenotazione da un'altra sessione
 				auditService.audit("Prenotazione fallita " + userSession.getTipoDonaPuntoPrelSelected().toString() + " " + DATE_HHMM.format(gc.getTime()) + " " + userSession.getDonaStatus().getRefDonatore());
 				request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.preno.missing", null, request.getLocale()));
 			} else {
@@ -295,6 +304,11 @@ public class AppController {
 		
 		if (userSession.getDonaStatus() != null) {
 			//donatore
+			Donatore donatore = agendaService.getDonatore(userSession.getDonaStatus().getCodinternodonat());
+			Agenda agenda = agendaService.getPrenoActive(donatore);
+			
+			userSession.getDonaStatus().setAgenda(agenda);
+			
 			if (userSession.getDonaStatus().getAgenda() != null)
 				agendaKey = userSession.getDonaStatus().getAgenda().getId();		//prenotazione attiva
 
@@ -313,9 +327,9 @@ public class AppController {
 			yearMonth = new YearMonth(gc.get(GregorianCalendar.YEAR), gc.get(GregorianCalendar.MONTH));
 		}
 		
-		if (tipoDonaPuntoPrel == null && userSession.getDonaStatus() == null) {
-			tipoDonaPuntoPrel = userSession.getListTipoDonazPuntiPrel().get(0);
-		}
+//		if (tipoDonaPuntoPrel == null && userSession.getDonaStatus() == null) {
+//			tipoDonaPuntoPrel = userSession.getListTipoDonazPuntiPrel().get(0);
+//		}
 		
 		if (tipoDonaPuntoPrel != null) {
 			MonthlyBookings monthlyBookings = agendaService.getYearMonth(yearMonth, tipoDonaPuntoPrel, userSession.getDonaStatus());

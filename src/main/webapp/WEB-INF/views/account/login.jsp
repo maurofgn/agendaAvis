@@ -24,21 +24,21 @@
             <div class="account-wall">
             
                 <form action="login" method="post" class="form-signin" style="position:absolute; width: 100%; top:100px;">
-                
-					<c:if test="${!empty SPRING_SECURITY_LAST_EXCEPTION}">
-						<p class="alert alert-danger"><c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/></p>
-						<c:remove scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"/>
-					</c:if>
-
 	                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 	                <input type="text" class="form-control" id="username" name="ssoId" placeholder="<fmt:message key="label.placeholder.codFisc" bundle="${lang}" />" required autofocus>
 	                <input type="password" class="form-control" id="password" name="password" placeholder="<fmt:message key="login.placeholder.password" bundle="${lang}" />" required>
  	                
 	                <br>
 	                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="login.button.submit" bundle="${lang}" /></button>
-	                
 		            <br>
-		            <a class="btn btn-default text-center" href=<c:url value='/user/resetPassword' /> ><fmt:message key="login.newPassword" bundle="${lang}" /></a>
+		            <div style=" margin: auto; width: 40%; padding-bottom: 5px;">
+		            	<a class="btn btn-default text-center" href=<c:url value='/user/resetPassword' /> style=" margin: auto;  width: 100%; "><fmt:message key="login.newPassword" bundle="${lang}" /></a>
+		            </div>
+		            <c:if test="${!empty SPRING_SECURITY_LAST_EXCEPTION}">
+						<p class="alert alert-danger"><c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/></p>
+						<c:remove scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"/>
+					</c:if>
+					
             	</form>
             	
             </div>
