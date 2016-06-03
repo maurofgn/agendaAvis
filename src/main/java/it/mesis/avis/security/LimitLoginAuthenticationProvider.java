@@ -75,10 +75,8 @@ public class LimitLoginAuthenticationProvider extends DaoAuthenticationProvider 
 				
 //				//il donatore non può donare. I motivi sono specificati in causa
 				String causa = userSession.getDonaStatus().getMsg();
-				auditService.audit(authentication.getName(), "Autenticato con successo, ma donatore non idoneo: " + causa);
-				String msg = messageSource.getMessage("msg.no.preno", new String[]{causa}, Locale.getDefault())
-//						+ "\n\n(" + userSession.getDonaStatus().getMsg(userService.getMaxDayBeforePreno()) + ")"
-						;
+				auditService.audit(authentication.getName(), "Autenticato con successo, ma non può donare: " + causa);
+				String msg = messageSource.getMessage("msg.no.preno", new String[]{causa}, Locale.getDefault());
 				throw new StatusException(msg);
 			}
 			

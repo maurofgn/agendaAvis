@@ -46,6 +46,8 @@ public class UrlAuthenticationFailureHandler implements AuthenticationFailureHan
 //			url = "/changePassword";
 		}
 		
+//		StatusException	//questo errore viene restituito se l'utente si è autenticato correttamente, ma non ha i requisiti per la donazione
+		
 		setMsgErr(request, msg);
 		
 		getRedirectStrategy().sendRedirect(request, response, url);

@@ -422,4 +422,19 @@ public class AccountController {
 		return userProfileService.findAll();
 	}
 	
+	
+//	@RequestMapping(value =  {"/sessionCount"}, method = RequestMethod.GET)
+//	public String sessionCount (HttpServletRequest request, HttpServletResponse response) {
+//		ServletContext ctx = request.getSession().getServletContext();
+//		return String.format("sessione aperte: %s su un totale di %s", ctx.getAttribute("currentusers"), ctx.getAttribute("totalusers"));
+//	}
+	
+	@RequestMapping(value =  {"/sessionCount"}, method = RequestMethod.GET)
+	public String sessionCount () {
+//		ServletContext ctx = request.getSession().getServletContext();
+//		String msg = String.format("sessione aperte: %s su un totale di %s", ctx.getAttribute("currentusers"), ctx.getAttribute("totalusers"));
+//		request.getSession().setAttribute("conta", msg);
+		return PREFIX_PATH + "sessionCount";
+	}
+	
 }
