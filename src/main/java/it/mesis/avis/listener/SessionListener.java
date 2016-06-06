@@ -23,8 +23,10 @@ public class SessionListener implements HttpSessionListener {
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent se) {
-		current--;
-        ctx.setAttribute("currentusers",current);
+		if (ctx != null) {
+			current--;
+	        ctx.setAttribute("currentusers",current);
+		}
 	}
 	
 }
