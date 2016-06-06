@@ -67,11 +67,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
-//		INSERT INTO user_profile (id,type) VALUES (1,'ADMIN');
-//		INSERT INTO user_profile (id,type) VALUES (2,'AVIS');
-//		INSERT INTO user_profile (id,type) VALUES (3,'DONA');
-//		INSERT INTO user_profile (id,type) VALUES (4,'OPERA');
-		
 	  http
 	  	.authorizeRequests()
 	  	.antMatchers("/user/resetPassword").permitAll()
@@ -85,7 +80,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	  	.usernameParameter("ssoId").passwordParameter("password")
 	  	.and().csrf()
 	  	.and().exceptionHandling().accessDeniedPage("/Access_Denied")
-//	  	
 	  	;
 	}
 }
