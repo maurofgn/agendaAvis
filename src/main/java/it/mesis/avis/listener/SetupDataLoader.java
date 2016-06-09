@@ -1,4 +1,4 @@
-package it.mesis.avis.configuration;
+package it.mesis.avis.listener;
 
 import java.sql.Timestamp;
 
