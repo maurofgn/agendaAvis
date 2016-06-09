@@ -11,4 +11,6 @@ public interface UserProfileDao {
 	UserProfile findByType(String type);
 	
 	UserProfile findById(int id);
+	
+	void save(UserProfile userProfile);
 }

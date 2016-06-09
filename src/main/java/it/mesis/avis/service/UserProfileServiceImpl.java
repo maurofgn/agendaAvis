@@ -27,4 +27,9 @@ public class UserProfileServiceImpl implements UserProfileService{
 	public UserProfile findById(int id) {
 		return dao.findById(id);
 	}
+
+	@Override
+	public void save(UserProfile userProfile) {
+		dao.save(userProfile);
+	}
 }

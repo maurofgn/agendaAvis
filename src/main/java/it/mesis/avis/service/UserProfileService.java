@@ -11,4 +11,6 @@ public interface UserProfileService {
 	UserProfile findByType(String type);
 	
 	UserProfile findById(int id);
+
+	void save(UserProfile userProfile);
 }

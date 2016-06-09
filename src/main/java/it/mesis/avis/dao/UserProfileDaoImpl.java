@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import it.mesis.avis.model.UserProfile;
 
 @Repository("userProfileDao")
-public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>implements UserProfileDao{
+public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>implements UserProfileDao {
 
 	@SuppressWarnings("unchecked")
 	public List<UserProfile> findAll(){
@@ -27,5 +27,10 @@ public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>impleme
 		Criteria crit = createEntityCriteria();
 		crit.add(Restrictions.eq("type", type));
 		return (UserProfile) crit.uniqueResult();
+	}
+
+	@Override
+	public void save(UserProfile userProfile) {
+		persist(userProfile);
 	}
 }
