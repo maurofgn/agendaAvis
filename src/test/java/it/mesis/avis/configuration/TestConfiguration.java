@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /*
@@ -51,11 +54,45 @@ public class TestConfiguration {
     }
 
 
-	
 	@Bean(name = "passwordEncoder")
 	public PasswordEncoder passwordEncoder() {
 //	    return new BCryptPasswordEncoder();
 		return new PswEncoder();
 	}
+	
+	@Bean(name = "passwordEncoderBCrypt")
+	public PasswordEncoder passwordEncoder2() {
+	    return new BCryptPasswordEncoder(12);
+//		return new PswEncoder();
+	}
+	
+	/**
+	 * Add PropertySourcesPlaceholderConfigurer to make placeholder work. This
+	 * method MUST be static
+	 */
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+
+		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+		
+		propertySourcesPlaceholderConfigurer.setNullValue("@null");	//stringa con la quale si riconosce il null
+
+		String activeProfile = System.getProperty("spring.profiles.active", "test");
+
+		ClassPathResource resource = null;
+		// choose different property files for different active profile
+		if ("development".equalsIgnoreCase(activeProfile)) {
+			resource = new ClassPathResource("development.properties");
+		} else if ("production".equalsIgnoreCase(activeProfile)) {
+			resource = new ClassPathResource("production.properties");
+		} else {
+			resource = new ClassPathResource("test.properties");
+		}
+
+		// load the property file
+		propertySourcesPlaceholderConfigurer.setLocation(resource);
+
+		return propertySourcesPlaceholderConfigurer;
+	}	
 	
 }

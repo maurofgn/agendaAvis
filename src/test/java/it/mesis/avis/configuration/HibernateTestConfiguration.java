@@ -17,6 +17,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -38,14 +41,14 @@ public class HibernateTestConfiguration {
 	@Autowired
 	private Environment environment;
 	
-	@Value("${jdbc.driverClassName:com.mysql.jdbc.Driver}") private String driverClassName;
-	@Value("${jdbc.url:jdbc:jtds:jdbc:mysql://localhost:3306/assoAvis_test}") private String url;
-	@Value("${jdbc.username:root}") private String username;
-	@Value("${jdbc.password:toor}") private String password;
-	@Value("${hibernate.dialect:org.hibernate.dialect.MySQLDialect}") private String dialect;
+	@Value("${jdbc.driverClassName:@null}") private String driverClassName;
+	@Value("${jdbc.url:@null}") private String url;
+	@Value("${jdbc.username:@null}") private String username;
+	@Value("${jdbc.password:@null}") private String password;
+	@Value("${hibernate.dialect:org.hibernate.dialect.H2Dialect}") private String dialect;
 	@Value("${hibernate.show_sql:true}") private String showSql;
 	@Value("${hibernate.format_sql:true}") private String formatSql;
-	@Value("${hibernate.hbm2ddl.auto:update}") private String hbm2ddlAuto;	//validate | update | create | create-drop
+	@Value("${hibernate.hbm2ddl.auto:@null}") private String hbm2ddlAuto;	//validate | update | create | create-drop
 	
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
@@ -57,27 +60,47 @@ public class HibernateTestConfiguration {
 	}
 
 	@Bean(name = "dataSource")
-  public DataSource dataSource() {
-      DriverManagerDataSource dataSource = new DriverManagerDataSource();
-      dataSource.setDriverClassName(driverClassName);
-      dataSource.setUrl(url);
-      dataSource.setUsername(username);
-      dataSource.setPassword(password);
-      return dataSource;
-  }
+	public DataSource dataSource() {
+		
+		if (driverClassName == null) {
+	        EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+	        return datasource;
+		} else {
+			DriverManagerDataSource dataSource = new DriverManagerDataSource();
+			dataSource.setDriverClassName(driverClassName);
+			dataSource.setUrl(url);
+			dataSource.setUsername(username);
+			dataSource.setPassword(password);
+			return dataSource;
+		}
+	}
+	
+//    @Override
+//    public DataSource dataSource() {
+//        EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+//        return datasource;
+//    }
+//    
+//    @Override
+//    protected Properties additionalProperties() {
+//        Properties properties = super.additionalProperties();
+//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+//        return properties;
+//    }    
+
 
 //  @Profile("Production")
-  private Properties hibernateProperties() {
-      Properties properties = new Properties();
-      properties.put("hibernate.dialect", dialect);
-      properties.put("hibernate.show_sql", showSql);
-      properties.put("hibernate.format_sql", formatSql);
-      
-      if (hbm2ddlAuto != null && !hbm2ddlAuto.isEmpty())
-      	properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
-      
-      return properties;        
-  }	
+	private Properties hibernateProperties() {
+		Properties properties = new Properties();
+		properties.put("hibernate.dialect", dialect);
+		properties.put("hibernate.show_sql", showSql);
+		properties.put("hibernate.format_sql", formatSql);
+
+		if (hbm2ddlAuto != null && !hbm2ddlAuto.isEmpty())
+			properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
+
+		return properties;
+	}
 	
 	@Bean
 	@Autowired

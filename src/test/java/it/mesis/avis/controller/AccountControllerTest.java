@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -70,6 +71,10 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 	@Autowired
 	@Spy
     PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	@Spy
+    PasswordEncoder passwordEncoderBCrypt;
 	
 	@Mock
 	AuditService auditService;
@@ -139,10 +144,66 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 	
 	@Test
 	public void passwordCrypt() {
-		String password = Utility.getNewPsw(10);
+		String password = Utility.getNewPsw(12);
 		String ecodedPsw = passwordEncoder.encode(password);
 		boolean ok = passwordEncoder.matches(password, ecodedPsw);
 		Assert.assertTrue(ok);
+	}
+	
+	@Test
+	public void passwordBCryptMulti() throws Exception {
+		int minLength = 56;
+		
+		Random rand = new Random();
+		for (int j = 0; j < 5; j++) {
+			
+			int addLen = rand.nextInt((10 - 0) + 1) + 0;
+			String psw = Utility.getNewPsw(minLength + addLen);
+			
+			for (int i = 0; i < 5; i++) {
+				
+				crypte(psw, i+1);
+			}
+		}
+	}
+	
+	private void crypte(String password, int i) {
+		String codedPsw = passwordEncoderBCrypt.encode(password);
+		System.out.println(password + " crypted in: " + codedPsw + " lunghezza crypted: " + codedPsw.length() + " lunghezza psw: " + password.length() + " " +  i);
+		boolean ok = passwordEncoderBCrypt.matches(password, codedPsw);
+		Assert.assertTrue(ok);
+	}
+	
+	@Test
+	public void passwordBCryptCollision() throws Exception {
+		int minLength = 8;
+		int collisionTestNr = 10;
+		
+		Random rand = new Random();
+		for (int j = 0; j < 5; j++) {
+			
+			int addLen = rand.nextInt((10 - 0) + 1) + 0;
+			String password = Utility.getNewPsw(minLength + addLen);
+			System.out.println("password: " + password + " length: " + password.length());
+			String[] cryptedPsw = getCryptedPsw(password, collisionTestNr);
+			
+			for (int i = 0; i < cryptedPsw.length; i++) {
+				String pswCrypted = cryptedPsw[i];
+				System.out.println("password verify: " + pswCrypted + " length: " + pswCrypted.length());
+				Assert.assertTrue(passwordEncoderBCrypt.matches(password, pswCrypted));
+			}
+		}
+	}
+	
+	
+	private String[] getCryptedPsw(String password, int size) {
+		String[] retValue = new String[size];
+		
+		for (int i = 0; i < size; i++) {
+			retValue[i] = passwordEncoderBCrypt.encode(password);
+		}
+		
+		return retValue;
 	}
 	
 	@Test
