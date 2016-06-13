@@ -1,10 +1,12 @@
 package it.mesis.avis.configuration;
 
+import it.mesis.avis.Application;
 import it.mesis.avis.interceptor.Trasfusionale;
 
 import java.util.Properties;
 
 //import javax.annotation.Resource;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -29,7 +31,7 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "it.mesis.avis")
+@ComponentScan(basePackageClasses = Application.class)
 @PropertySource(value = { "classpath:email.properties" , "classpath:application.properties"})
 
 public class AppConfig extends WebMvcConfigurerAdapter {
