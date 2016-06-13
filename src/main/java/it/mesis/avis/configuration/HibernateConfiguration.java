@@ -5,6 +5,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -55,12 +56,12 @@ public class HibernateConfiguration {
 //    @Profile("Production")
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        properties.put("hibernate.dialect", dialect);
-        properties.put("hibernate.show_sql", showSql);
-        properties.put("hibernate.format_sql", formatSql);
+        properties.put(Environment.DIALECT, dialect);
+        properties.put(Environment.SHOW_SQL, showSql);
+        properties.put(Environment.FORMAT_SQL, formatSql);
         
         if (hbm2ddlAuto != null && !hbm2ddlAuto.isEmpty())
-        	properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
+        	properties.put(Environment.HBM2DDL_AUTO, hbm2ddlAuto);
         
         return properties;        
     }
