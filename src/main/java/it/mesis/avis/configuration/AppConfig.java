@@ -133,6 +133,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 
 		// load the property file
 		propertySourcesPlaceholderConfigurer.setLocation(resource);
+		propertySourcesPlaceholderConfigurer.setIgnoreUnresolvablePlaceholders( true );
 
 		return propertySourcesPlaceholderConfigurer;
 	}
