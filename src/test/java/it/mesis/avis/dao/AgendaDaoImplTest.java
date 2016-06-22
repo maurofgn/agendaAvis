@@ -10,6 +10,7 @@ import it.mesis.util.model.Booking;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
 import it.mesis.util.model.ReportPreno;
+import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;
 import it.mesis.utility.TimeUtil;
 
@@ -138,30 +139,39 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	
 	@Test
 	public void freeHours() {
-		List<Hour> hours = agendaDao.freeHours(dataOraPreno, macchina.getTipoDonaPuntoPrel().getPuntoprelId() , macchina.getTipoDonaPuntoPrel().getTipoDonaId());
+		
+		List<Hour> hours = agendaDao.freeHours(dataOraPreno, macchina.getPuntoprelievo().getCodicepuntoprel(), macchina.getTipoDonazione().getCodice());
 		Assert.assertTrue(!hours.isEmpty());
 	}
 
 	@Test
 	public void prenotaConcurrent() {
-		AgendaEntity agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		
+		TipoDonaPuntoPrel tdpp = new TipoDonaPuntoPrel(macchina.getPuntoprelievo().getCodicepuntoprel(), macchina.getPuntoprelievo().getNomepuntoprel(), 
+				macchina.getTipoDonazione().getCodice(), macchina.getTipoDonazione().getDescrizione(), macchina.getTipoDonazione().getSigla() );
+		
+		AgendaEntity agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, tdpp);
 		Assert.assertEquals(agenda.getId().getDataorapren(), dataOraPreno);
 		Assert.assertEquals(agenda.getDonatore().getCodinternodonat(), codDonatoreInterno);
-		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
-		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
-		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, tdpp);
+		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, tdpp);
+		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, tdpp);
 	}
 	
 	@Test
 	public void prenota() {
-		AgendaEntity agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		
+		TipoDonaPuntoPrel tdpp = new TipoDonaPuntoPrel(macchina.getPuntoprelievo().getCodicepuntoprel(), macchina.getPuntoprelievo().getNomepuntoprel(), 
+				macchina.getTipoDonazione().getCodice(), macchina.getTipoDonazione().getDescrizione(), macchina.getTipoDonazione().getSigla() );
+
+		AgendaEntity agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, tdpp);
 		Assert.assertEquals(agenda.getId().getDataorapren(), dataOraPreno);
 		Assert.assertEquals(agenda.getDonatore().getCodinternodonat(), codDonatoreInterno);
 		
 		DonatoreEntity donatore = agenda.getDonatore();
 		Assert.assertEquals(donatore.getConvocato(), (short)1);
 		Assert.assertEquals(donatore.getCodconvocazion(), (short)0);
-		Assert.assertEquals(donatore.getTipodonazione(), macchina.getTipoDonaPuntoPrel().getTipoDonaId());
+		Assert.assertEquals(donatore.getTipodonazione(), macchina.getTipoDonazione().getCodice());
 		Assert.assertEquals(donatore.getDataconvpren(), dataOraPreno);
 		
 		agendaDao.disdetta(agenda.getId());
@@ -202,18 +212,29 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	 * @return nr di prenotazioni eseguite
 	 */
 	private int booking() {
-		List<Hour> hours = agendaDao.freeHours(dataOraPreno, macchina.getTipoDonaPuntoPrel().getPuntoprelId() , macchina.getTipoDonaPuntoPrel().getTipoDonaId());
+		List<Hour> hours = agendaDao.freeHours(dataOraPreno, macchina.getPuntoprelievo().getCodicepuntoprel(), macchina.getTipoDonazione().getCodice() );
 		
 		int totPreno = Math.min(donatori.length, hours.size());
+		TipoDonaPuntoPrel tdpp = getTipoDonaPuntoPrelFromMacchina(macchina);
 
 		for (int i = 0; i < totPreno; i++) {
 			Hour hour = hours.get(i);
-			AgendaEntity a = agendaDao.prenota(donatori[i], hour.getDate(), macchina.getTipoDonaPuntoPrel());
+			AgendaEntity a = agendaDao.prenota(donatori[i], hour.getDate(), tdpp);
 			Assert.assertNotNull(a);
 //			System.out.println(a.getId() + " " + a.getDonatore().getCodinternodonat() + " " + a.getDonatore().getCognomeenome());
 		}
 		
 		return totPreno;
+	}
+	
+	private TipoDonaPuntoPrel getTipoDonaPuntoPrelFromMacchina(
+			MacchineEntity macchina) {
+		return new TipoDonaPuntoPrel(macchina.getPuntoprelievo()
+				.getCodicepuntoprel(), macchina.getPuntoprelievo()
+				.getNomepuntoprel(), macchina.getTipoDonazione().getCodice(),
+				macchina.getTipoDonazione().getDescrizione(), macchina
+						.getTipoDonazione().getSigla());
+
 	}
 	
 	@Test

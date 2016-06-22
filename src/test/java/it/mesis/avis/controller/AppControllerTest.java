@@ -281,17 +281,20 @@ public class AppControllerTest {
 					AgendaEntity agenda = new AgendaEntity();
 					agenda.setId(ak);
 					agendas.add(agenda);
-					tipoDonaPuntoPrels.add(agenda.getId().getMacchina().getTipoDonaPuntoPrel());
-					
+					tipoDonaPuntoPrels.add(getTipoDonaPuntoPrelFromMacchina(agenda.getId().getMacchina()));
 				}
 				gc.add(GregorianCalendar.HOUR, 1);
 			}
 			gc.add(GregorianCalendar.DAY_OF_YEAR, 1);
 		}
 		
-		
-		
 		return agendas;
+	}
+	
+	private TipoDonaPuntoPrel getTipoDonaPuntoPrelFromMacchina(MacchineEntity macchina) {
+		return new TipoDonaPuntoPrel(macchina.getPuntoprelievo().getCodicepuntoprel(), macchina.getPuntoprelievo().getNomepuntoprel(), 
+				macchina.getTipoDonazione().getCodice(), macchina.getTipoDonazione().getDescrizione(), macchina.getTipoDonazione().getSigla() );
+
 	}
 	
 	private List<YearMonth> getYearMonths(List<Integer> listTipoDona) {

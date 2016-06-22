@@ -213,19 +213,19 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
 		return userSession;
 	}
 	
-	/**
-	 * Elenco di tutti i tipi donazione e punti di prelievo
-	 */
-	@Override
-	public List<TipoDonaPuntoPrel> getTipoDonazPuntiPrel() {
-		return getTipoDonazPuntiPrel(null);
-	}
+//	/**
+//	 * Elenco di tutti i tipi donazione e punti di prelievo
+//	 */
+//	@Override
+//	public List<TipoDonaPuntoPrel> getTipoDonazPuntiPrel() {
+//		return getTipoDonazPuntiPrel(null);
+//	}
 	
 	/**
 	 * Elenco di tutti i tipi donazione e punti di prelievo filtrati per tipo donazione
 	 */
-	@Override
-	public List<TipoDonaPuntoPrel> getTipoDonazPuntiPrel(List<Integer> listTipoDona) {
+//	@Override
+	private List<TipoDonaPuntoPrel> getTipoDonazPuntiPrel(List<Integer> listTipoDona) {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT distinct ");
