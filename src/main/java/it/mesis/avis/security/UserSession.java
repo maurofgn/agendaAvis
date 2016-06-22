@@ -2,7 +2,7 @@ package it.mesis.avis.security;
 
 import java.util.List;
 
-import it.mesis.avis.model.UserProfileType;
+import it.mesis.avis.enu.UserProfileType;
 import it.mesis.util.model.DonaStatus;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 import it.mesis.util.model.YearMonth;

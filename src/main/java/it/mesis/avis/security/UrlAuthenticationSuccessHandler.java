@@ -1,6 +1,6 @@
 package it.mesis.avis.security;
 
-import it.mesis.avis.model.User;
+import it.mesis.avis.bean.jpa.UserEntity;
 import it.mesis.avis.service.AuditService;
 import it.mesis.avis.service.UserService;
 
@@ -59,7 +59,7 @@ public class UrlAuthenticationSuccessHandler implements AuthenticationSuccessHan
 
     protected String determineTargetUrl(final Authentication authentication) {
     	
-    	User user = userService.findBySso(authentication.getName());
+    	UserEntity user = userService.findBySso(authentication.getName());
     	
         String targetUrl = null;
         

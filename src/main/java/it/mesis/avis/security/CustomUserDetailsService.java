@@ -1,7 +1,7 @@
 package it.mesis.avis.security;
 
-import it.mesis.avis.model.User;
-import it.mesis.avis.model.UserProfile;
+import it.mesis.avis.bean.jpa.UserEntity;
+import it.mesis.avis.bean.jpa.UserProfileEntity;
 import it.mesis.avis.service.UserService;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Transactional(readOnly=true)
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		User user = userService.findBySso(userName);
+		UserEntity user = userService.findBySso(userName);
 		if (user == null) {
 			throw new UsernameNotFoundException("Username not found");
 		}
@@ -44,10 +44,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 				);
 	}
 
-	private List<GrantedAuthority> getGrantedAuthorities(User user) {
+	private List<GrantedAuthority> getGrantedAuthorities(UserEntity user) {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		
-		for(UserProfile userProfile : user.getUserProfiles()) {
+		for(UserProfileEntity userProfile : user.getUserProfiles()) {
 			authorities.add(new SimpleGrantedAuthority("ROLE_"+userProfile.getType()));
 		}
 		return authorities;
