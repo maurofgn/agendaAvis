@@ -37,9 +37,13 @@ public class HibernateConfiguration {
     public LocalSessionFactoryBean sessionFactory() {    	
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.model", "it.mesis.avis.revision" });
+//        sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.model", "it.mesis.avis.revision" });
+        sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.bean.jpa", "it.mesis.avis.revision" });
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
+        
+        
+        
      }
 	
 //    @Profile("Production")
