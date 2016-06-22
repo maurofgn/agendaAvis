@@ -9,13 +9,13 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doNothing;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.MacchineEntity;
+import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
+import it.mesis.avis.bean.jpa.TipodonazEntity;
 import it.mesis.avis.dao.AgendaDao;
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.Macchine;
-import it.mesis.avis.model.Puntoprelievo;
-import it.mesis.avis.model.Tipodonaz;
 import it.mesis.util.model.TipoDonaPuntoPrel;
 
 import java.sql.Timestamp;
@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,7 +42,7 @@ public class AgendaServiceImplTest {
 	AgendaServiceImpl agendaService;
 	
 	@Spy
-	List<Agenda> agendas = new ArrayList<Agenda>();
+	List<AgendaEntity> agendas = new ArrayList<AgendaEntity>();
 	
 	@BeforeClass
 	public void setUp(){
@@ -67,17 +67,17 @@ public class AgendaServiceImplTest {
 
 	@Test
 	public void findById(){
-		Agenda age = agendas.get(0);
-		when(dao.findById(any(AgendaKey.class))).thenReturn(age);
+		AgendaEntity age = agendas.get(0);
+		when(dao.findById(any(AgendaEntityKey.class))).thenReturn(age);
 		Assert.assertEquals(agendaService.findById(age.getId()), age);
 	}
 
 	@Test
 	public void prenota(){
-		Agenda age = agendas.get(0);
+		AgendaEntity age = agendas.get(0);
 		when(dao.prenota(anyString(), any(Date.class), any(TipoDonaPuntoPrel.class))).thenReturn(age);
 		
-		Agenda ageReturn = agendaService.prenota(anyString(), any(Date.class), any(TipoDonaPuntoPrel.class));
+		AgendaEntity ageReturn = agendaService.prenota(anyString(), any(Date.class), any(TipoDonaPuntoPrel.class));
 		ageReturn = agendaService.prenota(anyString(), any(Date.class), any(TipoDonaPuntoPrel.class));
 		ageReturn = agendaService.prenota(anyString(), any(Date.class), any(TipoDonaPuntoPrel.class));
 		
@@ -89,10 +89,10 @@ public class AgendaServiceImplTest {
 	
 	@Test
 	public void disdetta(){
-		Agenda age = agendas.get(0);
-		doNothing().when(dao).disdetta(any(AgendaKey.class));
+		AgendaEntity age = agendas.get(0);
+		doNothing().when(dao).disdetta(any(AgendaEntityKey.class));
 		agendaService.disdetta(age.getId());
-		verify(dao, atLeastOnce()).disdetta(any(AgendaKey.class));
+		verify(dao, atLeastOnce()).disdetta(any(AgendaEntityKey.class));
 	}
 	
 //	@Test
@@ -131,13 +131,13 @@ public class AgendaServiceImplTest {
 //	}
 	
 	
-	public List<Agenda> getAgendaList() {
-		Agenda a1 = new Agenda();
+	public List<AgendaEntity> getAgendaList() {
+		AgendaEntity a1 = new AgendaEntity();
 		a1.setDonatore(getDonatore(1));
 		a1.setId(getAgendaKey(9));
 		a1.setNotapren("Nota 1");
 		
-		Agenda a2 = new Agenda();
+		AgendaEntity a2 = new AgendaEntity();
 		a2.setDonatore(getDonatore(2));
 		a2.setId(getAgendaKey(10));
 		a2.setNotapren("Nota 2");
@@ -147,15 +147,15 @@ public class AgendaServiceImplTest {
 		return agendas;
 	}
 	
-	private Donatore getDonatore(int id) {
-		Donatore donatore = new Donatore();
+	private DonatoreEntity getDonatore(int id) {
+		DonatoreEntity donatore = new DonatoreEntity();
 		donatore.setCodinternodonat("donatore" + id);
 		donatore.setCognomeenome("donatore " + id);
 		return donatore;
 	}
 	
-	private AgendaKey getAgendaKey(int hh) {
-		AgendaKey k = new AgendaKey();
+	private AgendaEntityKey getAgendaKey(int hh) {
+		AgendaEntityKey k = new AgendaEntityKey();
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.set(GregorianCalendar.MILLISECOND, 0);
 		gc.set(GregorianCalendar.SECOND, 0);
@@ -166,8 +166,8 @@ public class AgendaServiceImplTest {
 		return k;
 	}
 	
-	private Macchine getMacchine() {
-		Macchine macchine = new Macchine();
+	private MacchineEntity getMacchine() {
+		MacchineEntity macchine = new MacchineEntity();
 		macchine.setTipoDonazione(getTipodonaz());
 		macchine.setPuntoprelievo(getPuntoprelievo());
 		macchine.setNome("Macc. 1");
@@ -175,8 +175,8 @@ public class AgendaServiceImplTest {
 		return macchine;
 	}
 	
-	private Tipodonaz getTipodonaz() {
-		Tipodonaz tipodonaz = new Tipodonaz();
+	private TipodonazEntity getTipodonaz() {
+		TipodonazEntity tipodonaz = new TipodonazEntity();
 		tipodonaz.setCodice(1); 
 		tipodonaz.setDescrizione("Sangue Intero"); 
 		tipodonaz.setRimborsormat(50.0); 
@@ -191,8 +191,8 @@ public class AgendaServiceImplTest {
 		return tipodonaz;
 	}
 	
-	private Puntoprelievo getPuntoprelievo() {
-		Puntoprelievo puntoprelievo = new Puntoprelievo();
+	private PuntoprelievoEntity getPuntoprelievo() {
+		PuntoprelievoEntity puntoprelievo = new PuntoprelievoEntity();
 		puntoprelievo.setCodicepuntoprel(12765); 
 		puntoprelievo.setNomepuntoprel("Osp.Macerata"); 
 		return puntoprelievo;
