@@ -161,6 +161,21 @@ public class AccountControllerTest {
 	}
 	
 	@Test
+	public void quickPasswordEncodingGenerator() throws Exception {
+		String utente = "mauro";
+		String password = "mauro";
+		System.out.println("update utenti u set u.PASSWORD = '" + passwordEncoder.encode(password) + "' where NOME_UTENTE = '" + utente + "'; --");
+		
+//		//java 8
+//		java.util.stream.IntStream.range(1, 10).forEach(action -> System.out.println(password + "-->" + passwordEncoder.encode(password)));
+		
+		for (int i = 0; i < 10; i++) {
+			System.out.println(password + "-->" + passwordEncoder.encode(password));
+		}
+		
+	}
+	
+	@Test
 	public void passwordBCryptMulti() throws Exception {
 		int minLength = 56;
 		
