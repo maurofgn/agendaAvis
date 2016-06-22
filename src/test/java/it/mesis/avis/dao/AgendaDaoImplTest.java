@@ -1,11 +1,11 @@
 package it.mesis.avis.dao;
 
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.Macchine;
-import it.mesis.avis.model.Puntoprelievo;
-import it.mesis.avis.model.Tipodonaz;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.MacchineEntity;
+import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
+import it.mesis.avis.bean.jpa.TipodonazEntity;
 import it.mesis.util.model.Booking;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
@@ -18,12 +18,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 
@@ -37,11 +36,11 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 
 	private Integer macchinaId;
 
-	private Macchine macchina;
+	private MacchineEntity macchina;
 
 	private Timestamp dataOraPreno;
 
-	private AgendaKey agendaKey;
+	private AgendaEntityKey agendaKey;
 
 //	@Override
 //	protected IDataSet getDataSet() throws Exception {
@@ -91,23 +90,23 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 			if (mId != macchinaId)
 				continue;
 			
-			macchina = new Macchine();
+			macchina = new MacchineEntity();
 			macchina.setId(mId);
 			macchina.setNome((String)macchine.getValue(row, "NOME"));
 			
-			Puntoprelievo pp = new Puntoprelievo();
+			PuntoprelievoEntity pp = new PuntoprelievoEntity();
 			pp.setCodicepuntoprel(Integer.valueOf((String)macchine.getValue(row, "PP")));
 			
 			macchina.setPuntoprelievo(pp); 
 			
-			Tipodonaz td = new Tipodonaz();
+			TipodonazEntity td = new TipodonazEntity();
 			td.setCodice(Integer.valueOf((String)macchine.getValue(row, "TIPODONAZ_ID")));
 			macchina.setTipoDonazione(td); 
 			
 			break;
 		}
 		
-		agendaKey = new AgendaKey();
+		agendaKey = new AgendaEntityKey();
 		agendaKey.setMacchina(macchina);
 		agendaKey.setDataorapren(dataOraPreno);
 		
@@ -128,7 +127,7 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	@Test
 	public void findById() {
 		
-		AgendaKey ak = new AgendaKey();
+		AgendaEntityKey ak = new AgendaEntityKey();
 		ak.setMacchina(macchina);
 		ak.setDataorapren(dataOraPreno);
 		
@@ -145,7 +144,7 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 
 	@Test
 	public void prenotaConcurrent() {
-		Agenda agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		AgendaEntity agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
 		Assert.assertEquals(agenda.getId().getDataorapren(), dataOraPreno);
 		Assert.assertEquals(agenda.getDonatore().getCodinternodonat(), codDonatoreInterno);
 		agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
@@ -155,11 +154,11 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	
 	@Test
 	public void prenota() {
-		Agenda agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
+		AgendaEntity agenda = agendaDao.prenota(codDonatoreInterno, dataOraPreno, macchina.getTipoDonaPuntoPrel());
 		Assert.assertEquals(agenda.getId().getDataorapren(), dataOraPreno);
 		Assert.assertEquals(agenda.getDonatore().getCodinternodonat(), codDonatoreInterno);
 		
-		Donatore donatore = agenda.getDonatore();
+		DonatoreEntity donatore = agenda.getDonatore();
 		Assert.assertEquals(donatore.getConvocato(), (short)1);
 		Assert.assertEquals(donatore.getCodconvocazion(), (short)0);
 		Assert.assertEquals(donatore.getTipodonazione(), macchina.getTipoDonaPuntoPrel().getTipoDonaId());
@@ -209,7 +208,7 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 
 		for (int i = 0; i < totPreno; i++) {
 			Hour hour = hours.get(i);
-			Agenda a = agendaDao.prenota(donatori[i], hour.getDate(), macchina.getTipoDonaPuntoPrel());
+			AgendaEntity a = agendaDao.prenota(donatori[i], hour.getDate(), macchina.getTipoDonaPuntoPrel());
 			Assert.assertNotNull(a);
 //			System.out.println(a.getId() + " " + a.getDonatore().getCodinternodonat() + " " + a.getDonatore().getCognomeenome());
 		}
@@ -219,13 +218,13 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	
 	@Test
 	public void getTipodonaz() {
-		Tipodonaz tipodonaz = agendaDao.getTipodonaz(macchina.getTipoDonazione().getCodice());
+		TipodonazEntity tipodonaz = agendaDao.getTipodonaz(macchina.getTipoDonazione().getCodice());
 		Assert.assertEquals(tipodonaz.getCodice(), macchina.getTipoDonazione().getCodice());
 	}
 	
 	@Test
 	public void getPuntoprelievo() {
-		Puntoprelievo puntoprelievo = agendaDao.getPuntoprelievo(macchina.getPuntoprelievo().getCodicepuntoprel());
+		PuntoprelievoEntity puntoprelievo = agendaDao.getPuntoprelievo(macchina.getPuntoprelievo().getCodicepuntoprel());
 		Assert.assertEquals(puntoprelievo.getCodicepuntoprel(), macchina.getPuntoprelievo().getCodicepuntoprel());
 	}
 	
@@ -238,7 +237,7 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 	
 	@Test
 	public void getDonatore() {
-		Donatore donatore = agendaDao.getDonatore(codDonatoreInterno);
+		DonatoreEntity donatore = agendaDao.getDonatore(codDonatoreInterno);
 		Assert.assertEquals(donatore.getCodinternodonat(), codDonatoreInterno);
 	}
 	
@@ -251,13 +250,13 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 
 		YearMonth yearMonth = new YearMonth(year, month);
 		
-		Donatore donatore = agendaDao.getDonatore(codDonatoreInterno);
+		DonatoreEntity donatore = agendaDao.getDonatore(codDonatoreInterno);
 		Assert.assertEquals(donatore.getCodinternodonat(), codDonatoreInterno);
 
 		MonthlyBookings monthlyBookings = agendaDao.getYearMonth(yearMonth, null, donatore.getDonaStatus(30));
 		
 		Booking[][] bookingMonth = monthlyBookings.getBookingsWeek();
-		AgendaKey firstKeyNotNull = null;
+		AgendaEntityKey firstKeyNotNull = null;
 		for (int i = 0; i < bookingMonth.length && firstKeyNotNull == null; i++) {
 			for (int j = 0; j < bookingMonth[i].length && firstKeyNotNull == null; j++) {
 				

@@ -1,16 +1,15 @@
 package it.mesis.avis.dao;
 
-import it.mesis.util.model.AuditDto;
+import it.mesis.avis.bean.Audit;
 import it.mesis.util.model.jq.ColumnsDataTable;
 import it.mesis.util.model.jq.DataTable;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import junit.framework.Assert;
-
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.testng.annotations.Test;
@@ -40,7 +39,7 @@ public class AuditDaoImplTest extends EntityDaoImplTest {
 
 		ColumnsDataTable columnsDataTable = new ColumnsDataTable(request);
 	    
-	    DataTable<AuditDto> retValue = auditDao.findAuditsPages(columnsDataTable, dateFrom, dateTo, user, state);
+	    DataTable<Audit> retValue = auditDao.findAuditsPages(columnsDataTable, dateFrom, dateTo, user, state);
 	    
 	    Assert.assertTrue(retValue.getData().size() > 0);
 	}

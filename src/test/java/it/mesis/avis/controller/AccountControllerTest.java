@@ -4,10 +4,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.UserEntity;
+import it.mesis.avis.bean.jpa.UserProfileEntity;
 import it.mesis.avis.configuration.TestConfiguration;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.User;
-import it.mesis.avis.model.UserProfile;
 import it.mesis.avis.service.AuditService;
 import it.mesis.avis.service.UserProfileService;
 import it.mesis.avis.service.UserService;
@@ -98,10 +98,10 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 //	List<Hour> hours = new ArrayList<Hour>();
 	
 	@Spy
-	User user = new User();
+	UserEntity user = new UserEntity();
 	
 	@Spy
-	User operator = new User();
+	UserEntity operator = new UserEntity();
 	
 	@Spy
 	ModelMap model;
@@ -220,7 +220,7 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 //		}
 		
 		when(userService.findUserByCodFisc(anyString())).thenReturn(user);
-		doNothing().when(userService).updateUser(any(User.class));
+		doNothing().when(userService).updateUser(any(UserEntity.class));
 		doNothing().when(auditService).audit(anyString(), anyString());
 		doNothing().when(mailSender).send(any(SimpleMailMessage.class));
 		when(messageSource.getMessage(anyString(), any(Object[].class), any(Locale.class))).thenReturn(testMessage);
@@ -244,10 +244,10 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 		Assert.assertEquals(resp, "/account/accessDenied");
 	}
 	
-	private List<GrantedAuthority> getGrantedAuthorities(User user){
+	private List<GrantedAuthority> getGrantedAuthorities(UserEntity user){
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		
-		for(UserProfile userProfile : user.getUserProfiles()) {
+		for(UserProfileEntity userProfile : user.getUserProfiles()) {
 			authorities.add(new SimpleGrantedAuthority("ROLE_"+userProfile.getType()));
 		}
 		return authorities;
@@ -415,8 +415,8 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 //		return pps;
 //	}
 	
-	private User getUser() {
-		User user = new User();
+	private UserEntity getUser() {
+		UserEntity user = new UserEntity();
 		user.setId(126);
 		user.setSsoId("CIFSC_0005412765");
 		user.setPassword("55CA");
@@ -431,8 +431,8 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 		return user;
 	}
 	
-	private User getUserOperator() {
-		User user = new User();
+	private UserEntity getUserOperator() {
+		UserEntity user = new UserEntity();
 		user.setId(1);
 		user.setSsoId("mauro");
 		user.setPassword("55CA");
@@ -488,11 +488,11 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 //		return a;
 //	}
 	
-	private Donatore getDonatore() {
+	private DonatoreEntity getDonatore() {
 		
 		GregorianCalendar gc = new GregorianCalendar(1960, 9, 13);
 		
-		Donatore d = new Donatore();
+		DonatoreEntity d = new DonatoreEntity();
 		
 		d.setCodinternodonat("0005412765");
 		d.setTessera("276509040");

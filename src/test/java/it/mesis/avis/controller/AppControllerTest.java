@@ -4,13 +4,13 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.Macchine;
-import it.mesis.avis.model.Puntoprelievo;
-import it.mesis.avis.model.Tipodonaz;
-import it.mesis.avis.model.User;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.MacchineEntity;
+import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
+import it.mesis.avis.bean.jpa.TipodonazEntity;
+import it.mesis.avis.bean.jpa.UserEntity;
 import it.mesis.avis.security.UserSession;
 import it.mesis.avis.service.AgendaService;
 import it.mesis.avis.service.UserService;
@@ -59,25 +59,25 @@ public class AppControllerTest {
 	AppController appController;
 	
 	@Spy
-	List<Tipodonaz> tipodonazs = new ArrayList<Tipodonaz>();
+	List<TipodonazEntity> tipodonazs = new ArrayList<TipodonazEntity>();
 	
 	@Spy
-	List<Puntoprelievo> pps = new ArrayList<Puntoprelievo>();
+	List<PuntoprelievoEntity> pps = new ArrayList<PuntoprelievoEntity>();
 	
 	@Spy
-	List<Macchine> machines = new ArrayList<Macchine>();
+	List<MacchineEntity> machines = new ArrayList<MacchineEntity>();
 	
 	@Spy
-	List<Agenda> agendas = new ArrayList<Agenda>();
+	List<AgendaEntity> agendas = new ArrayList<AgendaEntity>();
 		
 	@Spy
 	List<Hour> hours = new ArrayList<Hour>();
 	
 	@Spy
-	User user = new User();
+	UserEntity user = new UserEntity();
 	
 	@Spy
-	User operator = new User();
+	UserEntity operator = new UserEntity();
 	
 	@Spy
 	ModelMap model;
@@ -245,14 +245,14 @@ public class AppControllerTest {
 		return hours;
 	}
 
-	private List<Agenda> getAgendaList() {
+	private List<AgendaEntity> getAgendaList() {
 		
 		GregorianCalendar gc = new GregorianCalendar();
 		TimeUtil.setMinHour(gc);
 		
 		int gg = 32;
 		int hh = 3;
-		agendas = new ArrayList<Agenda>(gg * machines.size() * 5);
+		agendas = new ArrayList<AgendaEntity>(gg * machines.size() * 5);
 		
 		tipoDonaPuntoPrels = new HashSet<TipoDonaPuntoPrel>();
 		yearMonths = new ArrayList<YearMonth>();
@@ -266,11 +266,11 @@ public class AppControllerTest {
 			
 			gc.set(GregorianCalendar.HOUR_OF_DAY, 9);
 			for (int j = 0; j < hh; j++) {
-				for (Macchine macchine : machines) {
-					AgendaKey ak = new AgendaKey();
+				for (MacchineEntity macchine : machines) {
+					AgendaEntityKey ak = new AgendaEntityKey();
 					ak.setMacchina(macchine);
 					ak.setDataorapren(new Timestamp(gc.getTimeInMillis()));
-					Agenda agenda = new Agenda();
+					AgendaEntity agenda = new AgendaEntity();
 					agenda.setId(ak);
 					agendas.add(agenda);
 					tipoDonaPuntoPrels.add(agenda.getId().getMacchina().getTipoDonaPuntoPrel());
@@ -300,11 +300,11 @@ public class AppControllerTest {
 		return retValue;
 	}
 		
-	private List<Macchine> getMacchine() {
+	private List<MacchineEntity> getMacchine() {
 		
-		machines = new ArrayList<Macchine>(4);
+		machines = new ArrayList<MacchineEntity>(4);
 		
-		Macchine m = new Macchine();
+		MacchineEntity m = new MacchineEntity();
 		m.setId(15);
 		m.setNome("Aferesi Prova diego");
 		m.setPuntoprelievo(pps.get(0));
@@ -312,7 +312,7 @@ public class AppControllerTest {
 		m.setTipoDonazione(tipodonazs.get(0));
 		machines.add(m);
 		
-		m = new Macchine();
+		m = new MacchineEntity();
 		m.setId(17);
 		m.setNome("Prelievo sangue m1");
 		m.setPuntoprelievo(pps.get(0));
@@ -321,7 +321,7 @@ public class AppControllerTest {
 		m.setNotamacchina("Manutenzione il giovedì");
 		machines.add(m);
 		
-		m = new Macchine();
+		m = new MacchineEntity();
 		m.setId(21);
 		m.setNome("Prelievo sangue m2");
 		m.setPuntoprelievo(pps.get(0));
@@ -330,7 +330,7 @@ public class AppControllerTest {
 		m.setNotamacchina("Manutenzione il venerdì");
 		machines.add(m);
 
-		m = new Macchine();
+		m = new MacchineEntity();
 		m.setId(20);
 		m.setNome("macchina giova mauro");
 		m.setPuntoprelievo(pps.get(0));
@@ -342,9 +342,9 @@ public class AppControllerTest {
 		return machines;
 	}
 	
-	private List<Tipodonaz> getTipodonaz() {
-		tipodonazs = new ArrayList<Tipodonaz>(2);
-		Tipodonaz td = new Tipodonaz();
+	private List<TipodonazEntity> getTipodonaz() {
+		tipodonazs = new ArrayList<TipodonazEntity>(2);
+		TipodonazEntity td = new TipodonazEntity();
 		td.setCodice(1);
 		td.setDescrizione("Sangue Intero");
 		td.setRimborsosp(18.8);
@@ -358,7 +358,7 @@ public class AppControllerTest {
 		td.setRpers5(0.0);
 		tipodonazs.add(td);
 
-		td = new Tipodonaz();
+		td = new TipodonazEntity();
 		td.setCodice(2);
 		td.setDescrizione("Plasmaferesi");
 		td.setRimborsosp(20.5);
@@ -375,14 +375,14 @@ public class AppControllerTest {
 		return tipodonazs;
 	}
 	
-	private List<Puntoprelievo> getPuntoprelievos() {
-		pps = new ArrayList<Puntoprelievo>(2);
-		Puntoprelievo pp = new Puntoprelievo();
+	private List<PuntoprelievoEntity> getPuntoprelievos() {
+		pps = new ArrayList<PuntoprelievoEntity>(2);
+		PuntoprelievoEntity pp = new PuntoprelievoEntity();
 		pp.setCodicepuntoprel(12765);
 		pp.setNomepuntoprel("Osp.Macerata");
 		pps.add(pp);
 		
-		pp = new Puntoprelievo();
+		pp = new PuntoprelievoEntity();
 		pp.setCodicepuntoprel(152765);
 		pp.setNomepuntoprel("Macerata Festivo");
 		pps.add(pp);
@@ -390,8 +390,8 @@ public class AppControllerTest {
 		return pps;
 	}
 	
-	private User getUser() {
-		User user = new User();
+	private UserEntity getUser() {
+		UserEntity user = new UserEntity();
 		user.setId(126);
 		user.setSsoId("CIFSC_0005412765");
 		user.setPassword("55CA");
@@ -406,8 +406,8 @@ public class AppControllerTest {
 		return user;
 	}
 	
-	private User getUserOperator() {
-		User user = new User();
+	private UserEntity getUserOperator() {
+		UserEntity user = new UserEntity();
 		user.setId(1);
 		user.setSsoId("mauro");
 		user.setPassword("55CA");
@@ -422,14 +422,14 @@ public class AppControllerTest {
 	}
 	
 
-	private UserSession getUserSession(User user, boolean withAgenda) {
+	private UserSession getUserSession(UserEntity user, boolean withAgenda) {
 		
 		if (user == null)
 			return null;
 		
 		UserSession userSession = new UserSession();
 		
-		Donatore donatore = user.getDonatore();
+		DonatoreEntity donatore = user.getDonatore();
 		
 		DonaStatus donaStatus = null;
 		if (donatore != null) {
@@ -444,7 +444,7 @@ public class AppControllerTest {
 //				donaStatusType.setSuspended(isSusp);
 //			}
 //			
-			Agenda agenda = withAgenda ? getAgenda(donatore) : null;
+			AgendaEntity agenda = withAgenda ? getAgenda(donatore) : null;
 			donaStatus.setAgenda(agenda);								//setta l'eventuale prenotazione attiva del donatore
 		}
 		
@@ -457,18 +457,18 @@ public class AppControllerTest {
 	}
 	
 	
-	private Agenda getAgenda(Donatore donatore) {
+	private AgendaEntity getAgenda(DonatoreEntity donatore) {
 		
-		Agenda a = agendas.get(Utility.randInt(0, agendas.size()));
+		AgendaEntity a = agendas.get(Utility.randInt(0, agendas.size()));
 		a.setDonatore(donatore);
 		return a;
 	}
 	
-	private Donatore getDonatore() {
+	private DonatoreEntity getDonatore() {
 		
 		GregorianCalendar gc = new GregorianCalendar(1960, 9, 13);
 		
-		Donatore d = new Donatore();
+		DonatoreEntity d = new DonatoreEntity();
 		
 		d.setCodinternodonat("0005412765");
 		d.setTessera("276509040");
