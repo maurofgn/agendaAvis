@@ -2,9 +2,9 @@ package it.mesis.avis.listener;
 
 import java.sql.Timestamp;
 
-import it.mesis.avis.model.User;
-import it.mesis.avis.model.UserProfile;
-import it.mesis.avis.model.UserProfileType;
+import it.mesis.avis.bean.jpa.UserEntity;
+import it.mesis.avis.bean.jpa.UserProfileEntity;
+import it.mesis.avis.enu.UserProfileType;
 import it.mesis.avis.service.UserProfileService;
 import it.mesis.avis.service.UserService;
 import it.mesis.util.model.State;
@@ -47,7 +47,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
         
         String ssoId = "test@test.com";
-        User user = userService.findBySso(ssoId);
+        UserEntity user = userService.findBySso(ssoId);
         
         if (alreadySetup = user != null) {
             return;
@@ -65,7 +65,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             createRoleIfNotFound(userProfileType);
 		}
         
-        user = new User();
+        user = new UserEntity();
         user.setSsoId(ssoId);
         user.setPassword(passwordEncoder.encode("1"));
         user.setAssoAvis("Y");
@@ -97,10 +97,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 //    }
 
     @Transactional
-    private final UserProfile createRoleIfNotFound(final UserProfileType type) {
-    	UserProfile userProfile = userProfileService.findByType(type.getUserProfileType());
+    private final UserProfileEntity createRoleIfNotFound(final UserProfileType type) {
+    	UserProfileEntity userProfile = userProfileService.findByType(type.getUserProfileType());
         if (userProfile == null) {
-        	userProfile = new UserProfile(type);
+        	userProfile = new UserProfileEntity(type);
         	userProfileService.save(userProfile);
         	System.out.println("creato " + userProfile.toString());
         }
