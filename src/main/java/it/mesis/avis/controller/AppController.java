@@ -1,9 +1,9 @@
 package it.mesis.avis.controller;
 
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
 import it.mesis.avis.exception.StatusException;
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
 import it.mesis.avis.security.UserSession;
 import it.mesis.avis.service.AgendaService;
 import it.mesis.avis.service.AuditService;
@@ -120,8 +120,8 @@ public class AppController {
 		
 		UserSession userSession = (UserSession)request.getSession().getAttribute(UserSession.USER_SESSION_KEY);
 		
-		if (userSession == null)
-			return "redirect:/login";	//TODO: questo non dovrebbe accadere, ma sta accadendo, per cui va risolto
+//		if (userSession == null)
+//			return "redirect:/login";
 		
 		if (userSession.getDonaStatus() != null && userSession.getDonaStatus().getAgenda() != null) {
 			agendaService.disdetta(userSession.getDonaStatus().getAgenda().getId());
@@ -142,8 +142,8 @@ public class AppController {
 		
 		UserSession userSession = (UserSession)request.getSession().getAttribute(UserSession.USER_SESSION_KEY);
 		
-		if (userSession == null)
-			return "redirect:/login";	//TODO: questo non dovrebbe accadere, ma sta accadendo, per cui va risolto
+//		if (userSession == null)
+//			return "redirect:/login";
 		
 		GregorianCalendar gc = new GregorianCalendar(userSession.getYearMonth().getYear(), userSession.getYearMonth().getMonth(), dayNr);
 		
@@ -176,9 +176,7 @@ public class AppController {
 			) {
 		
 		GregorianCalendar gc = new GregorianCalendar(year, month, day);
-		
 		List<Hour> hours = agendaService.freeHours(gc.getTime(), puntoprelId, tipoDonaId);
-		
 		return hours;
 	}
 	
@@ -217,8 +215,8 @@ public class AppController {
 		
 		UserSession userSession = (UserSession)request.getSession().getAttribute(UserSession.USER_SESSION_KEY);
 		
-		if (userSession == null)
-			return "redirect:/login";	//TODO: questo non dovrebbe accadere, ma sta accadendo, per cui va risolto
+//		if (userSession == null)
+//			return "redirect:/login";
 		
 		if (userSession.getDonaStatus() != null) {
 			
@@ -231,7 +229,7 @@ public class AppController {
 				throw new StatusException(msg);
 			}
 			
-			Donatore donatore = agendaService.getDonatore(userSession.getDonaStatus().getCodinternodonat());
+			DonatoreEntity donatore = agendaService.getDonatore(userSession.getDonaStatus().getCodinternodonat());
 			
 			if (agendaService.hasPrenoActive(donatore)) {
 				auditService.audit("Prenotazione già esistente " + userSession.getDonaStatus().getRefDonatore());
@@ -245,7 +243,7 @@ public class AppController {
 			gc.set(GregorianCalendar.HOUR_OF_DAY, Utility.parseInteger(xx[0]));
 			gc.set(GregorianCalendar.MINUTE, Utility.parseInteger(xx[1]));
 			
-			Agenda agenda = agendaService.prenota(userSession.getDonaStatus().getCodinternodonat(), gc.getTime(), userSession.getTipoDonaPuntoPrelSelected());
+			AgendaEntity agenda = agendaService.prenota(userSession.getDonaStatus().getCodinternodonat(), gc.getTime(), userSession.getTipoDonaPuntoPrelSelected());
 			
 			if (agenda == null) {
 				//non è stato possibile prenotare perchè non c'è più disponibilità oppure è stata fatta una prenotazione da un'altra sessione
@@ -253,7 +251,7 @@ public class AppController {
 				request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.preno.missing", null, request.getLocale()));
 			} else {
 				userSession.getDonaStatus().setAgenda(agenda);
-				auditService.audit("Prenotazione " + userSession.getDonaStatus().getAgenda().getId().toString() + " " + userSession.getDonaStatus().getRefDonatore());
+				auditService.audit("Prenotazione " + agenda.getId().toString() + " " + userSession.getDonaStatus().getRefDonatore());
 				request.getSession().setAttribute("prenoMsg", messageSource.getMessage("msg.preno.success", null, request.getLocale()));
 			}
 			
@@ -276,8 +274,8 @@ public class AppController {
 		
 		UserSession userSession = (UserSession)request.getSession().getAttribute(UserSession.USER_SESSION_KEY);
 		
-		if (userSession == null)
-			return "redirect:/login";	//TODO: questo non dovrebbe accadere, ma sta accadendo, per cui va risolto
+//		if (userSession == null)
+//			return "redirect:/login";
 		
 		YearMonth yearMonth = null;
 		if (yearMonthString != null) {
@@ -300,12 +298,12 @@ public class AppController {
 		}
 
 		GregorianCalendar gc = new GregorianCalendar();
-		AgendaKey agendaKey = null;							//key dell'attuale prenotazione attiva
+		AgendaEntityKey agendaKey = null;							//key dell'attuale prenotazione attiva
 		
 		if (userSession.getDonaStatus() != null) {
 			//donatore
-			Donatore donatore = agendaService.getDonatore(userSession.getDonaStatus().getCodinternodonat());
-			Agenda agenda = agendaService.getPrenoActive(donatore);
+			DonatoreEntity donatore = agendaService.getDonatore(userSession.getDonaStatus().getCodinternodonat());
+			AgendaEntity agenda = agendaService.getPrenoActive(donatore);
 			
 			userSession.getDonaStatus().setAgenda(agenda);
 			

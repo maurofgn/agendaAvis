@@ -1,12 +1,12 @@
 package it.mesis.avis.controller;
 
+import it.mesis.avis.bean.Audit;
+import it.mesis.avis.bean.jpa.UserEntity;
+import it.mesis.avis.bean.jpa.UserProfileEntity;
 import it.mesis.avis.exception.StatusException;
-import it.mesis.avis.model.User;
-import it.mesis.avis.model.UserProfile;
 import it.mesis.avis.service.AuditService;
 import it.mesis.avis.service.UserProfileService;
 import it.mesis.avis.service.UserService;
-import it.mesis.util.model.AuditDto;
 import it.mesis.util.model.GenericResponse;
 import it.mesis.util.model.jq.ColumnsDataTable;
 import it.mesis.util.model.jq.DataTable;
@@ -98,7 +98,7 @@ public class AccountController {
 	 */
 	@Secured ({"ROLE_ADMIN", "ROLE_AVIS"})
 	@RequestMapping(value="/auditRecsPages", produces="application/json")
-	public @ResponseBody DataTable<AuditDto> recordsPages(
+	public @ResponseBody DataTable<Audit> recordsPages(
 			HttpServletRequest  request,
     		@RequestParam(value="dateFrom", required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateFrom,
     		@RequestParam(value="dateTo",   required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateTo,
@@ -111,7 +111,7 @@ public class AccountController {
 	
 	@Secured ({"ROLE_ADMIN", "ROLE_AVIS"})
 	@RequestMapping(value="/auditRecs", produces="application/json")
-	public @ResponseBody DataTable<AuditDto> records(
+	public @ResponseBody DataTable<Audit> records(
 			HttpServletRequest  request,
     		@RequestParam(value="dateFrom", required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateFrom,
     		@RequestParam(value="dateTo",   required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dateTo,
@@ -129,9 +129,9 @@ public class AccountController {
 	 * @param dateTo
 	 * @param user
 	 * @param state
-	 * @return DataTable<AuditDto>
+	 * @return DataTable<Audit>
 	 */
-	private DataTable<AuditDto> getPage(HttpServletRequest request, Date dateFrom, Date dateTo, String user, String state) {
+	private DataTable<Audit> getPage(HttpServletRequest request, Date dateFrom, Date dateTo, String user, String state) {
 		DateFromTo dateRange = new DateFromTo(dateFrom, dateTo);
 		return auditService.findAuditsPage(new ColumnsDataTable(request), dateRange.getDateFrom(), dateRange.getDateTo(), user, state);
 	}
@@ -171,7 +171,7 @@ public class AccountController {
 		try {
 			
 			String userName = getPrincipal();
-			User user = userService.findBySso(userName);
+			UserEntity user = userService.findBySso(userName);
 			
 			if (passwordEncoder.matches(oldpassword, user.getPassword())) {
 				
@@ -271,11 +271,9 @@ public class AccountController {
     @ResponseBody
     public GenericResponse resetPassword(final HttpServletRequest request, @RequestParam("email") String userEmail, @RequestParam("codFisc") String codFisc) {
     	
-	    User user = userService.findUserByCodFisc(codFisc);
+	    UserEntity user = userService.findUserByCodFisc(codFisc);
 	    if (user == null || user.getDonatore() == null) {
-	    	
 	    	auditService.audit(codFisc, "Richiesta password di un donatore non presente tra i donatori");
-	    	
 	        throw new UsernameNotFoundException("Non trovato: " + codFisc);
 	    }
 	    
@@ -317,7 +315,7 @@ public class AccountController {
 //        return new GenericResponse(messageSource.getMessage("message.resetPasswordEmail", null, request.getLocale()));
     }
 	
-    private final SimpleMailMessage constructResetTokenEmail(final Locale locale, final String password, final User user) {
+    private final SimpleMailMessage constructResetTokenEmail(final Locale locale, final String password, final UserEntity user) {
         final String subject = messageSource.getMessage("message.Subject.resetPassword", null, locale);
         final String message = messageSource.getMessage("message.Body.resetPassword", null, locale);
         
@@ -418,7 +416,7 @@ public class AccountController {
 	}
 
 	@ModelAttribute("roles")
-	public List<UserProfile> initializeProfiles() {
+	public List<UserProfileEntity> initializeProfiles() {
 		return userProfileService.findAll();
 	}
 	
