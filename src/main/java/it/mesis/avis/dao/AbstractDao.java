@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractDao<PK extends Serializable, T> {
 	
 	private final Class<T> persistentClass;
-//	protected final int MAX_RESULTS = 100;
 	
 	@SuppressWarnings("unchecked")
 	public AbstractDao(){
