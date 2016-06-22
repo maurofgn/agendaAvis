@@ -23,8 +23,8 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Assert;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.Test;
 
 public class AgendaDaoImplTest extends EntityDaoImplTest {
 	

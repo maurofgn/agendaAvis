@@ -25,13 +25,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.junit.Assert;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class AgendaServiceImplTest {
 
@@ -44,12 +43,11 @@ public class AgendaServiceImplTest {
 	@Spy
 	List<AgendaEntity> agendas = new ArrayList<AgendaEntity>();
 	
-	@BeforeClass
+	@Before
 	public void setUp(){
 		MockitoAnnotations.initMocks(this);
 		agendas = getAgendaList();
 	}
-	
 	
 //	Agenda findById(AgendaKey id);
 //	Tipodonaz getTipodonaz(int key);

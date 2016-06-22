@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -41,15 +46,15 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
+//@RunWith(MockitoJUnitRunner.class)
+
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { TestConfiguration.class })
-public class AccountControllerTest extends AbstractTestNGSpringContextTests {
+public class AccountControllerTest {
 	
 	@Mock
 	UserProfileService userProfileService;
@@ -117,6 +122,11 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 //	private ArrayList<YearMonth> yearMonths;
 
 	@BeforeClass
+	public static void onlyOnce() {
+//		System.out.println("prima dell'istanza");
+	}
+	
+	@Before
 	public void setUp(){
 		MockitoAnnotations.initMocks(this);
 		
@@ -161,7 +171,6 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 			String psw = Utility.getNewPsw(minLength + addLen);
 			
 			for (int i = 0; i < 5; i++) {
-				
 				crypte(psw, i+1);
 			}
 		}
@@ -169,7 +178,7 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 	
 	private void crypte(String password, int i) {
 		String codedPsw = passwordEncoderBCrypt.encode(password);
-		System.out.println(password + " crypted in: " + codedPsw + " lunghezza crypted: " + codedPsw.length() + " lunghezza psw: " + password.length() + " " +  i);
+//		System.out.println(password + " crypted in: " + codedPsw + " lunghezza crypted: " + codedPsw.length() + " lunghezza psw: " + password.length() + " " +  i);
 		boolean ok = passwordEncoderBCrypt.matches(password, codedPsw);
 		Assert.assertTrue(ok);
 	}
@@ -184,12 +193,12 @@ public class AccountControllerTest extends AbstractTestNGSpringContextTests {
 			
 			int addLen = rand.nextInt((10 - 0) + 1) + 0;
 			String password = Utility.getNewPsw(minLength + addLen);
-			System.out.println("password: " + password + " length: " + password.length());
+//			System.out.println("password: " + password + " length: " + password.length());
 			String[] cryptedPsw = getCryptedPsw(password, collisionTestNr);
 			
 			for (int i = 0; i < cryptedPsw.length; i++) {
 				String pswCrypted = cryptedPsw[i];
-				System.out.println("password verify: " + pswCrypted + " length: " + pswCrypted.length());
+//				System.out.println("password verify: " + pswCrypted + " length: " + pswCrypted.length());
 				Assert.assertTrue(passwordEncoderBCrypt.matches(password, pswCrypted));
 			}
 		}

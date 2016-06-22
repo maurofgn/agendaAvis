@@ -1,14 +1,25 @@
 package it.mesis.avis.service.mapping;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.modelmapper.convention.MatchingStrategies;
-import org.testng.annotations.Test;
 
-import junit.framework.TestCase;
 
-public class TestMapper extends TestCase {
+public class TestMapper  {
+
+	@BeforeClass
+	public static void setUp() {
+	}
+	
+	@Before
+	public void before() {
+	}
 
 	@Test
-	public void testMap() throws Exception {
+	public void map()  {
 		OrderFactoryForTest orderFactoryForTest = new OrderFactoryForTest();
 		Order order = orderFactoryForTest.newOrder();
 		

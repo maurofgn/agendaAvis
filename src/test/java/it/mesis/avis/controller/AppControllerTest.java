@@ -11,6 +11,7 @@ import it.mesis.avis.bean.jpa.MacchineEntity;
 import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
 import it.mesis.avis.bean.jpa.TipodonazEntity;
 import it.mesis.avis.bean.jpa.UserEntity;
+import it.mesis.avis.configuration.TestConfiguration;
 import it.mesis.avis.security.UserSession;
 import it.mesis.avis.service.AgendaService;
 import it.mesis.avis.service.UserService;
@@ -33,21 +34,27 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestConfiguration.class })
 public class AppControllerTest {
 
 	@Mock
-	AgendaService service;
+	AgendaService agendaService;
 	
 	@Mock
 	UserService userService;
@@ -90,7 +97,7 @@ public class AppControllerTest {
 	private ArrayList<YearMonth> yearMonths;
 
 	
-	@BeforeClass
+	@Before
 	public void setUp(){
 		MockitoAnnotations.initMocks(this);
 		
@@ -107,7 +114,7 @@ public class AppControllerTest {
 	@Test
 	public void listHours() {
 		
-		when(service.freeHours(any(Date.class), anyInt(), anyInt() )).thenReturn(hours);
+		when(agendaService.freeHours(any(Date.class), anyInt(), anyInt() )).thenReturn(hours);
 		
 		int puntoprelId = pps.get(0).getCodicepuntoprel();
 		int tipoDonaId = tipodonazs.get(0).getCodice();
@@ -119,8 +126,9 @@ public class AppControllerTest {
 		int day = gc.get(Calendar.DAY_OF_MONTH);
 
 		List<Hour> hhs = appController.freeHoursJson(puntoprelId, tipoDonaId, year, month, day);
+//		hhs.forEach(h ->  System.out.println(h) );
 		
-		hhs.forEach(h ->  System.out.println(h) );
+		Assert.assertEquals(hours, hhs);
 		
 //		Assert.assertEquals(appController.listParaAnagrafica(model), "allemployees");
 //		Assert.assertEquals(model.get("employees"), anagrafiche);

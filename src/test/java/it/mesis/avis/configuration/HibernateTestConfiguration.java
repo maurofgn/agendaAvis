@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "it.mesis.avis.dao" })
+@ComponentScan({ "it.mesis.avis.dao", "it.mesis.avis.service" })
 @PropertySource(value = { "classpath:email.properties" , "classpath:application.properties"})
 public class HibernateTestConfiguration {
 
@@ -54,7 +54,7 @@ public class HibernateTestConfiguration {
 	public LocalSessionFactoryBean sessionFactory() {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
-		sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.model" });
+        sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.bean.jpa", "it.mesis.avis.revision" });
 		sessionFactory.setHibernateProperties(hibernateProperties());
 		return sessionFactory;
 	}

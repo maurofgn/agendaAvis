@@ -62,7 +62,7 @@ public class TestConfiguration {
 	
 	@Bean(name = "passwordEncoderBCrypt")
 	public PasswordEncoder passwordEncoder2() {
-	    return new BCryptPasswordEncoder(12);
+	    return new BCryptPasswordEncoder(11);
 //		return new PswEncoder();
 	}
 	
