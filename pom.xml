@@ -39,7 +39,8 @@
 		<jasperreports.version>6.1.0</jasperreports.version>
 		
 		<commons-lang3.version>3.0</commons-lang3.version>
-		
+		<modelmapper.version>0.7.5</modelmapper.version>
+		<junit.version>4.11</junit.version>
 	</properties>
 	
 	<dependencies>
@@ -200,7 +201,12 @@
 		    <artifactId>commons-lang3</artifactId>
 		    <version>${commons-lang3.version}</version>
 		</dependency>
-		
+        <dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>${modelmapper.version}</version>
+		</dependency>
+
 		<!-- Servlet+JSP+JSTL -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -274,6 +280,30 @@
 			<version>${dbunit.version}</version>
 			<scope>test</scope>
 		</dependency>
+  		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit-dep</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 	</dependencies>
 
