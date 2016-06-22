@@ -1,7 +1,7 @@
 package it.mesis.avis.service;
 
-import it.mesis.avis.model.Audit;
-import it.mesis.util.model.AuditDto;
+import it.mesis.avis.bean.Audit;
+import it.mesis.avis.bean.jpa.AuditEntity;
 import it.mesis.util.model.jq.ColumnsDataTable;
 import it.mesis.util.model.jq.DataTable;
 
@@ -11,22 +11,22 @@ import java.util.List;
 
 public interface AuditService {
 	
-	void save(Audit audit);
+	void save(AuditEntity audit);
 	
 	void audit(String msg);
 	
 	void audit(String userName, String msg);
 	
-	Audit findById(int id);
+	AuditEntity findById(int id);
 	
-	List<Audit> findAllBySSO(String sso, Timestamp timestamp);
+	List<AuditEntity> findAllBySSO(String sso, Timestamp timestamp);
 
-	List<Audit> findAllAudits();
+	List<AuditEntity> findAllAudits();
 	
-	List<Audit> findAudits(Date dateFrom, Date dateTo, String user, String state);
+	List<AuditEntity> findAudits(Date dateFrom, Date dateTo, String user, String state);
 	
-	List<Audit> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state);
+	List<AuditEntity> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state);
 
-	DataTable<AuditDto> findAuditsPage(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state);
+	DataTable<Audit> findAuditsPage(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state);
 	
 }

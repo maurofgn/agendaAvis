@@ -1,7 +1,7 @@
 package it.mesis.util.model;
 
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
 
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -28,7 +28,7 @@ public class MonthlyBookings {
 	
 	private Booking[][] bookingsWeek;
 	
-	public MonthlyBookings(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, List<Agenda> listAgenda, DonaStatus donaStatus) {
+	public MonthlyBookings(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, List<AgendaEntity> listAgenda, DonaStatus donaStatus) {
 		super();
 		this.yearMonth = yearMonth;
 		this.tipoDonazPuntoPrel = tipoDonazPuntoPrel;
@@ -42,10 +42,10 @@ public class MonthlyBookings {
 		loadList(listAgenda);
 	}
 	
-	private void loadList(List<Agenda> listAgenda) {
+	private void loadList(List<AgendaEntity> listAgenda) {
 		
 		
-		AgendaKey agendaKey = getAgendaKey();
+		AgendaEntityKey agendaKey = getAgendaKey();
 		
 		YearMonthDay dayPreno = agendaKey != null
 			? new YearMonthDay(agendaKey.getDataorapren()) 
@@ -57,7 +57,7 @@ public class MonthlyBookings {
 		
 		bookingsWeek = new Booking[MAX_WEEK][MAX_DAY];	//sei settimane x 7 giorni
 		
-		for (Agenda agenda : listAgenda) {
+		for (AgendaEntity agenda : listAgenda) {
 			
 			YearMonthDay day = new YearMonthDay(agenda.getId().getDataorapren());
 			
@@ -84,7 +84,7 @@ public class MonthlyBookings {
 //						updateable && 
 						sameTipoDonaPuntoPrel &&
 						(dayPreno == null || (dayPreno.equals(day))) &&
-						Agenda.isUpdateable(agenda.getId().getDataorapren()) &&
+						AgendaEntity.isUpdateable(agenda.getId().getDataorapren()) &&
 						donaStatus.isBookable(agenda.getId().getDataorapren())		//verifica che la data dell'agenda sia compresa all'interno del range accettabile
 						;
 				
@@ -127,7 +127,7 @@ public class MonthlyBookings {
 		}
 	}
 	
-	public AgendaKey getAgendaKey() {
+	public AgendaEntityKey getAgendaKey() {
 		return donaStatus != null && donaStatus.getAgenda() != null ? donaStatus.getAgenda().getId() : null;
 	}
 

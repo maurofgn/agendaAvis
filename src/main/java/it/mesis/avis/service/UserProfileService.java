@@ -2,15 +2,15 @@ package it.mesis.avis.service;
 
 import java.util.List;
 
-import it.mesis.avis.model.UserProfile;
+import it.mesis.avis.bean.jpa.UserProfileEntity;
 
 public interface UserProfileService {
 
-	List<UserProfile> findAll();
+	List<UserProfileEntity> findAll();
 	
-	UserProfile findByType(String type);
+	UserProfileEntity findByType(String type);
 	
-	UserProfile findById(int id);
+	UserProfileEntity findById(int id);
 
-	void save(UserProfile userProfile);
+	void save(UserProfileEntity userProfile);
 }

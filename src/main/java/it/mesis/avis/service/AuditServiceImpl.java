@@ -1,8 +1,8 @@
 package it.mesis.avis.service;
 
+import it.mesis.avis.bean.Audit;
+import it.mesis.avis.bean.jpa.AuditEntity;
 import it.mesis.avis.dao.AuditDao;
-import it.mesis.avis.model.Audit;
-import it.mesis.util.model.AuditDto;
 import it.mesis.util.model.jq.ColumnsDataTable;
 import it.mesis.util.model.jq.DataTable;
 
@@ -23,7 +23,7 @@ public class AuditServiceImpl implements AuditService {
 	private AuditDao dao;
 
 	@Override
-	public void save(Audit audit) {
+	public void save(AuditEntity audit) {
 		dao.save(audit);
 	}
 	
@@ -34,17 +34,17 @@ public class AuditServiceImpl implements AuditService {
 	
 	@Override
 	public void audit(String userName, String msg) {
-		Audit audit = new Audit(userName, msg);
+		AuditEntity audit = new AuditEntity(userName, msg);
 		dao.save(audit);
 	}
 
 	@Override
-	public Audit findById(int id) {
+	public AuditEntity findById(int id) {
 		return dao.findById(id);
 	}
 
 	@Override
-	public List<Audit> findAllBySSO(String sso, Timestamp timestamp) {
+	public List<AuditEntity> findAllBySSO(String sso, Timestamp timestamp) {
 		return dao.findAllBySSO(sso, timestamp);
 	}
 	
@@ -53,22 +53,22 @@ public class AuditServiceImpl implements AuditService {
 	}
 	
 	@Override
-	public List<Audit> findAllAudits() {
+	public List<AuditEntity> findAllAudits() {
 		return dao.findAllAudits();
 	}
 
 	@Override
-	public List<Audit> findAudits(Date dateFrom, Date dateTo, String user, String state) {
+	public List<AuditEntity> findAudits(Date dateFrom, Date dateTo, String user, String state) {
 		return dao.findAudits(dateFrom, dateTo, user, state);
 	}
 
 	@Override
-	public 	List<Audit> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state) {
+	public 	List<AuditEntity> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state) {
 		return dao.findAudits(firstResult, pageSize, dateFrom, dateTo, user, state);
 	}
 	
 	@Override
-	public DataTable<AuditDto> findAuditsPage(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state) {
+	public DataTable<Audit> findAuditsPage(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state) {
 		return dao.findAuditsPages(columnsDataTable, dateFrom, dateTo, user, state);
 	}
 

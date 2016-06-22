@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
+import it.mesis.avis.bean.jpa.TipodonazEntity;
 import it.mesis.avis.dao.AgendaDao;
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.Puntoprelievo;
-import it.mesis.avis.model.Tipodonaz;
 import it.mesis.util.model.DonaStatus;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
@@ -28,22 +28,22 @@ public class AgendaServiceImpl implements AgendaService {
 	private AgendaDao dao;
 	
 	@Override
-	public Agenda findById(AgendaKey id) {
+	public AgendaEntity findById(AgendaEntityKey id) {
 		return dao.findById(id);
 	}
 
 	@Override
-	public List<Tipodonaz> getTipoDonazList() {
+	public List<TipodonazEntity> getTipoDonazList() {
 		return dao.getTipoDonazList();
 	}
 
 	@Override
-	public Tipodonaz getTipodonaz(int key) {
+	public TipodonazEntity getTipodonaz(int key) {
 		return dao.getTipodonaz(key);
 	}
 	
 	@Override
-	public Puntoprelievo getPuntoprelievo(int key) {
+	public PuntoprelievoEntity getPuntoprelievo(int key) {
 		return dao.getPuntoprelievo(key);
 	}
 	
@@ -53,17 +53,17 @@ public class AgendaServiceImpl implements AgendaService {
 	}
 
 	@Override
-	public void disdetta(AgendaKey id) {
+	public void disdetta(AgendaEntityKey id) {
 		dao.disdetta(id);
 	}
 
 	@Override
-	public Agenda prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
+	public AgendaEntity prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
 		return dao.prenota(codinternodonat, datePreno, tipoDonaPuntoPrel);
 	}
 
 	@Override
-	public Donatore getDonatore(String codinternodonat) {
+	public DonatoreEntity getDonatore(String codinternodonat) {
 		return dao.getDonatore(codinternodonat);
 	}
 
@@ -78,7 +78,7 @@ public class AgendaServiceImpl implements AgendaService {
 	}
 
 	@Override
-	public List<Puntoprelievo> getPuntiPrelievoList() {
+	public List<PuntoprelievoEntity> getPuntiPrelievoList() {
 		return dao.getPuntiPrelievoList();
 	}
 	
@@ -88,12 +88,12 @@ public class AgendaServiceImpl implements AgendaService {
 	}
 
 	@Override
-	public Boolean hasPrenoActive(Donatore donatore) {
+	public Boolean hasPrenoActive(DonatoreEntity donatore) {
 		return dao.hasPrenoActive(donatore);
 	}
 
 	@Override
-	public Agenda getPrenoActive(Donatore donatore) {
+	public AgendaEntity getPrenoActive(DonatoreEntity donatore) {
 		return dao.getPrenoActive(donatore);
 	}
 

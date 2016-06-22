@@ -2,23 +2,23 @@ package it.mesis.avis.service;
 
 import java.util.List;
 
-import it.mesis.avis.model.User;
+import it.mesis.avis.bean.jpa.UserEntity;
 import it.mesis.avis.security.UserAttempts;
 import it.mesis.avis.security.UserSession;
 
 public interface UserService {
 
-	void save(User user);
+	void save(UserEntity user);
 	
-	User findById(int id);
+	UserEntity findById(int id);
 	
-	User findBySso(String sso);
+	UserEntity findBySso(String sso);
 	
-	List<User> findAllUsers(); 
+	List<UserEntity> findAllUsers(); 
 	
 	boolean isUserSSOUnique(Integer id, String sso);
 	
-	void updateUser(User user);
+	void updateUser(UserEntity user);
 	
 	void deleteUserBySSO(String sso);
 
@@ -44,9 +44,9 @@ public interface UserService {
 
 	UserSession getUserSession(String name);
 
-	void addDefaultRole(User user);
+	void addDefaultRole(UserEntity user);
 
-	User findUserByCodFisc(String codFisc);
+	UserEntity findUserByCodFisc(String codFisc);
 	
 	void updateOldPsw(String sso, String newPsw);
 

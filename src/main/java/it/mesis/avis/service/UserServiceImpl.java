@@ -1,7 +1,7 @@
 package it.mesis.avis.service;
 
+import it.mesis.avis.bean.jpa.UserEntity;
 import it.mesis.avis.dao.UserDao;
-import it.mesis.avis.model.User;
 import it.mesis.avis.security.UserAttempts;
 import it.mesis.avis.security.UserSession;
 import it.mesis.utility.Utility;
@@ -30,31 +30,31 @@ public class UserServiceImpl implements UserService{
     private Environment environment;
 
     @Override
-	public void save(User user){		
+	public void save(UserEntity user){		
 		dao.save(user);
 	}
 	
 	@Override
-	public User findById(int id) {
+	public UserEntity findById(int id) {
 		return dao.findById(id);
 	}
 
 	@Override
-	public User findBySso(String sso) {
+	public UserEntity findBySso(String sso) {
 		return dao.findBySSO(sso);
 	}
 	
 	@Override
-	public User findUserByCodFisc(String codFisc) {
+	public UserEntity findUserByCodFisc(String codFisc) {
 		return dao.findUserByCodFisc(codFisc);
 	}
 	
-	public List<User> findAllUsers() {
+	public List<UserEntity> findAllUsers() {
 		return dao.findAllUsers();
 	}
 
 	public boolean isUserSSOUnique(Integer id, String sso) {
-		User user = findBySso(sso);
+		UserEntity user = findBySso(sso);
 		return ( user == null || ((id != null) && (user.getId() == id)));
 	}
 	
@@ -63,8 +63,8 @@ public class UserServiceImpl implements UserService{
 	 * Just fetch the entity from db and update it with proper values within transaction.
 	 * It will be updated in db once transaction ends. 
 	 */
-	public void updateUser(User user) {
-		User entity = dao.findById(user.getId());
+	public void updateUser(UserEntity user) {
+		UserEntity entity = dao.findById(user.getId());
 		if(entity != null){
 			entity.setSsoId(user.getSsoId());
 			entity.setPassword(user.getPassword());
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void addDefaultRole(User user) {
+	public void addDefaultRole(UserEntity user) {
 		user.addDefaultRole();
 	}
 
