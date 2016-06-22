@@ -1,7 +1,5 @@
 package it.mesis.avis.bean.jpa;
 
-import it.mesis.util.model.TipoDonaPuntoPrel;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -81,8 +79,8 @@ public class MacchineEntity {
 		this.tipoDonazione = tipoDonazione;
 	}
 	
-	public TipoDonaPuntoPrel getTipoDonaPuntoPrel() {
-		return new TipoDonaPuntoPrel(puntoprelievo.getCodicepuntoprel(), puntoprelievo.getNomepuntoprel(), tipoDonazione.getCodice(), tipoDonazione.getDescrizione(), tipoDonazione.getSigla() );
-	}
+//	public TipoDonaPuntoPrel getTipoDonaPuntoPrel() {
+//		return new TipoDonaPuntoPrel(puntoprelievo.getCodicepuntoprel(), puntoprelievo.getNomepuntoprel(), tipoDonazione.getCodice(), tipoDonazione.getDescrizione(), tipoDonazione.getSigla() );
+//	}
 
 }
