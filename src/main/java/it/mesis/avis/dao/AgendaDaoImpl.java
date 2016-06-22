@@ -1,10 +1,10 @@
 package it.mesis.avis.dao;
 
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.Puntoprelievo;
-import it.mesis.avis.model.Tipodonaz;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
+import it.mesis.avis.bean.jpa.TipodonazEntity;
 import it.mesis.util.model.DonaStatus;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
@@ -27,10 +27,10 @@ import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 @Repository("agendaDao")
-public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements AgendaDao {
+public class AgendaDaoImpl extends AbstractDao<AgendaEntityKey, AgendaEntity> implements AgendaDao {
 	
 	@Override
-	public Agenda findById(AgendaKey id) {
+	public AgendaEntity findById(AgendaEntityKey id) {
 		return getByKey(id);
 	}
 	
@@ -38,17 +38,17 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 * lista dei punti di prelievo usati almeno una volta in una agenda
 	 */
 	@Override
-	public List<Puntoprelievo> getPuntiPrelievoList() {
+	public List<PuntoprelievoEntity> getPuntiPrelievoList() {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("from Puntoprelievo as pp where exists (");
-		sb.append("from Agenda as a where a.id.macchina.puntoprelievo = pp.codicepuntoprel");
+		sb.append("from PuntoprelievoEntity as pp where exists (");
+		sb.append("from AgendaEntity as a where a.id.macchina.puntoprelievo = pp.codicepuntoprel");
 		sb.append(") ");
-		sb.append("order by nomepuntoprel asc");
+		sb.append("order by pp.nomepuntoprel asc");
 		
 		Query query =  getSession().createQuery(sb.toString());
 		@SuppressWarnings("unchecked")
-		List<Puntoprelievo> list = (List<Puntoprelievo>)query.list();
+		List<PuntoprelievoEntity> list = (List<PuntoprelievoEntity>)query.list();
 		return list;
 	}
 
@@ -56,13 +56,13 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 //	@Override
 //	public List<Tipodonaz> getTipoDonazList() {
 //		
-////		Query query =  getSession().createQuery("FROM Tipodonaz where codice = :key");
+////		Query query =  getSession().createQuery("FROM TipodonazEntity where codice = :key");
 ////		query.setParameter("key", key);
 ////		
 ////		List<?> list = query.list();
 ////		return list != null && !list.isEmpty() ? (Tipodonaz)list.get(0) : null;
 //		
-//		Criteria criteria =  getSession().createCriteria(Tipodonaz.class)
+//		Criteria criteria =  getSession().createCriteria(TipodonazEntity.class)
 //			.addOrder(Order.asc("descrizione"));
 //		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);//To avoid duplicates.
 //		List<Tipodonaz> tipodonazs = (List<Tipodonaz>)criteria.list();
@@ -75,37 +75,19 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Tipodonaz> getTipoDonazList() {
+	public List<TipodonazEntity> getTipoDonazList() {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("from Tipodonaz as td where exists (");
-		sb.append("from Agenda as a where a.id.macchina.tipoDonazione = td.codice");
+		sb.append("from TipodonazEntity as td where exists (");
+		sb.append("from AgendaEntity as a where a.id.macchina.tipoDonazione = td.codice");
 		sb.append(")");
 		sb.append("order by descrizione asc");
 		
 		Query query =  getSession().createQuery(sb.toString());
-		List<Tipodonaz> list = (List<Tipodonaz>)query.list();
+		List<TipodonazEntity> list = (List<TipodonazEntity>)query.list();
 		return list;
 	}
 	
-	@Override
-	public Tipodonaz getTipodonaz(int key) {
-		Query query =  getSession().createQuery("FROM Tipodonaz where codice = :key");
-		query.setParameter("key", key);
-		
-		List<?> list = query.list();
-		return list != null && !list.isEmpty() ? (Tipodonaz)list.get(0) : null;
-	}
-	
-	@Override
-	public Puntoprelievo getPuntoprelievo(int key) {
-		Query query =  getSession().createQuery("FROM Puntoprelievo where codicePuntoPrel = :key");
-		query.setParameter("key", key);
-		
-		List<?> list = query.list();
-		return list != null && !list.isEmpty() ? (Puntoprelievo)list.get(0) : null;
-	}
-
 	/**
 	 * 
 	 */
@@ -122,7 +104,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 		
 		StringBuffer sb = new StringBuffer();
         sb.append("select a ");
-        sb.append("from Agenda as a ");
+        sb.append("from AgendaEntity as a ");
         sb.append("  inner join a.id.macchina as m ");
         sb.append("  inner join m.puntoprelievo as p ");
         sb.append("  inner join m.tipoDonazione as t ");
@@ -145,10 +127,10 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         }
         
         @SuppressWarnings("unchecked")
-        List<Agenda>resultList = query.list();
+        List<AgendaEntity>resultList = query.list();
         return new MonthlyBookings(yearMonth, tipoDonazPuntoPrel, resultList, donaStatus);
 		
-//		Criteria criteria = getSession().createCriteria(Agenda.class, "a") 
+//		Criteria criteria = getSession().createCriteria(AgendaEntity.class, "a") 
 //	        .add(Restrictions.ge("a.DATAORAPREN", fromDate))
 //	        .add(Restrictions.le("a.DATAORAPREN", toDate))
 //	        .createCriteria("a.id.macchina" , "macc");
@@ -159,7 +141,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 //		criteria.add(Restrictions.eq("macc.TIPODONAZ_ID", tipoDona));
 		
 //		@SuppressWarnings("unchecked")
-//		List<Agenda>resultList = (List<Agenda>)getSession().createCriteria(Agenda.class, "a") 
+//		List<Agenda>resultList = (List<Agenda>)getSession().createCriteria(AgendaEntity.class, "a") 
 //                .add(Restrictions.ge("a.id.DATAORAPREN", fromDate))
 //                .add(Restrictions.le("a.id.DATAORAPREN", toDate))
 //                .createCriteria("a.id.macchina" , "macc")
@@ -278,12 +260,12 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 * @param id
 	 */
 	@Override
-	public void disdetta(AgendaKey id) {
-		Agenda agenda = findById(id);
+	public void disdetta(AgendaEntityKey id) {
+		AgendaEntity agenda = findById(id);
 		
 		if (agenda != null) {
 			
-			Donatore donatore = agenda.getDonatore();
+			DonatoreEntity donatore = agenda.getDonatore();
 			prenoDonatore(false, donatore, null, null);
 			
 			agenda.setDonatore(null);
@@ -293,31 +275,29 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	}
 	
 	@Override
-	public Boolean hasPrenoActive(Donatore donatore) {
+	public Boolean hasPrenoActive(DonatoreEntity donatore) {
 		
-		Query query = getSession().createQuery("select count(*) from Agenda a where a.donatore = :dona and a.id.dataorapren >= :todayMorning");
+		Query query = getSession().createQuery("select count(*) from AgendaEntity a where a.donatore = :dona and a.id.dataorapren >= :todayMorning");
 		query.setParameter("dona", donatore);
 		query.setParameter("todayMorning", getTodayMorning());
 		return (Long) query.uniqueResult() > 0;
 	}
 	
 	@Override
-	public Agenda getPrenoActive(Donatore donatore) {
+	public AgendaEntity getPrenoActive(DonatoreEntity donatore) {
 		
-		Query query = getSession().createQuery("select a from Agenda a where a.donatore = :dona and a.id.dataorapren >= :todayMorning");
+		Query query = getSession().createQuery("select a from AgendaEntity a where a.donatore = :dona and a.id.dataorapren >= :todayMorning");
 		query.setParameter("dona", donatore);
 		query.setParameter("todayMorning", getTodayMorning());
 		
-		return (Agenda)query.uniqueResult();
+		return (AgendaEntity)query.uniqueResult();	//potrebbe tornare errore se dovesse esserci più di un risultato, teoricamente non possibile
 //		return (Agenda)query.list().get(0);
 	}
 	
 	private Date getTodayMorning() {
 		return DateUtils.truncate(new Date(), Calendar.DATE);
-
 	}
 
-	
 	/**
 	 * 
 	 * @param codinternodonat
@@ -325,15 +305,15 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 * @param tipoDonaPuntoPrel
 	 */
 	@Override
-	public Agenda prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
+	public AgendaEntity prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
 		
-		Donatore donatore = getDonatore(codinternodonat);
+		DonatoreEntity donatore = getDonatore(codinternodonat);
 		if (donatore == null)
 			return null;
 		
 		StringBuffer sb = new StringBuffer();
         sb.append("select a ");
-        sb.append("from Agenda as a ");
+        sb.append("from AgendaEntity as a ");
         sb.append("  inner join a.id.macchina as m ");
         sb.append("  inner join m.puntoprelievo as p ");
         sb.append("  inner join m.tipoDonazione as t ");
@@ -342,7 +322,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         sb.append("and a.id.dataorapren = :datePreno ");
         sb.append("and p.codicepuntoprel = :pp ");
         sb.append("and t.codice = :td ");
-        sb.append("and not exists (select 1 from Agenda a2 where a2.donatore = :dona and a2.id.dataorapren >= :todayMorning)");
+        sb.append("and not exists (select 1 from AgendaEntity a2 where a2.donatore = :dona and a2.id.dataorapren >= :todayMorning)");
         
 		Date today = new Date();
 		Date todayMorning = DateUtils.truncate(today, Calendar.DATE);
@@ -360,15 +340,15 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 			return null;
 		
         sb = new StringBuffer();
-        sb.append("update Agenda as a "); 
+        sb.append("update AgendaEntity as a "); 
         sb.append("set a.donatore = :dona "); 
         sb.append("where a.id = :id "); 
         sb.append("and a.donatore is null ");
         Query upd = getSession().createQuery(sb.toString());
 
-		Agenda agenda = null;
+		AgendaEntity agenda = null;
 		for (Object object : list) {
-			agenda = (Agenda)object;
+			agenda = (AgendaEntity)object;
 			upd.setParameter("dona", donatore);
 			upd.setParameter("id", agenda.getId());
 			int result = upd.executeUpdate();
@@ -393,7 +373,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	 * @param datePreno
 	 * @param tipoDonaPuntoPrel
 	 */
-	private void prenoDonatore(boolean preno, Donatore donatore, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
+	private void prenoDonatore(boolean preno, DonatoreEntity donatore, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel) {
 		
 		if (donatore == null)
 			return;
@@ -413,9 +393,28 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
 	}
 	
 	@Override
-	public Donatore getDonatore(String codinternodonat) {
-		Donatore d = (Donatore) getSession().get(Donatore.class, codinternodonat);
-		return d;
+	public DonatoreEntity getDonatore(String codinternodonat) {
+		return (DonatoreEntity) getSession().get(DonatoreEntity.class, codinternodonat);
+	}
+	
+	@Override
+	public TipodonazEntity getTipodonaz(int key) {
+		return (TipodonazEntity) getSession().get(TipodonazEntity.class, key);
+//		Query query =  getSession().createQuery("FROM TipodonazEntity where codice = :key");
+//		query.setParameter("key", key);
+//		
+//		List<?> list = query.list();
+//		return list != null && !list.isEmpty() ? (TipodonazEntity)list.get(0) : null;
+	}
+	
+	@Override
+	public PuntoprelievoEntity getPuntoprelievo(int key) {
+		return (PuntoprelievoEntity) getSession().get(PuntoprelievoEntity.class, key);
+//		Query query =  getSession().createQuery("FROM PuntoprelievoEntity where codicePuntoPrel = :key");
+//		query.setParameter("key", key);
+//		
+//		List<?> list = query.list();
+//		return list != null && !list.isEmpty() ? (PuntoprelievoEntity)list.get(0) : null;
 	}
 	
 	@Override
@@ -427,7 +426,7 @@ public class AgendaDaoImpl extends AbstractDao<AgendaKey, Agenda> implements Age
         sb.append("a.id.macchina.tipoDonazione.sigla, d.cognomeenome, d.luogonascita, d.provdinascita, ");
         sb.append("d.datadinascita, d.codicefiscale, d.cellulare, d.domtel ");
         
-        sb.append("from Agenda as a ");
+        sb.append("from AgendaEntity as a ");
         sb.append("  inner join a.donatore as d ");
         sb.append("  inner join a.id.macchina as m ");
         sb.append("  inner join m.puntoprelievo as p ");

@@ -2,7 +2,7 @@ package it.mesis.avis.dao;
 
 import java.util.List;
 
-import it.mesis.avis.model.User;
+import it.mesis.avis.bean.jpa.UserEntity;
 import it.mesis.avis.security.UserAttempts;
 import it.mesis.avis.security.UserSession;
 import it.mesis.util.model.TipoDonaPuntoPrel;
@@ -10,13 +10,13 @@ import it.mesis.util.model.YearMonth;
 
 public interface UserDao {
 
-	void save(User user);
+	void save(UserEntity user);
 	
-	User findById(int id);
+	UserEntity findById(int id);
 	
-	User findBySSO(String sso);
+	UserEntity findBySSO(String sso);
 	
-	List<User> findAllUsers();
+	List<UserEntity> findAllUsers();
 	
 	void deleteBySSO(String sso);
 
@@ -26,7 +26,7 @@ public interface UserDao {
 
 	UserAttempts getUserAttempts(String sso);
 
-	User findUserByCodFisc(String codFisc);
+	UserEntity findUserByCodFisc(String codFisc);
 
 	List<TipoDonaPuntoPrel> getTipoDonazPuntiPrel();
 

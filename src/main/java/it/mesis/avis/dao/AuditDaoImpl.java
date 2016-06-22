@@ -1,8 +1,8 @@
 package it.mesis.avis.dao;
 
-import it.mesis.avis.model.Audit;
-import it.mesis.util.model.AuditDto;
-import it.mesis.util.model.AuditMapper;
+import it.mesis.avis.bean.Audit;
+import it.mesis.avis.bean.jpa.AuditEntity;
+import it.mesis.avis.service.mapping.AuditServiceMapper;
 import it.mesis.util.model.jq.ColumnsDataTable;
 import it.mesis.util.model.jq.DataTable;
 
@@ -15,28 +15,33 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+
 @Repository("auditDao")
-public class AuditDaoImpl extends AbstractDao<Integer, Audit> implements AuditDao {
+public class AuditDaoImpl extends AbstractDao<Integer, AuditEntity> implements AuditDao {
 	
+	@Autowired
+	private AuditServiceMapper auditServiceMapper;
+
 	@Override
-	public void save(Audit audit) {
+	public void save(AuditEntity audit) {
 		persist(audit);
 	}
 
 	@Override
-	public Audit findById(int id) {
+	public AuditEntity findById(int id) {
 		return getByKey(id);
 	}
 
 	@Override
-	public List<Audit> findAllBySSO(String sso, Timestamp timestamp) {
+	public List<AuditEntity> findAllBySSO(String sso, Timestamp timestamp) {
 		
 		Criteria criteria = createEntityCriteria().addOrder(Order.asc("created"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);	//To avoid duplicates.
 		@SuppressWarnings("unchecked")
-		List<Audit> audits = (List<Audit>) criteria.list();
+		List<AuditEntity> audits = (List<AuditEntity>) criteria.list();
 		return audits;
 	}
 
@@ -45,18 +50,18 @@ public class AuditDaoImpl extends AbstractDao<Integer, Audit> implements AuditDa
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Audit> findAllAudits() {
+	public List<AuditEntity> findAllAudits() {
 		return createEntityCriteria().list();
 	}
 
 	@Override
-	public List<Audit> findAudits(Date dateFrom, Date dateTo, String user, String state) {
+	public List<AuditEntity> findAudits(Date dateFrom, Date dateTo, String user, String state) {
 		return findAudits(-1, -1, dateFrom, dateTo, user, state);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Audit> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state) {
+	public List<AuditEntity> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state) {
 		
         Criteria criteria = getCriteria(dateFrom, dateTo, user, state)
                 .addOrder(Order.desc("created"))
@@ -67,14 +72,14 @@ public class AuditDaoImpl extends AbstractDao<Integer, Audit> implements AuditDa
         	criteria.setMaxResults(pageSize);
         }
 
-		List<Audit> results = (List<Audit>)criteria.list();
+		List<AuditEntity> results = (List<AuditEntity>)criteria.list();
 		
 		return results;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public DataTable<AuditDto> findAuditsPages(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state) {
+	public DataTable<Audit> findAuditsPages(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state) {
 		
         Criteria criteria = getCriteria(dateFrom, dateTo, user, state);
         
@@ -91,10 +96,15 @@ public class AuditDaoImpl extends AbstractDao<Integer, Audit> implements AuditDa
 		Long totRec = count();											//record totali della tabella
 		Long recordsFiltered = count(dateFrom, dateTo, user, state);	//record totali che soddisfano il filtro
 		
-		List<Audit> audits = (List<Audit>)criteria.list();
-		List<AuditDto> data = AuditMapper.map(audits);
+		List<AuditEntity> auditEntity = (List<AuditEntity>)criteria.list();
 		
-		return new DataTable<AuditDto>(totRec.intValue(), recordsFiltered.intValue(), data, columnsDataTable.getDraw());
+		//passaggio da list di audit a list di auditDto
+		
+		List<Audit> data = auditServiceMapper.mapAuditEntityToAudit(auditEntity);
+		
+//		List<AuditDto> data = AuditMapper.map(audits);
+		
+		return new DataTable<Audit>(totRec.intValue(), recordsFiltered.intValue(), data, columnsDataTable.getDraw());
 	}
 
 	@Override

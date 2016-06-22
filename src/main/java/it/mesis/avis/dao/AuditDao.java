@@ -1,7 +1,7 @@
 package it.mesis.avis.dao;
 
-import it.mesis.avis.model.Audit;
-import it.mesis.util.model.AuditDto;
+import it.mesis.avis.bean.Audit;
+import it.mesis.avis.bean.jpa.AuditEntity;
 import it.mesis.util.model.jq.ColumnsDataTable;
 import it.mesis.util.model.jq.DataTable;
 
@@ -11,15 +11,15 @@ import java.util.List;
 
 public interface AuditDao {
 
-	void save(Audit audit);
+	void save(AuditEntity audit);
 	
-	Audit findById(int id);
+	AuditEntity findById(int id);
 	
-	List<Audit> findAllBySSO(String sso, Timestamp timestamp);
+	List<AuditEntity> findAllBySSO(String sso, Timestamp timestamp);
 	
-	List<Audit> findAllAudits();
+	List<AuditEntity> findAllAudits();
 
-	List<Audit> findAudits(Date dateFrom, Date dateTo, String user, String state);
+	List<AuditEntity> findAudits(Date dateFrom, Date dateTo, String user, String state);
 
 	/**
 	 * 
@@ -31,7 +31,7 @@ public interface AuditDao {
 	 * @param state
 	 * @return List<Audit>
 	 */
-	List<Audit> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state);
+	List<AuditEntity> findAudits(int firstResult, int pageSize, Date dateFrom, Date dateTo, String user, String state);
 	
 	/**
 	 * 
@@ -42,7 +42,7 @@ public interface AuditDao {
 	 * @param state messaggio per like
 	 * @return DataTable<AuditDto> con la pagina richiesta che soddisfa il filtro
 	 */
-	DataTable<AuditDto> findAuditsPages(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state);
+	DataTable<Audit> findAuditsPages(ColumnsDataTable columnsDataTable, Date dateFrom, Date dateTo, String user, String state);
 	
 	/**
 	 * 

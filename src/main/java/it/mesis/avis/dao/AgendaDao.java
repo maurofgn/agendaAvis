@@ -3,11 +3,11 @@ package it.mesis.avis.dao;
 import java.util.Date;
 import java.util.List;
 
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.Puntoprelievo;
-import it.mesis.avis.model.Tipodonaz;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.PuntoprelievoEntity;
+import it.mesis.avis.bean.jpa.TipodonazEntity;
 import it.mesis.util.model.DonaStatus;
 import it.mesis.util.model.Hour;
 import it.mesis.util.model.MonthlyBookings;
@@ -17,32 +17,32 @@ import it.mesis.util.model.YearMonth;
 
 public interface AgendaDao {
 
-	Agenda findById(AgendaKey id);
+	AgendaEntity findById(AgendaEntityKey id);
 
-	Tipodonaz getTipodonaz(int key);
+	TipodonazEntity getTipodonaz(int key);
 
-	Puntoprelievo getPuntoprelievo(int key);
+	PuntoprelievoEntity getPuntoprelievo(int key);
 	
 	MonthlyBookings getYearMonth(YearMonth yearMonth, TipoDonaPuntoPrel tipoDonazPuntoPrel, DonaStatus donaStatus);
 
-	void disdetta(AgendaKey id);
+	void disdetta(AgendaEntityKey id);
 
-	Agenda prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel);
+	AgendaEntity prenota(String codinternodonat, Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel);
 	
-	Donatore getDonatore(String codinternodonat);
+	DonatoreEntity getDonatore(String codinternodonat);
 
 	List<Hour> freeHours(Date datePreno, TipoDonaPuntoPrel tipoDonaPuntoPrel);
 
 	List<Hour> freeHours(Date datePreno, int puntoprelId, int tipoDonaId);
 	
-	List<Tipodonaz> getTipoDonazList();
+	List<TipodonazEntity> getTipoDonazList();
 
-	List<Puntoprelievo> getPuntiPrelievoList();
+	List<PuntoprelievoEntity> getPuntiPrelievoList();
 
 	List<ReportPreno> reportPreno(Date fromDate, Date toDate, Integer puntoPrelievo, Integer tipoDona);
 	
-	Boolean hasPrenoActive(Donatore donatore);
+	Boolean hasPrenoActive(DonatoreEntity donatore);
 
-	Agenda getPrenoActive(Donatore donatore);
+	AgendaEntity getPrenoActive(DonatoreEntity donatore);
 
 }

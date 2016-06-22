@@ -1,8 +1,8 @@
 package it.mesis.avis.dao;
 
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.Donatore;
-import it.mesis.avis.model.User;
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.DonatoreEntity;
+import it.mesis.avis.bean.jpa.UserEntity;
 import it.mesis.avis.security.UserAttempts;
 import it.mesis.avis.security.UserSession;
 import it.mesis.util.model.DonaStatus;
@@ -28,56 +28,70 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.springframework.stereotype.Repository;
 
 @Repository("userDao")
-public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
+public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements UserDao {
 	
-	public void save(User user) {
+	public void save(UserEntity user) {
 		persist(user);
 	}
 	
 	@Override
-	public User findById(int id) {
+	public UserEntity findById(int id) {
 		return getByKey(id);
 	}
 	
-	public User findBySSO(String sso) {
+	public UserEntity findBySSO(String sso) {
 		if (sso == null || sso.isEmpty())
 			return null;
-		Criteria crit = createEntityCriteria();
-		crit.add(Restrictions.eq("ssoId", sso));
-		return (User) crit.uniqueResult();
+		Criteria crit = createEntityCriteria()
+				.add(Restrictions.eq("ssoId", sso));
+		return (UserEntity) crit.uniqueResult();
 	}
 	
 	@Override
-	public User findUserByCodFisc(String codFisc) {
+	public UserEntity findUserByCodFisc(String codFisc) {
 		if (codFisc == null || codFisc.isEmpty())
 			return null;
 		
-		String hql = "select u FROM User as u inner join u.donatore as d where d.codicefiscale = :codFisc";
+//		String hql = "select u FROM UserEntity as u inner join u.donatore as d where d.codicefiscale = :codFisc";
+		String hql = "select u FROM UserEntity as u where u.donatore.codicefiscale = :codFisc";
 		
-		Query query = getSession().createQuery(hql);
-		query.setParameter("codFisc", codFisc);
+		Query query = getSession().createQuery(hql)
+			.setParameter("codFisc", codFisc);
 		
-		@SuppressWarnings("unchecked")
-		List<User> results = query.list();
+		UserEntity user = (UserEntity)query.uniqueResult();
 		
-		User user = null;
+//		UserEntity user = null;
+//		try {
+//			user = (UserEntity)query.uniqueResult();
+//		} catch (NonUniqueResultException e) {
+//			throw new Exception("Sono presenti più utenti con donatore con lo stesso codice fiscale");
+//		}
 		
-		if (!results.isEmpty()) {
-			user = results.get(0);
+		
+		if (user != null)
 			Hibernate.initialize(user.getDonatore());	//forza il load del donatore
-		}
+			
+//		@SuppressWarnings("unchecked")
+//		List<UserEntity> results = query.list();
+//		UserEntity user = null;
+//		
+//		if (!results.isEmpty()) {
+//			user = results.get(0);
+//			Hibernate.initialize(user.getDonatore());	//forza il load del donatore
+//		}
 		
 		return user;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<User> findAllUsers() {
+	public List<UserEntity> findAllUsers() {
 		Criteria criteria = createEntityCriteria().addOrder(Order.asc("firstName"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);//To avoid duplicates.
-		List<User> users = (List<User>) criteria.list();
+		List<UserEntity> users = (List<UserEntity>) criteria.list();
 		
 		// No need to fetch userProfiles since we are not showing them on list page. Let them lazy load. 
 		// Uncomment below lines for eagerly fetching of userProfiles if you want.
@@ -91,13 +105,13 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 	public void deleteBySSO(String sso) {
 		Criteria crit = createEntityCriteria();
 		crit.add(Restrictions.eq("ssoId", sso));
-		User user = (User)crit.uniqueResult();
+		UserEntity user = (UserEntity)crit.uniqueResult();
 		delete(user);
 	}
 
 	@Override
 	public void resetFailAttempts(String sso) {
-		Query query = getSession().createSQLQuery("UPDATE APP_USER SET attempts = 0, last_Access = :now WHERE sso_id = :sso_id");
+		SQLQuery query = getSession().createSQLQuery("UPDATE APP_USER SET attempts = 0, last_Access = :now WHERE sso_id = :sso_id");
 		query.setParameter("now", new Timestamp(System.currentTimeMillis()));
 		query.setParameter("sso_id", sso);
 //		int result = 
@@ -118,7 +132,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		if (sso == null || sso.isEmpty())
 			return;
 
-		User user = findBySSO(sso);
+		UserEntity user = findBySSO(sso);
 		if (user == null) 
 			return;
 		
@@ -140,7 +154,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 	
 	@Override
 	public UserAttempts getUserAttempts(String sso) {
-		User user = findBySSO(sso);		
+		UserEntity user = findBySSO(sso);		
 		return user != null ? user.getUserAttempts() : null;
 	}
 
@@ -167,13 +181,13 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 	@Override
 	public UserSession getUserSession(String sso, int dayBefore) {
 		
-		User user = findBySSO(sso);
+		UserEntity user = findBySSO(sso);
 		if (user == null)
 			return null;
 		
 		UserSession userSession = new UserSession();
 		
-		Donatore donatore = user.getDonatore();
+		DonatoreEntity donatore = user.getDonatore();
 		
 		DonaStatus donaStatus = null;
 		if (donatore != null) {
@@ -187,7 +201,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 				donaStatusType.setSuspended(isSusp);
 			}
 			
-			Agenda agenda = getAgenda(donatore.getCodinternodonat());	//prenotazione attiva del donatore
+			AgendaEntity agenda = getAgenda(donatore.getCodinternodonat());	//prenotazione attiva del donatore
 			donaStatus.setAgenda(agenda);								//setta l'eventuale prenotazione attiva del donatore
 		}
 		
@@ -237,8 +251,14 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		
 		ArrayList<TipoDonaPuntoPrel> retValue = new ArrayList<TipoDonaPuntoPrel>();
 		
-		Query query = getSession().createSQLQuery(sb.toString());
-
+		SQLQuery query = getSession().createSQLQuery(sb.toString())
+				.addScalar("pp", new IntegerType())
+				.addScalar("NOMEPUNTOPREL", new StringType())
+				.addScalar("CODICE", new IntegerType())
+				.addScalar("DESCRIZIONE", new StringType())
+				.addScalar("SIGLA", new StringType())
+				;
+		
 		GregorianCalendar gc = new GregorianCalendar();
 		TimeUtil.setMinHour(gc);
 		query.setParameter("dateFrom", gc.getTime());
@@ -282,7 +302,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		
 		ArrayList<YearMonth> retValue = new ArrayList<YearMonth>();
 		
-		Query query = getSession().createSQLQuery(sb.toString());
+		SQLQuery query = getSession().createSQLQuery(sb.toString());
 
 		query.setParameter("dateFrom", TimeUtil.getToday().getTime());
 		
@@ -348,16 +368,15 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 	 * @param donatoreId
 	 * @return la prenotazione (nel futuro oggi compreso) del donatore
 	 */
-	private Agenda getAgenda(String donatoreId) {
+	private AgendaEntity getAgenda(String donatoreId) {
 
-		Query query = getSession().createQuery("from Agenda where CODINTERNODONAT = :donatoreId and dataoraPren >= :today ");
+		Query query = getSession().createQuery("from AgendaEntity where CODINTERNODONAT = :donatoreId and dataoraPren >= :today ");
 
 		query.setParameter("donatoreId", donatoreId);
 		query.setParameter("today", TimeUtil.getToday().getTime());	//data odierna con oraio 0
 
 		List<?> list = query.list();
-
-		return list != null && !list.isEmpty() ? (Agenda)list.get(0) : null;
+		return list != null && !list.isEmpty() ? (AgendaEntity)list.get(0) : null;
 	}
 
 	@Override
@@ -367,7 +386,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao {
 		sb.append("update app_user set password = :newPsw, last_Change_Psw = :du "); 
 		sb.append("where sso_id = :sso "); 
 		
-		Query query = getSession().createSQLQuery(sb.toString());
+		SQLQuery query = getSession().createSQLQuery(sb.toString());
 		query.setParameter("newPsw", newPsw);
 		query.setParameter("du", new Date());
 		query.setParameter("sso", sso);

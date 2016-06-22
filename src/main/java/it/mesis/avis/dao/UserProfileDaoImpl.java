@@ -7,30 +7,30 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
-import it.mesis.avis.model.UserProfile;
+import it.mesis.avis.bean.jpa.UserProfileEntity;
 
 @Repository("userProfileDao")
-public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>implements UserProfileDao {
+public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfileEntity>implements UserProfileDao {
 
 	@SuppressWarnings("unchecked")
-	public List<UserProfile> findAll(){
+	public List<UserProfileEntity> findAll(){
 		Criteria crit = createEntityCriteria();
 		crit.addOrder(Order.asc("type"));
-		return (List<UserProfile>)crit.list();
+		return (List<UserProfileEntity>)crit.list();
 	}
 	
-	public UserProfile findById(int id) {
+	public UserProfileEntity findById(int id) {
 		return getByKey(id);
 	}
 	
-	public UserProfile findByType(String type) {
+	public UserProfileEntity findByType(String type) {
 		Criteria crit = createEntityCriteria();
 		crit.add(Restrictions.eq("type", type));
-		return (UserProfile) crit.uniqueResult();
+		return (UserProfileEntity) crit.uniqueResult();
 	}
 
 	@Override
-	public void save(UserProfile userProfile) {
+	public void save(UserProfileEntity userProfile) {
 		persist(userProfile);
 	}
 }
