@@ -1,7 +1,7 @@
 package it.mesis.util.model;
 
+import it.mesis.avis.bean.jpa.AgendaEntity;
 import it.mesis.avis.enu.MembershipState;
-import it.mesis.avis.model.Agenda;
 import it.mesis.utility.TimeUtil;
 
 import java.text.SimpleDateFormat;
@@ -23,7 +23,7 @@ public class DonaStatus {
 	private boolean idoneo;
 	private Set<DonaStatusType> status;
 	private MembershipState membershipState;
-	private Agenda agenda;
+	private AgendaEntity agenda;
 	
 	private String cognomeenome;
 	private String luogonascita;
@@ -260,11 +260,11 @@ public class DonaStatus {
 		}
 	}
 
-	public void setAgenda(Agenda agenda) {
+	public void setAgenda(AgendaEntity agenda) {
 		this.agenda = agenda;
 	}
 	
-	public Agenda getAgenda() {
+	public AgendaEntity getAgenda() {
 		return agenda;
 	}
 	

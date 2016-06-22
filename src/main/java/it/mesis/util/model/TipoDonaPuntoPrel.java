@@ -1,6 +1,6 @@
 package it.mesis.util.model;
 
-import it.mesis.avis.model.Macchine;
+import it.mesis.avis.bean.jpa.MacchineEntity;
 
 public class TipoDonaPuntoPrel {
 	
@@ -10,18 +10,13 @@ public class TipoDonaPuntoPrel {
 	private String tipoDonazione;
 	private String sigla;
 
-	
-//	public TipoDonaPuntoPrel(int puntoprelId, int tipoDonaId) {
-//		this(puntoprelId, null, tipoDonaId, null, null) ;
-//	}
-	
 	public TipoDonaPuntoPrel(int puntoprelId, String puntoprel, int tipoDonaId, String tipoDonazione, String sigla) {
 		super();
 		this.puntoprelId = puntoprelId;
 		this.puntoprel = puntoprel;
 		this.tipoDonaId = tipoDonaId;
 		this.tipoDonazione = tipoDonazione;
-		this.sigla =sigla;
+		this.sigla = sigla;
 	}
 
 	public int getPuntoprelId() {
@@ -53,7 +48,7 @@ public class TipoDonaPuntoPrel {
 		return tipoDonaId + "," + puntoprelId;
 	}
 
-	public boolean isSameTipoDonaPuntoPrel(Macchine macchina) {
+	public boolean isSameTipoDonaPuntoPrel(MacchineEntity macchina) {
 		if (macchina == null)
 			return true;
 		return macchina.getTipoDonazione().getCodice() == getTipoDonaId()

@@ -4,9 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.mesis.avis.bean.jpa.AgendaEntity;
+import it.mesis.avis.bean.jpa.AgendaEntityKey;
 import it.mesis.avis.enu.PrenoState;
-import it.mesis.avis.model.Agenda;
-import it.mesis.avis.model.AgendaKey;
 
 /**
  * 
@@ -15,12 +15,12 @@ import it.mesis.avis.model.AgendaKey;
  */
 public class Booking {
 	
-	private List<Agenda> agendaList;
+	private List<AgendaEntity> agendaList;
 	private int busy;
 	private boolean updateable;
 	private boolean donor;
 	private YearMonthDay day;
-	private AgendaKey agendaKey;
+	private AgendaEntityKey agendaKey;
 	
 	private static final SimpleDateFormat HH_MM = new SimpleDateFormat("HH:mm");
 	
@@ -29,16 +29,16 @@ public class Booking {
 		this.day = day;
 		this.updateable = updateable;
 		this.donor = donor;
-		this.agendaList = new ArrayList<Agenda>();
+		this.agendaList = new ArrayList<AgendaEntity>();
 	}
 
-	public void add(Agenda agenda) {
+	public void add(AgendaEntity agenda) {
 		agendaList.add(agenda);
 		if (agenda.getDonatore() != null)
 			busy++;
 	}
 
-	public List<Agenda> getAgendaList() {
+	public List<AgendaEntity> getAgendaList() {
 		return agendaList;
 	}
 
@@ -146,14 +146,12 @@ public class Booking {
 		return "" + getTotal();
 	}
 
-	public void setMyPreno(AgendaKey agendaKey) {
+	public void setMyPreno(AgendaEntityKey agendaKey) {
 		this.agendaKey = agendaKey;
 	}
 
-	public AgendaKey getAgendaKey() {
+	public AgendaEntityKey getAgendaKey() {
 		return agendaKey;
 	}
-	
-	
 	
 }
