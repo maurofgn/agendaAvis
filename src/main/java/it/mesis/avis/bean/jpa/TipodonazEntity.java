@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "TIPODONAZ")
-public class Tipodonaz {
+public class TipodonazEntity {
 
 	@Id
 	@Column(name = "CODICE", unique = true, nullable = false)

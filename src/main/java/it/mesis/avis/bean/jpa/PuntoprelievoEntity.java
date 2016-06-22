@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "PUNTOPRELIEVO")
-public class Puntoprelievo {
+public class PuntoprelievoEntity {
 
 	@Id
 	@Column(name = "CODICEPUNTOPREL", nullable = false)

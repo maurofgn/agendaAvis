@@ -1,5 +1,6 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
+import it.mesis.avis.enu.UserProfileType;
 import it.mesis.avis.security.UserAttempts;
 import it.mesis.util.model.State;
 
@@ -30,7 +31,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "APP_USER")
 //@Audited
-public class User {
+public class UserEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,9 +74,9 @@ public class User {
 //	@OneToOne(fetch = FetchType.LAZY, mappedBy = "utenti", cascade = CascadeType.ALL)
 	@OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="UTENTI_ID", referencedColumnName = "ID", insertable = false, updatable = false)
-    private Utenti utenti;
+    private UtentiEntity utenti;
 	
-	public Utenti getUtenti() {
+	public UtentiEntity getUtenti() {
 		return this.utenti;
 	}
 	
@@ -86,20 +87,20 @@ public class User {
 	
 	@OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="CODINTERNODONAT", referencedColumnName = "CODINTERNODONAT", insertable = false, updatable = false)
-    private Donatore donatore;
+    private DonatoreEntity donatore;
 	
-	public Donatore getDonatore() {
+	public DonatoreEntity getDonatore() {
 		return this.donatore;
 	}
 	
-	public void setDonatore(Donatore donatore) {
+	public void setDonatore(DonatoreEntity donatore) {
 		this.donatore = donatore;
 	}
 
 	@NotAudited
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "APP_USER_USER_PROFILE", joinColumns = { @JoinColumn(name = "USER_ID") }, inverseJoinColumns = { @JoinColumn(name = "USER_PROFILE_ID") })
-	private Set<UserProfile> userProfiles = new HashSet<UserProfile>();
+	private Set<UserProfileEntity> userProfiles = new HashSet<UserProfileEntity>();
 
 	/**
 	 * 
@@ -107,7 +108,7 @@ public class User {
 	 * @return true se l'user ha il ruolo
 	 */
 	public boolean hasRole(UserProfileType type) {
-		for (UserProfile userProfile : userProfiles) {
+		for (UserProfileEntity userProfile : userProfiles) {
 			if (userProfile.getType().equals(type.getUserProfileType()))
 				return true;
 		}
@@ -195,11 +196,11 @@ public class User {
 		this.attempts = attempts;
 	}
 
-	public Set<UserProfile> getUserProfiles() {
+	public Set<UserProfileEntity> getUserProfiles() {
 		return userProfiles;
 	}
 
-	public void setUserProfiles(Set<UserProfile> userProfiles) {
+	public void setUserProfiles(Set<UserProfileEntity> userProfiles) {
 		this.userProfiles = userProfiles;
 	}
 	
@@ -273,7 +274,7 @@ public class User {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		User other = (User) obj;
+		UserEntity other = (UserEntity) obj;
 		if (id != other.id)
 			return false;
 		if (ssoId == null) {
@@ -302,16 +303,16 @@ public class User {
 	public void addDefaultRole() {
 		
 		if (!hasRole(UserProfileType.DONA) && getDonatore() != null) {
-			userProfiles.add(new UserProfile(UserProfileType.DONA));
+			userProfiles.add(new UserProfileEntity(UserProfileType.DONA));
 		}
 		
 		if (getUtentiId() != null && getUtentiId() > 0) {
 			if ("N".equalsIgnoreCase(assoAvis))
-				userProfiles.add(new UserProfile(UserProfileType.OPERA));
+				userProfiles.add(new UserProfileEntity(UserProfileType.OPERA));
 			else
-				userProfiles.add(new UserProfile(UserProfileType.AVIS));
+				userProfiles.add(new UserProfileEntity(UserProfileType.AVIS));
 		} else if (getDonatore() == null)
-			userProfiles.add(new UserProfile(UserProfileType.OPERA));
+			userProfiles.add(new UserProfileEntity(UserProfileType.OPERA));
 		
 	}
 

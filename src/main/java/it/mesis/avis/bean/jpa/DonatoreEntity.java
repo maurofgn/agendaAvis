@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 import java.text.SimpleDateFormat;
 
@@ -24,7 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 		@UniqueConstraint(columnNames = "CODICEFISCALE")
 		 })
 
-public class Donatore {
+public class DonatoreEntity {
 
 	@Id
 	@Size(min=1, max=50)

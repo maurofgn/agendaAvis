@@ -1,4 +1,6 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
+
+import it.mesis.avis.enu.UserProfileType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,20 +11,20 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="USER_PROFILE")
-public class UserProfile {
+public class UserProfileEntity {
 	
-	public UserProfile() {
-	}
-	
-	public UserProfile(UserProfileType type) {
-		this.type = type.getUserProfileType();
-	}
-
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;	
 
 	@Column(name="TYPE", length=30, unique=true, nullable=false)
 	private String type = UserProfileType.DONA.getUserProfileType();
+	
+	public UserProfileEntity() {
+	}
+	
+	public UserProfileEntity(UserProfileType type) {
+		this.type = type.getUserProfileType();
+	}
 	
 	public int getId() {
 		return id;
@@ -40,7 +42,6 @@ public class UserProfile {
 		this.type = type;
 	}
 
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -56,9 +57,9 @@ public class UserProfile {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof UserProfile))
+		if (!(obj instanceof UserProfileEntity))
 			return false;
-		UserProfile other = (UserProfile) obj;
+		UserProfileEntity other = (UserProfileEntity) obj;
 		if (id != other.id)
 			return false;
 		if (type == null) {
@@ -73,6 +74,5 @@ public class UserProfile {
 	public String toString() {
 		return "UserProfile [id=" + id + ",  type=" + type	+ "]";
 	}
-	
 
 }

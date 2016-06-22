@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 //import java.sql.Timestamp;
 import it.mesis.utility.TimeUtil;
@@ -19,31 +19,31 @@ import javax.persistence.Table;
 //@Audited
 @Entity
 @Table(name = "AGENDA")
-public class Agenda {
+public class AgendaEntity {
 	
 	@EmbeddedId
-	private AgendaKey id;
+	private AgendaEntityKey id;
 
 //	@NotAudited
 	@ManyToOne(optional = true)
     @JoinColumn(name="CODINTERNODONAT")
-    private Donatore donatore;
+    private DonatoreEntity donatore;
 	
 	@Column(name = "NOTAPREN")
 	private String notapren;
 	
 	
-	public AgendaKey getId() {
+	public AgendaEntityKey getId() {
 		return id;
 	}
-	public void setId(AgendaKey id) {
+	public void setId(AgendaEntityKey id) {
 		this.id = id;
 	}
 	
-	public Donatore getDonatore() {
+	public DonatoreEntity getDonatore() {
 		return donatore;
 	}
-	public void setDonatore(Donatore donatore) {
+	public void setDonatore(DonatoreEntity donatore) {
 		this.donatore = donatore;
 	}
 

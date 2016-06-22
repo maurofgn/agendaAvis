@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -12,13 +12,13 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class AgendaKey implements Serializable {
+public class AgendaEntityKey implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	@ManyToOne(optional = false)
     @JoinColumn(name="IDMACCHINA")
-    private Macchine macchina;
+    private MacchineEntity macchina;
 	
 	@NotNull
 //	@DateTimeFormat(pattern="dd/MM/yyyy HH:mm")
@@ -26,10 +26,10 @@ public class AgendaKey implements Serializable {
 	@Column(name = "DATAORAPREN", nullable = false)
 	private java.util.Date dataorapren;
 
-	public Macchine getMacchina() {
+	public MacchineEntity getMacchina() {
 		return macchina;
 	}
-	public void setMacchina(Macchine macchina) {
+	public void setMacchina(MacchineEntity macchina) {
 		this.macchina = macchina;
 	}
 

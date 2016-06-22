@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 import java.util.Date;
 
@@ -15,13 +15,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "AUDIT")
-public class Audit {
+public class AuditEntity {
 	
-	public Audit() {
+	public AuditEntity() {
 		super();
 	}
 	
-	public Audit(String ssoId, String state) {
+	public AuditEntity(String ssoId, String state) {
 		super();
 		this.ssoId = ssoId;
 		this.created = new Date();
@@ -96,7 +96,7 @@ public class Audit {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Audit other = (Audit) obj;
+		AuditEntity other = (AuditEntity) obj;
 		if (created == null) {
 			if (other.created != null)
 				return false;

@@ -1,4 +1,4 @@
-package it.mesis.avis.model;
+package it.mesis.avis.bean.jpa;
 
 import it.mesis.util.model.TipoDonaPuntoPrel;
 
@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "MACCHINE")
-public class Macchine {
+public class MacchineEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class Macchine {
 	
 	@ManyToOne(optional = false)
     @JoinColumn(name="PP")
-    private Puntoprelievo puntoprelievo;
+    private PuntoprelievoEntity puntoprelievo;
 	
 	@Column(name = "DISPONIBILITA")
 	private String disponibilita;
@@ -36,7 +36,7 @@ public class Macchine {
 
 	@ManyToOne(optional = false)
     @JoinColumn(name="TIPODONAZ_ID")
-    private Tipodonaz tipoDonazione;
+    private TipodonazEntity tipoDonazione;
 
 
 	public int getId() {
@@ -67,17 +67,17 @@ public class Macchine {
 		this.notamacchina = notamacchina;
 	}
 	
-	public Puntoprelievo getPuntoprelievo() {
+	public PuntoprelievoEntity getPuntoprelievo() {
 		return puntoprelievo;
 	}
-	public void setPuntoprelievo(Puntoprelievo puntoprelievo) {
+	public void setPuntoprelievo(PuntoprelievoEntity puntoprelievo) {
 		this.puntoprelievo = puntoprelievo;
 	}
 	
-	public Tipodonaz getTipoDonazione() {
+	public TipodonazEntity getTipoDonazione() {
 		return tipoDonazione;
 	}
-	public void setTipoDonazione(Tipodonaz tipoDonazione) {
+	public void setTipoDonazione(TipodonazEntity tipoDonazione) {
 		this.tipoDonazione = tipoDonazione;
 	}
 	
