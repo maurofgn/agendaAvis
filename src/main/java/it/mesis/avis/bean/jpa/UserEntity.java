@@ -80,13 +80,13 @@ public class UserEntity {
 		return this.utenti;
 	}
 	
-	@Size(min=0, max=50)
-	@Column(name = "CODINTERNODONAT")
-	private String codinternodonat;
+//	@Size(min=0, max=50)
+//	@Column(name = "CODINTERNODONAT")
+//	private String codinternodonat;
 	
-	
-	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="CODINTERNODONAT", referencedColumnName = "CODINTERNODONAT", insertable = false, updatable = false)
+	@OneToOne(optional=true, fetch = FetchType.LAZY)
+//    @JoinColumn(name="CODINTERNODONAT", referencedColumnName = "CODINTERNODONAT", insertable = false, updatable = false, nullable=true)
+    @JoinColumn(name="CODINTERNODONAT", referencedColumnName = "CODINTERNODONAT")
     private DonatoreEntity donatore;
 	
 	public DonatoreEntity getDonatore() {
@@ -168,12 +168,12 @@ public class UserEntity {
 		this.utentiId = utentiId;
 	}
 	
-	public String getCodinternodonat() {
-		return codinternodonat;
-	}
-	public void setCodinternodonat(String codinternodonat) {
-		this.codinternodonat = codinternodonat;
-	}
+//	public String getCodinternodonat() {
+//		return codinternodonat;
+//	}
+//	public void setCodinternodonat(String codinternodonat) {
+//		this.codinternodonat = codinternodonat;
+//	}
 
 	public java.sql.Timestamp getLastChangePsw() {
 		return lastChangePsw;
