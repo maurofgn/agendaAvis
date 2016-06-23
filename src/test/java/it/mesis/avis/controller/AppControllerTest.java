@@ -411,7 +411,8 @@ public class AppControllerTest {
 		user.setLastChangePsw(new Timestamp(System.currentTimeMillis()) );
 		user.setState(State.ACTIVE);
 		user.setUtentiId(null);
-		user.setCodinternodonat("0005412765");
+//		user.setCodinternodonat("0005412765");
+		user.setDonatore(getDonatore());
 		user.setAssoAvis("Y");
 		user.setDonatore(getDonatore());
 		return user;
@@ -427,7 +428,7 @@ public class AppControllerTest {
 		user.setLastChangePsw(new Timestamp(System.currentTimeMillis()) );
 		user.setState(State.ACTIVE);
 		user.setUtentiId(null);
-		user.setCodinternodonat(null);
+		user.setDonatore(null);
 		user.setAssoAvis("N");
 		return user;
 	}
