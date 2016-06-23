@@ -63,7 +63,8 @@ public class UrlAuthenticationSuccessHandler implements AuthenticationSuccessHan
     	
         String targetUrl = null;
         
-    	if (user.getCodinternodonat() != null && !user.pswNotExpired(userService.getValidityDayPswDue())) {
+//    	if (user.getCodinternodonat() != null && !user.pswNotExpired(userService.getValidityDayPswDue())) {
+    	if (user.getDonatore() != null && !user.pswNotExpired(userService.getValidityDayPswDue())) {
     		auditService.audit(authentication.getName(), "Scadenza password tra " + (userService.getValidityDayPsw() - user.daysPasswordExpiry() + 1) + " gg");
     		return "/changePassword";	//solo per donatori. Le credenziali stanno per scadere
     	}
