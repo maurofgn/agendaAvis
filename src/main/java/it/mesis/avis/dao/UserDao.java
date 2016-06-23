@@ -38,6 +38,8 @@ public interface UserDao {
 	void credentialsExpired(String sso);
 
 	void updateOldPsw(String sso, String newPsw);
+
+	Long count();
 	
 }
 
