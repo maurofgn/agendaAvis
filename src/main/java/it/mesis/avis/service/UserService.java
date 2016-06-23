@@ -49,5 +49,7 @@ public interface UserService {
 	UserEntity findUserByCodFisc(String codFisc);
 	
 	void updateOldPsw(String sso, String newPsw);
+	
+	Long count();
 
 }

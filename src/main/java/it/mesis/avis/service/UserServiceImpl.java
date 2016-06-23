@@ -145,8 +145,11 @@ public class UserServiceImpl implements UserService{
 		dao.updateOldPsw(sso, newPsw);
 	}
 
+	@Override
+	public Long count() {
+		return dao.count();
+	}
 
-	
 //	public Collection<? extends GrantedAuthority> getRoles() {
 ////		Principal p = request.getUserPrincipal();
 //		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
