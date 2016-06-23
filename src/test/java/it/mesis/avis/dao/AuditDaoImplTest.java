@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,9 @@ public class AuditDaoImplTest extends EntityDaoImplTest {
 
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-		java.io.InputStream is = this.getClass().getClassLoader().getResourceAsStream("audit.xml");
-		IDataSet dataSet = new FlatXmlDataSet(is);
+		
+		FlatXmlDataSetBuilder flatXmlDataSetBuilder = new FlatXmlDataSetBuilder();
+		IDataSet dataSet = flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("audit.xml"));
 		return dataSet;
 	}
 	

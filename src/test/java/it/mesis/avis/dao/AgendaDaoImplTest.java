@@ -22,7 +22,7 @@ import java.util.List;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,16 +60,29 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 //		System.out.println(dataSet);
 //		IDataSet retValue = dataSet;
 		
+		FlatXmlDataSetBuilder flatXmlDataSetBuilder = new FlatXmlDataSetBuilder();
+		
 		IDataSet[] datasets = new IDataSet[] {
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("macchine.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("donatore.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("agenda.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("user_profile.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("utenti.xml")),
-			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("app_user.xml"))
-		  };
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("macchine.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("donatore.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("agenda.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("user_profile.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("utenti.xml")),
+				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("app_user.xml"))
+			  };
+
+//		IDataSet[] datasets = new IDataSet[] {
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("macchine.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("donatore.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("agenda.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("user_profile.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("utenti.xml")),
+//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("app_user.xml"))
+//		  };
 		
 		CompositeDataSet retValue = new CompositeDataSet(datasets);
 		
