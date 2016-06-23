@@ -31,7 +31,7 @@
 		
 		<mockito.version>1.10.19</mockito.version>
 		<h2.version>1.4.187</h2.version>
-		<dbunit.version>2.2</dbunit.version>
+		<dbunit.version>2.5.2</dbunit.version>
 		<sqlbuilder.version>2.1.2</sqlbuilder.version>
 		<org.slf4j.version>1.7.13</org.slf4j.version>
 		
@@ -246,7 +246,7 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>${log4j.version}</version>
-		</dependency>
+		</dependency> 
 		
 		<!-- Testing dependencies -->
 		<dependency>
@@ -267,18 +267,14 @@
 			<version>${h2.version}</version>
 			<scope>test</scope>
 		</dependency>
+			
 		<dependency>
-			<groupId>dbunit</groupId>
-			<artifactId>dbunit</artifactId>
-			<version>${dbunit.version}</version>
+		    <groupId>org.dbunit</groupId>
+		    <artifactId>dbunit</artifactId>
+		    <version>${dbunit.version}</version>
 			<scope>test</scope>
 		</dependency>
-<!--   		<dependency> -->
-<!-- 			<groupId>junit</groupId> -->
-<!-- 			<artifactId>junit-dep</artifactId> -->
-<!-- 			<version>${junit.version}</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
+			
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
