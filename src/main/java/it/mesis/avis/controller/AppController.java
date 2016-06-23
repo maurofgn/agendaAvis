@@ -343,8 +343,8 @@ public class AppController {
 		model.addAttribute("yearMonthPrev", yearMontInList(yearMonth.prev(), userSession.getListYearMonth()));
 		model.addAttribute("yearMonthNext", yearMontInList(yearMonth.next(), userSession.getListYearMonth()));
 		
-		model.addAttribute("listTipoDonaz", agendaService.getTipoDonazList());
-		model.addAttribute("listPuntiPrel", agendaService.getPuntiPrelievoList());
+//		model.addAttribute("listTipoDonaz", agendaService.getTipoDonazList());
+//		model.addAttribute("listPuntiPrel", agendaService.getPuntiPrelievoList());
 
 		if (userSession.getDonaStatus() != null) {
 			userSession.setYearMonth(yearMonth);
