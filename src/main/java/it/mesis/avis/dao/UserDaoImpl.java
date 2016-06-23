@@ -26,6 +26,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -48,7 +49,12 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
 			return null;
 		Criteria crit = createEntityCriteria()
 				.add(Restrictions.eq("ssoId", sso));
-		return (UserEntity) crit.uniqueResult();
+		UserEntity userEntity = (UserEntity) crit.uniqueResult();
+		
+//		if (userEntity != null)
+//			Hibernate.initialize(userEntity.getDonatore());	//forza il load del donatore
+		
+		return userEntity;
 	}
 	
 	@Override
@@ -190,8 +196,9 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
 		DonatoreEntity donatore = user.getDonatore();
 		
 		DonaStatus donaStatus = null;
+//		if (donatore != null && !donatore.getCodinternodonat().isEmpty()) {
 		if (donatore != null) {
-			
+
 			donaStatus = donatore.getDonaStatus(dayBefore);
 			
 //			donaStatus.getStatus().forEach(donaStatusType -> donaStatusType.setSuspended(isSuspend(donaStatusType, donatore.getCodinternodonat())));
@@ -394,6 +401,11 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
 //		int count = query.executeUpdate();
 //		if (count != 1)
 //			System.out.println("non aggiornato");
+	}
+	
+	@Override
+	public Long count() {
+		return (Long) createEntityCriteria().setProjection(Projections.rowCount()).uniqueResult();
 	}
 
 }
