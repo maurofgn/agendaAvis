@@ -46,10 +46,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             return;
         }
         
-        String ssoId = "test@test.com";
-        UserEntity user = userService.findBySso(ssoId);
+        Long userCount = userService.count();
         
-        if (alreadySetup = user != null) {
+//        String ssoId = "test@test.com";
+//        UserEntity user = userService.findBySso(ssoId);
+        
+        if (alreadySetup = userCount > 0) {
             return;
         }
 
@@ -65,8 +67,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             createRoleIfNotFound(userProfileType);
 		}
         
-        user = new UserEntity();
-        user.setSsoId(ssoId);
+        UserEntity user = new UserEntity();
+        user.setSsoId("test@test.com");
         user.setPassword(passwordEncoder.encode("1"));
         user.setAssoAvis("Y");
         user.setState(State.ACTIVE);
