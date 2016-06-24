@@ -64,21 +64,27 @@ public class UserEntity {
 	@Column(name = "STATE", nullable = false)
 	private String state = State.ACTIVE.getState();
 
-	@Column(name = "UTENTI_ID")
-	private Short utentiId;
+//	@Column(name = "UTENTI_ID")
+//	private Short utentiId;
 	
 	@NotEmpty
 	@Column(name = "asso_avis", nullable = false, length=1, columnDefinition = "varchar(1) NOT NULL default 'N'")
 	private String assoAvis = "N";
 
 //	@OneToOne(fetch = FetchType.LAZY, mappedBy = "utenti", cascade = CascadeType.ALL)
-	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="UTENTI_ID", referencedColumnName = "ID", insertable = false, updatable = false)
+//    @JoinColumn(name="UTENTI_ID", referencedColumnName = "ID", insertable = false, updatable = false)
+	@OneToOne(optional=true, fetch = FetchType.LAZY)
+    @JoinColumn(name="UTENTI_ID", referencedColumnName = "ID")
     private UtentiEntity utenti;
 	
 	public UtentiEntity getUtenti() {
 		return this.utenti;
 	}
+	
+	public void setUtenti(UtentiEntity utenti) {
+		this.utenti = utenti;
+	}
+	
 	
 //	@Size(min=0, max=50)
 //	@Column(name = "CODINTERNODONAT")
@@ -136,7 +142,7 @@ public class UserEntity {
 	 * @return psw dell'utente se è definita, diversamente torna la password definita in app_user (donatore)
 	 */
 	public String getPasswordDefault() {
-		return getUtentiId() != null && getUtenti().getPassword() != null && !getUtenti().getPassword().isEmpty() 
+		return getUtenti() != null && getUtenti().getPassword() != null && !getUtenti().getPassword().isEmpty() 
 				? getUtenti().getPassword() 
 				: password;
 	}
@@ -161,12 +167,12 @@ public class UserEntity {
 		this.state = state.getState();
 	}
 	
-	public Short getUtentiId() {
-		return utentiId;
-	}
-	public void setUtentiId(Short utentiId) {
-		this.utentiId = utentiId;
-	}
+//	public Short getUtentiId() {
+//		return utentiId;
+//	}
+//	public void setUtentiId(Short utentiId) {
+//		this.utentiId = utentiId;
+//	}
 	
 //	public String getCodinternodonat() {
 //		return codinternodonat;
@@ -306,7 +312,7 @@ public class UserEntity {
 			userProfiles.add(new UserProfileEntity(UserProfileType.DONA));
 		}
 		
-		if (getUtentiId() != null && getUtentiId() > 0) {
+		if (getUtenti() != null && getUtenti().getId() > 0) {
 			if ("N".equalsIgnoreCase(assoAvis))
 				userProfiles.add(new UserProfileEntity(UserProfileType.OPERA));
 			else
