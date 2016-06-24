@@ -16,6 +16,7 @@ package it.mesis.utility;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -945,5 +946,36 @@ public class TimeUtil
 	public static DateFromTo getDateRange(Date dateFrom, Date dateTo) {
 		return new DateFromTo(dateFrom, dateTo);
 	}
+	
+	/**
+	 * 
+	 * @param shortName formato del nome corto/lungo 
+	 * @param locale
+	 * @return lista di nomi dei giorni della settimana nella lingua e nell'ordine di locale
+	 */
+	public static List<String> daysWeekName(boolean shortName, Locale locale) {
+		int fdow = 1;
+		DateFormatSymbols dfs = null;
+		
+		if (locale != null) {
+			fdow = Calendar.getInstance(locale).getFirstDayOfWeek();
+			dfs = DateFormatSymbols.getInstance(locale);
+			
+		} else {
+			fdow = Calendar.getInstance().getFirstDayOfWeek();
+			dfs = DateFormatSymbols.getInstance();
+		}
+		
+		String[] weekdays = shortName ? dfs.getShortWeekdays() : dfs.getWeekdays();
+		
+		List<String> retValue = new ArrayList<String>(7);
+		for (int i = 0; i < weekdays.length; i++) {
+			int gg = (i+fdow) % weekdays.length;
+			if (gg != 0)
+				retValue.add(weekdays[gg]);
+		}
+		return retValue;
+	}
+	
 	
 }
