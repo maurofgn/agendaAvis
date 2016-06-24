@@ -4,6 +4,8 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%> 
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
+<%@ page import="it.mesis.utility.TimeUtil" %>
+
 <c:set var="language" value="${not empty param.language ? param.language : not empty language ? language : pageContext.request.locale}" scope="session" />
 <fmt:setLocale value="${language}" />
 <fmt:setBundle basename="messages" var="lang" />
@@ -377,20 +379,15 @@ function populateDonars(data) {
 		
     </div>
     
-    
 	<div class="flex-itemTable"  >
 	    
 		<table id="week" class="table table-bordered">
 		    <thead>
-		      <tr>
-		        <th class="text-center">Lun</th>
-		        <th class="text-center">Mar</th>
-		        <th class="text-center">Mer</th>
-		        <th class="text-center">Gio</th>
-		        <th class="text-center">Ven</th>
-		        <th class="text-center">Sab</th>
-		        <th class="text-center">Dom</th>
-		      </tr>
+
+			    <c:forEach items="${TimeUtil.daysWeekName(true, $pageContext.request.locale)}" var="weekDayName">
+			    	<th class="text-center">${weekDayName}</th>
+			    </c:forEach>
+
 		    </thead>
 		    <tbody>
 		    
@@ -436,51 +433,67 @@ function populateDonars(data) {
 		    </tbody>
 		</table>
 		
-		<div class="row">
-			<div class="form-group col-md-12">
-			
-				<c:if test="${empty monthlyBookings.agendaKey}">
-			
-					<div class="col-md-5" style="text-align:right;" >
-						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthPrev}">disabled</c:if>>
-							<span class="glyphicon glyphicon-step-backward"></span>
-						</a>
-					</div>
-					
-					<div class="col-md-2" style="text-align:center;">
-					</div>			
-					
-					<div class="col-md-5" style="text-align:left;">
-						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthNext}">disabled</c:if>>
-							<span class="glyphicon glyphicon-step-forward"></span>
-						</a>
-					</div>
-				</c:if>	
+		
+		<c:if test="${months > 1 && not empty monthlyBookings}">
+		
+			<div class="row">
+				<div class="form-group col-md-12">
 				
-				<c:if test="${not empty monthlyBookings.agendaKey}">
-			
-					<div class="col-md-3" style="text-align:right;" >
-						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthPrev}">disabled</c:if>>
-							<span class="glyphicon glyphicon-step-backward"></span>
-						</a>
-					</div>
-					
-					<div class="col-md-6" style="text-align:center;">
-						<a href="<c:url value='agenda' />" class="btn btn-primary">
-							<fmt:message key="agenda.para.current" bundle="${lang}"/>
-						</a>
-					</div>			
-					
-					<div class="col-md-3" style="text-align:left;">
-						<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" <c:if test="${empty yearMonthNext}">disabled</c:if>>
-							<span class="glyphicon glyphicon-step-forward"></span>
-						</a>
-					</div>
-				</c:if>					
+					<c:if test="${not monthlyBookings.prenoNotInMonth}">
 				
+						<div class="col-md-5" style="text-align:right;" >
+							<c:if test="${not empty yearMonthPrev}">
+								<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" >
+									<span class="glyphicon glyphicon-step-backward"></span>
+								</a>
+							</c:if>
+						</div>
+						
+						<div class="col-md-2" style="text-align:center;">
+						</div>			
+						
+						<div class="col-md-5" style="text-align:left;">
+							<c:if test="${not empty yearMonthNext}">
+								<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" >
+									<span class="glyphicon glyphicon-step-forward"></span>
+								</a>
+							</c:if>
+						</div>
+					</c:if>	
+					
+					
+					<c:if test="${monthlyBookings.prenoNotInMonth}">
+				
+						<div class="col-md-3" style="text-align:right;" >
+						
+							<c:if test="${not empty yearMonthPrev}">
+								<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthPrev.valToString}' />" class="btn btn-primary" >
+									<span class="glyphicon glyphicon-step-backward"></span>
+								</a>
+							</c:if>
+						</div>
+						
+						<div class="col-md-6" style="text-align:center;">
+							<a href="<c:url value='agenda' />" class="btn btn-primary">
+								<fmt:message key="agenda.para.current" bundle="${lang}"/>
+							</a>
+						</div>			
+						
+						<div class="col-md-3" style="text-align:left;">
+							<c:if test="${not empty yearMonthNext}">
+								<a href="<c:url value='agenda?tipoDonazPuntiPrel=${tipoDonazPuntiPrelSelected.valToString}&yearMonth=${yearMonthNext.valToString}' />" class="btn btn-primary" >
+									<span class="glyphicon glyphicon-step-forward"></span>
+								</a>
+							</c:if>
+						</div>
+					</c:if>					
+					
+					
+				</div>
 				
 			</div>
-		</div>
+		</c:if>
+		
 		
 	</div>
 	
