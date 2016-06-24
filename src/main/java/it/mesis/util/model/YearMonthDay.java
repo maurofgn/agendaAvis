@@ -34,6 +34,8 @@ public class YearMonthDay extends YearMonth {
 			weekDay = weekDay - FIRST_DAY_OF_WEEK;				//nr giorno della settimana ==> lun=0, Mar=1, Mer=2, Gio=3, Ven=4, Sab=5, Dom=6
 			if (weekDay < 0)
 				weekDay = 6;
+			
+			yearMonth = new YearMonth(gc.get(GregorianCalendar.YEAR), gc.get(GregorianCalendar.MONTH));
 		}
 	}
 	
