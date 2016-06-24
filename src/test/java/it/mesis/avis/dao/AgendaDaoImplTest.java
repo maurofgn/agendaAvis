@@ -62,6 +62,13 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		
 		FlatXmlDataSetBuilder flatXmlDataSetBuilder = new FlatXmlDataSetBuilder();
 		
+		/**
+		 * senza questo flag, le colonne sono definite solo dalla prima riga,
+		 * per cui colonne non presenti nella prima riga (colonne con null value)
+		 * non vengono gestite se presenti in righe successive.
+		 */
+		flatXmlDataSetBuilder.setColumnSensing(true);	
+		
 		IDataSet[] datasets = new IDataSet[] {
 				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
 				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
@@ -73,17 +80,6 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 				flatXmlDataSetBuilder.build(this.getClass().getClassLoader().getResourceAsStream("app_user.xml"))
 			  };
 
-//		IDataSet[] datasets = new IDataSet[] {
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("tipodonaz.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("puntoprelievo.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("macchine.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("donatore.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("agenda.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("user_profile.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("utenti.xml")),
-//			new FlatXmlDataSet(this.getClass().getClassLoader().getResourceAsStream("app_user.xml"))
-//		  };
-		
 		CompositeDataSet retValue = new CompositeDataSet(datasets);
 		
 		ITable donatores = retValue.getTable("donatore");
@@ -124,11 +120,10 @@ public class AgendaDaoImplTest extends EntityDaoImplTest {
 		agendaKey.setMacchina(macchina);
 		agendaKey.setDataorapren(dataOraPreno);
 		
-		
 //		ITable users = retValue.getTable("app_user");
 //		for (int row = 0; row < users.getRowCount(); row++) {
 //			try {
-//				System.out.println(users.getValue(row, "CODINTERNODONAT"));
+//				System.out.println(users.getValue(row, "utenti_id"));
 //			} catch (Exception e) {
 //				continue;
 ////				e.printStackTrace();
