@@ -345,6 +345,10 @@ public class AppController {
 		
 		model.addAttribute("listTipoDonaz", agendaService.getTipoDonazList());
 		model.addAttribute("listPuntiPrel", agendaService.getPuntiPrelievoList());
+		
+		model.addAttribute("months", userSession.getListYearMonth() != null ? userSession.getListYearMonth().size() : 0);	//nr mesi navigabili 
+		
+		
 
 		if (userSession.getDonaStatus() != null) {
 			userSession.setYearMonth(yearMonth);
@@ -355,9 +359,14 @@ public class AppController {
 		return PREFIX_PATH + "agenda";
 	}
 
-	
+	/**
+	 * 
+	 * @param yearMonth
+	 * @param listYearMonth
+	 * @return YearMonth se questo è presente in listYearMonth
+	 */
 	private YearMonth yearMontInList(YearMonth yearMonth, List<YearMonth> listYearMonth) {
-		return listYearMonth.contains(yearMonth) ? yearMonth : null;
+		return listYearMonth != null && listYearMonth.contains(yearMonth) ? yearMonth : null;
 	}
 	
 	private TipoDonaPuntoPrel getTipoDonaPuntoPrelFromReq (List<TipoDonaPuntoPrel> listTipoDonaPuntoPrel, int tipoDon, int puntoPrel) {
