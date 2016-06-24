@@ -19,6 +19,7 @@ public class MonthlyBookings {
 	private YearMonth yearMonth;
 	private TipoDonaPuntoPrel tipoDonazPuntoPrel;
 	private int lastDay;
+	private YearMonthDay dayPreno;			//giorno di prenotazione
 	
 //	private boolean updateable;
 //	private boolean donor;
@@ -47,7 +48,7 @@ public class MonthlyBookings {
 		
 		AgendaEntityKey agendaKey = getAgendaKey();
 		
-		YearMonthDay dayPreno = agendaKey != null
+		dayPreno = agendaKey != null
 			? new YearMonthDay(agendaKey.getDataorapren()) 
 			: null;	//giorno in cui c'è una prenotazione attiva
 			
@@ -168,5 +169,13 @@ public class MonthlyBookings {
 			return null;	//fuori range
 		
 		return bookingsWeek[week][weekDay] != null ? bookingsWeek[week][weekDay] : new Booking(YearMonthDay.VOID, false, true);
+	}
+	
+	/**
+	 * 
+	 * @return true se esiste una prenotazione e questa non è nel mese corrente
+	 */
+	public boolean getPrenoNotInMonth() {
+		return dayPreno != null && !dayPreno.getYearMonth().equals(yearMonth);
 	}
 }
