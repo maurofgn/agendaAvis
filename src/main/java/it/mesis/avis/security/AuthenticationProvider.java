@@ -21,7 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component("authenticationProvider")
-public class LimitLoginAuthenticationProvider extends DaoAuthenticationProvider {
+public class AuthenticationProvider extends DaoAuthenticationProvider {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
