@@ -34,7 +34,7 @@ public class HibernateConfiguration {
 //    private Environment environment;
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory() {    	
+    public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
 //        sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.model", "it.mesis.avis.revision" });
