@@ -253,16 +253,31 @@ public class UserEntity {
 
 	/**
 	 * 
-	 * @return delta in giorni tra data ultimo cambio password ed oggi, se LastChangePsw is null --> 0
+	 * @return delta in giorni trascorsi dalla data ultimo cambio password ad oggi, se ultimo cambio password is null ==> 2147483647
 	 * 
 	 */
 	public int daysPasswordExpiry() {
-		if (getLastChangePsw() == null)
-			return Integer.MAX_VALUE;
-		Interval interval = new Interval(getLastChangePsw().getTime(), new Date().getTime());
-		return interval.toDuration().toStandardDays().getDays();
+		return getLastChangePsw() == null ? Integer.MAX_VALUE : daysPast(getLastChangePsw(), new Date());
 	}
-
+	
+	/**
+	 * giorni trascorsi da dateFrom a dateTo, se dateFrom > dateTo il risultato sarà negativo. (usa joda-time)
+	 * 
+	 * @param dateFrom cannot be null
+	 * @param dateTo cannot be null
+	 * @return giorni trascorsi
+	 * @throws IllegalArgumentException 
+	 */
+	private Integer daysPast(Date dateFrom, Date dateTo) {
+		
+		boolean sign = dateFrom.compareTo(dateTo) < 0;
+		Interval interval = sign 
+			? new Interval(dateFrom.getTime(), dateTo.getTime()) 
+			: new Interval(dateTo.getTime(), dateFrom.getTime());
+		
+		return interval.toDuration().toStandardDays().getDays() * (sign ? 1 :-1);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
