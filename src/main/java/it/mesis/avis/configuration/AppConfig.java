@@ -1,7 +1,7 @@
 package it.mesis.avis.configuration;
 
 import it.mesis.avis.Application;
-import it.mesis.avis.interceptor.Trasfusionale;
+import it.mesis.avis.interceptor.MyInterceptor;
 
 import java.util.Properties;
 
@@ -82,14 +82,14 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	 * @return Trasfusionale
 	 */
 	@Bean
-	public Trasfusionale trasfusionaleInterceptor() {
-	    return new Trasfusionale();
+	public MyInterceptor myInterceptor() {
+	    return new MyInterceptor();
 	}
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-	    InterceptorRegistration registration = registry.addInterceptor(trasfusionaleInterceptor());
-	    registration.excludePathPatterns("/login", "/logout", "/defineSid");	//pattern url per i quali non viene eseguito il filtro   
+	    InterceptorRegistration registration = registry.addInterceptor(myInterceptor());
+	    registration.excludePathPatterns("/login", "/logout", "/defineSid");	// URL pattern for which the filter is excluded
 	}
 	
     @Bean
@@ -116,11 +116,8 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
 
 		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-		
 		propertySourcesPlaceholderConfigurer.setNullValue("@null");	//stringa con la quale si riconosce il null
-
 		String activeProfile = System.getProperty("spring.profiles.active", "production");
-
 		ClassPathResource resource = null;
 		// choose different property files for different active profile
 		if ("development".equalsIgnoreCase(activeProfile)) {
