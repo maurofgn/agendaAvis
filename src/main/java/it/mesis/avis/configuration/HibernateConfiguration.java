@@ -41,11 +41,33 @@ public class HibernateConfiguration {
         sessionFactory.setPackagesToScan(new String[] { "it.mesis.avis.bean.jpa", "it.mesis.avis.revision" });
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
-        
-        
-        
      }
-	
+    
+/**
+ * Uso di jpa invece di hibernate    
+ * 
+ */
+//    
+//    @Bean
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws NamingException {
+//        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+//        factoryBean.setDataSource(dataSource());
+//        factoryBean.setPackagesToScan(new String[] { "it.mesis.avis.bean.jpa", "it.mesis.avis.revision" });
+//        factoryBean.setJpaVendorAdapter(jpaVendorAdapter());
+//        factoryBean.setJpaProperties(hibernateProperties());
+//        return factoryBean;
+//    }
+// 
+//    /*
+//     * Provider specific adapter.
+//     */
+//    @Bean
+//    public JpaVendorAdapter jpaVendorAdapter() {
+//        HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
+//        return hibernateJpaVendorAdapter;
+//    }
+    
+    
 //    @Profile("Production")
     @Bean
     public DataSource dataSource() {
