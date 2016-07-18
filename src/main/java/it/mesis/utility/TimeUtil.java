@@ -27,6 +27,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+import org.joda.time.Interval;
+
 /**
  *	Time Utilities
  *
@@ -490,6 +492,28 @@ public class TimeUtil
 			return counter * -1;
 		return counter;
 	}	//	getDatesBetrween
+	
+	
+	/**
+	 * giorni trascorsi da dateFrom a dateTo, se dateFrom > dateTo il risultato sarà negativo.
+	 * (usa joda-time)
+	 * @param dateFrom cannot be null
+	 * @param dateTo cannot be null
+	 * @return giorni trascorsi
+	 * @throws IllegalArgumentException 
+	 */
+	public static Integer daysPast(Date dateFrom, Date dateTo) throws IllegalArgumentException {
+		
+		if (dateFrom == null || dateTo == null)
+			throw new IllegalArgumentException("params cannot be null.");
+		
+		boolean sign = dateFrom.compareTo(dateTo) < 0;
+		Interval interval = sign 
+			? new Interval(dateFrom.getTime(), dateTo.getTime()) 
+			: new Interval(dateTo.getTime(), dateFrom.getTime());
+		
+		return interval.toDuration().toStandardDays().getDays() * (sign ? 1 :-1);
+	}	
 
 	/**
 	 * 	Return Day + offset (truncates)
