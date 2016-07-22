@@ -78,7 +78,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	/**
-	 * Questo metodo è necessario, diversamente Trasfusionale non è interno all'ambiente di spring e non può ricevere eventuali iniezzioni
+	 * Questo metodo è necessario, diversamente non è interno all'ambiente di spring e non può essere iniettato
 	 * @return Trasfusionale
 	 */
 	@Bean
