@@ -27,6 +27,7 @@ import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.Interval;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "APP_USER")
@@ -269,7 +270,8 @@ public class UserEntity {
 	 * @throws IllegalArgumentException 
 	 */
 	private Integer daysPast(Date dateFrom, Date dateTo) {
-		
+		Assert.notNull(dateFrom, "'dateFrom' is required.");
+		Assert.notNull(dateTo, "'dateTo' is required.");
 		boolean sign = dateFrom.compareTo(dateTo) < 0;
 		Interval interval = sign 
 			? new Interval(dateFrom.getTime(), dateTo.getTime()) 

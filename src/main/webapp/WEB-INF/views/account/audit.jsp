@@ -132,6 +132,9 @@ $(document).ready(function() {
         	{
             url : "auditRecsPages",
             type: "GET", // This is the default value, could also be POST
+            "beforeSend": function (msg) {
+                console.log("2-sending...");
+            },
             data: function(d) {
                     d.dateFrom = $('#dateFrom').val();
                 	d.dateTo = $('#dateTo').val();
